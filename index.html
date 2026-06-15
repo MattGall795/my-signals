@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en"> <!-- 关键点：这里添加了 lang="en" -->
 <head>
+    <meta charset="UTF-8"> <!-- 建议添加：确保字符编码正确 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 建议添加：确保移动端适配 -->
     <base target="_top">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Roboto+Mono:wght@500;700&display=swap');
@@ -120,7 +122,7 @@
         let globalRows = [];
         const sigLabels = ["Morning Signal", "Extra Signal 1", "Extra Signal 2", "Evening Signal", "VIP2 Signal", "Team Signal"];
 
-       const API_URL = "https://script.google.com/macros/s/AKfycbyjgP77NdjATECNUrGyQ-hGUGW3wj-hMn10dHEqqX0Yq4x32Ps0jOMYCgjLW_pz2-vt/exec"; // 替换成你刚才复制的链接
+        const API_URL = "https://script.google.com/macros/s/AKfycbyjgP77NdjATECNUrGyQ-hGUGW3wj-hMn10dHEqqX0Yq4x32Ps0jOMYCgjLW_pz2-vt/exec";
 
 window.onload = () => {
     fetch(API_URL)
@@ -131,7 +133,6 @@ window.onload = () => {
                 return;
             }
             
-            // 设置 Logo
             const logoImg = document.getElementById('logo');
             if (data.logo) {
                 logoImg.src = data.logo;
