@@ -6,12 +6,11 @@
     <title>STAR GROUP | Global Incentive Dashboard</title>
     
     <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     
     <style>
         :root {
-            /* 非洲暖色调 + 透明度定义 */
             --glass-bg: rgba(255, 255, 255, 0.15);
             --safari-red: #a3141c;
             --sunset-gold: #f9a826;
@@ -24,7 +23,6 @@
             font-family: 'Segoe UI', Arial, sans-serif;
             margin: 0;
             padding: 40px 20px;
-            /* 背景采用更具动感的日落渐变，以衬托毛玻璃 */
             background: linear-gradient(135deg, #fdf5e6 0%, #ffcc80 50%, #e64a19 100%);
             background-attachment: fixed;
             min-height: 100vh;
@@ -33,7 +31,6 @@
             align-items: center;
         }
 
-        /* 顶部区域 */
         .header-container {
             display: flex;
             align-items: center;
@@ -57,7 +54,7 @@
             text-shadow: 2px 2px 8px rgba(0,0,0,0.1);
         }
         .sub-ribbon {
-            background: rgba(46, 125, 50, 0.85); /* 半透明丛林绿 */
+            background: rgba(46, 125, 50, 0.85);
             backdrop-filter: blur(5px);
             color: white;
             padding: 8px 25px;
@@ -69,7 +66,6 @@
             border: 1px solid rgba(255,255,255,0.2);
         }
 
-        /* 毛玻璃立体表格容器 */
         .glass-wrapper {
             width: 100%;
             max-width: 1100px;
@@ -78,7 +74,6 @@
             -webkit-backdrop-filter: blur(15px) saturate(180%);
             border-radius: 25px;
             border: 1px solid rgba(255, 255, 255, 0.3);
-            /* 立体阴影：一层深阴影，一层环境光阴影 */
             box-shadow: 
                 0 20px 50px rgba(0, 0, 0, 0.15),
                 inset 0 0 20px rgba(255, 255, 255, 0.1);
@@ -87,13 +82,13 @@
             transition: transform 0.3s ease;
         }
         .glass-wrapper:hover {
-            transform: translateY(-5px); /* 悬浮感 */
+            transform: translateY(-5px);
         }
 
         table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0 10px; /* 行间距创造层次感 */
+            border-spacing: 0 10px;
         }
 
         th {
@@ -105,7 +100,6 @@
             border-bottom: 2px solid var(--safari-red);
         }
 
-        /* 每一行都做成一个独立的玻璃卡片 */
         tbody tr {
             background: rgba(255, 255, 255, 0.4);
             transition: all 0.3s ease;
@@ -137,7 +131,6 @@
 
         .desc-text { color: var(--earth-brown); line-height: 1.6; font-weight: 500; }
 
-        /* 状态图标立体化 */
         .icon-check { color: var(--jungle-green); font-size: 2.5em; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
         .icon-clock { color: var(--sunset-gold); font-size: 2.2em; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
         
@@ -149,7 +142,6 @@
             color: var(--safari-red);
         }
 
-        /* 毛玻璃页脚 */
         .footer {
             width: 100%;
             max-width: 1100px;
@@ -172,11 +164,10 @@
             font-size: 1.1em;
         }
 
-        /* 移动端适配 */
         @media (max-width: 768px) {
             .header-container { flex-direction: column; text-align: center; }
             .header-title { font-size: 2.5em; }
-            th { display: none; } /* 手机端隐藏表头以节省空间 */
+            th { display: none; }
             td { display: block; text-align: center; border: none !important; }
             .activity-name { justify-content: center; }
         }
@@ -206,7 +197,7 @@
             <tbody id="table-body">
                 <tr><td colspan="3" style="text-align:center; padding: 60px;">
                     <i class="fas fa-sun fa-spin fa-3x" style="color: var(--sunset-gold);"></i>
-                    <p style="font-weight: bold; color: var(--safari-red);">Loading African Sun Data...</p>
+                    <p style="font-weight: bold; color: var(--safari-red);">Syncing Savanna Data...</p>
                 </td></tr>
             </tbody>
         </table>
@@ -231,10 +222,10 @@
                 if (index === 0 || !row[0] || row[0].trim() === "") return;
 
                 const name = row[0].trim();
-                let icon = row[1] ? row[1].trim() : 'fas fa-star';
+                let icon = row[1] ? row[1].trim() : 'star';
                 if (!icon.includes('fa-')) icon = 'fas fa-' + icon;
 
-                const desc = row[2] ? row[2].trim() : 'Strategic details incoming...';
+                const desc = row[2] ? row[2].trim() : 'Strategic details pending...';
                 const isLongTerm = row[3] && /TRUE|YES|Y|是/i.test(row[3].trim());
                 const note = row[4] ? row[4].trim() : '';
                 
