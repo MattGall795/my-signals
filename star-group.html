@@ -15,7 +15,6 @@
             --sunset-gold: #f9a826;
             --jungle-green: #2e7d32;
             --earth-brown: #3e2723;
-            --accent-glow: rgba(249, 168, 38, 0.4);
         }
 
         body {
@@ -31,7 +30,6 @@
             color: var(--earth-brown);
         }
 
-        /* 头部动画增强 */
         .header-container {
             display: flex;
             align-items: center;
@@ -54,7 +52,7 @@
         
         .header-title {
             color: var(--safari-red);
-            font-size: clamp(2em, 5vw, 3.5em);
+            font-size: clamp(2.2em, 5vw, 3.5em);
             font-weight: 900;
             font-style: italic;
             margin: 0;
@@ -64,7 +62,6 @@
         
         .sub-ribbon {
             background: linear-gradient(90deg, var(--jungle-green), #43a047);
-            backdrop-filter: blur(5px);
             color: white;
             padding: 10px 25px;
             border-radius: 50px;
@@ -78,7 +75,6 @@
             letter-spacing: 1px;
         }
 
-        /* 玻璃拟态容器 */
         .glass-wrapper {
             width: 100%;
             max-width: 1100px;
@@ -90,7 +86,7 @@
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
             padding: 30px;
             margin-bottom: 40px;
-            overflow: hidden;
+            min-height: 300px;
         }
 
         table {
@@ -107,12 +103,12 @@
             font-weight: 800;
             font-size: 0.85em;
             border-bottom: 2px solid rgba(163, 20, 28, 0.2);
+            text-align: left;
         }
 
         tbody tr {
             background: rgba(255, 255, 255, 0.5);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
         }
 
         tbody tr td {
@@ -146,10 +142,9 @@
             align-items: center;
             justify-content: center;
             border-radius: 10px;
-            font-size: 0.9em;
         }
 
-        .desc-text { color: var(--earth-brown); line-height: 1.6; font-weight: 500; }
+        .desc-text { color: var(--earth-brown); line-height: 1.6; font-weight: 500; font-size: 0.95em; }
 
         .icon-check { color: var(--jungle-green); font-size: 2.2em; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
         .icon-clock { color: var(--sunset-gold); font-size: 2em; animation: pulse 2s infinite; }
@@ -169,7 +164,6 @@
             text-transform: uppercase;
         }
 
-        /* 页脚增强 */
         .footer {
             width: 100%;
             max-width: 1100px;
@@ -179,7 +173,6 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .footer span {
@@ -189,25 +182,17 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            font-size: 0.95em;
+            font-size: 0.9em;
         }
         .footer i { color: var(--sunset-gold); }
 
-        /* 加载状态 */
         #loader { text-align: center; padding: 60px; }
-        .shimmer {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer { to { background-position: -200% 0; } }
 
         @media (max-width: 768px) {
             .header-container { flex-direction: column; text-align: center; }
             th { display: none; }
             td { display: block; text-align: center; padding: 15px !important; }
             .activity-name { justify-content: center; }
-            .glass-wrapper { padding: 15px; }
         }
     </style>
 </head>
@@ -218,7 +203,7 @@
         <div class="header-text-content">
             <h1 class="header-title">Radiant Future, Shared Success.</h1>
             <div class="sub-ribbon">
-                <i class="fas fa-shield-halved"></i> STAR Encryption Secure Access
+                <i class="fas fa-lock"></i> Encrypted Strategy Dashboard
             </div>
         </div>
     </div>
@@ -227,16 +212,16 @@
         <table id="data-table">
             <thead>
                 <tr>
-                    <th width="25%">Strategic Initiatives</th>
-                    <th width="55%">Deployment Details</th>
-                    <th width="20%">Status</th>
+                    <th width="25%">Incentive Project</th>
+                    <th width="55%">Operational Details</th>
+                    <th width="20%" style="text-align: center;">Status</th>
                 </tr>
             </thead>
             <tbody id="table-body">
                 <tr id="loader">
                     <td colspan="3">
-                        <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--safari-red); margin-bottom:15px;"></i>
-                        <p style="font-weight: 900; color: var(--safari-red); letter-spacing: 2px;">ESTABLISHING ENCRYPTED LINK...</p>
+                        <i class="fas fa-sync-alt fa-spin fa-3x" style="color: var(--safari-red); margin-bottom:15px;"></i>
+                        <p style="font-weight: 900; color: var(--safari-red); letter-spacing: 2px;">AUTHENTICATING ACCESS...</p>
                     </td>
                 </tr>
             </tbody>
@@ -244,30 +229,33 @@
     </div>
 
     <div class="footer">
-        <span><i class="fas fa-vault"></i> Secure Protocol</span>
-        <span><i class="fas fa-chart-line"></i> Real-time Analytics</span>
-        <span><i class="fas fa-globe"></i> Global Deployment</span>
-        <span><i class="fas fa-certificate"></i> Verified Excellence</span>
+        <span><i class="fas fa-fingerprint"></i> SECURE TERMINAL</span>
+        <span><i class="fas fa-bolt"></i> HIGH FREQUENCY DATA</span>
+        <span><i class="fas fa-satellite-dish"></i> GLOBAL SYNC</span>
+        <span><i class="fas fa-award"></i> TOP-TIER INCENTIVES</span>
     </div>
 
     <script>
-        /**
-         * 首席策略师 Matt Gall 提醒：
-         * 请将下方的 URL 替换为你从 Google Apps Script 部署后获得的 Web App 链接
-         */
-        const API_ENDPOINT = '你的_GOOGLE_APPS_SCRIPT_URL_在这里';
+        const API_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyYdUrhDYd9NpHv3-q7nB91sJFJtwYjpyh3WD6tW5BIPzR47TQpdxN-y-2oZMK8srF0/exec';
 
-        async function fetchStrategyData() {
+        async function initDashboard() {
             try {
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
                 const response = await fetch(API_ENDPOINT);
                 const data = await response.json();
-                renderTable(data);
+                
+                if (data && data.length > 0) {
+                    renderTable(data);
+                } else {
+                    throw new Error("Empty Dataset");
+                }
             } catch (error) {
-                console.error('Connection Error:', error);
+                console.error('System Error:', error);
                 document.getElementById('table-body').innerHTML = `
-                    <tr><td colspan="3" style="text-align:center; color: var(--safari-red); padding: 40px;">
-                        <i class="fas fa-exclamation-triangle fa-2x"></i><br>
-                        Link timeout. Please refresh your secure terminal.
+                    <tr><td colspan="3" style="text-align:center; color: var(--safari-red); padding: 50px;">
+                        <i class="fas fa-unlink fa-2x"></i><br><br>
+                        Connection failure. Secure link invalid.
                     </td></tr>`;
             }
         }
@@ -276,7 +264,6 @@
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = ''; 
 
-            // data[0] 是表头，所以从 index 1 开始遍历
             for (let i = 1; i < data.length; i++) {
                 const row = data[i];
                 if (!row[0] || row[0].toString().trim() === "") continue;
@@ -285,13 +272,13 @@
                 let icon = row[1] || 'star';
                 if (!icon.includes('fa-')) icon = 'fas fa-' + icon;
 
-                const desc = row[2] || 'Strategic details pending...';
-                const isLongTerm = row[3] && /TRUE|YES|Y|是/i.test(row[3].toString().trim());
+                const desc = row[2] || 'Operational intelligence pending...';
+                const isLongTerm = row[3] && /TRUE|YES|Y|是|checked/i.test(row[3].toString().trim());
                 const note = row[4] || '';
                 
                 const statusHtml = isLongTerm 
-                    ? `<i class="fas fa-circle-check icon-check"></i>` 
-                    : `<i class="fas fa-hourglass-half icon-clock"></i><span class="status-note">${note || 'In Progress'}</span>`;
+                    ? `<i class="fas fa-circle-check icon-check"></i><span class="status-note" style="color:var(--jungle-green)">Verified</span>` 
+                    : `<i class="fas fa-hourglass-half icon-clock"></i><span class="status-note">${note || 'Active'}</span>`;
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -303,8 +290,7 @@
             }
         }
 
-        // 初始化加载
-        window.addEventListener('DOMContentLoaded', fetchStrategyData);
+        document.addEventListener('DOMContentLoaded', initDashboard);
     </script>
 </body>
 </html>
