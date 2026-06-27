@@ -14,172 +14,164 @@
     
     <style>
         :root {
-            --star-red: #a3141c;
-            --star-gold: #f9a826;
-            --bg-gradient: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 50%, #ffcc80 100%);
+            /* 非洲特色色温方案 */
+            --safari-red: #a3141c;     /* 炽热红土色 */
+            --sunset-gold: #f9a826;   /* 落日余晖金 */
+            --jungle-green: #2e7d32;   /* 丛林深绿色 */
+            --sand-bg: #fdf5e6;        /* 萨瓦纳沙地色 */
+            --earth-brown: #5d4037;    /* 肥沃大地棕 */
+            --row-odd: #fff3e0;        /* 浅色土陶黄 */
             --row-even: #ffffff;
-            --row-odd: #fce8e9;
-            --shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background: var(--bg-gradient);
+            /* 增加非洲传统纹理感的背景 */
+            background-color: var(--sand-bg);
+            background-image: radial-gradient(var(--row-odd) 0.5px, transparent 0.5px);
+            background-size: 20px 20px;
             min-height: 100vh;
-            color: #333;
         }
 
-        /* 顶部品牌区 */
+        /* 标头布局：左 Logo，右文字 (还原原始布局) */
         .header-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 40px;
-            margin-bottom: 40px;
+            gap: 30px;
+            margin-bottom: 35px;
             flex-wrap: wrap;
-            animation: fadeInDown 0.8s ease-out;
+            animation: fadeIn 1s ease-in;
         }
         .star-logo {
-            height: 120px;
+            height: 110px;
             width: auto;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
-            transition: transform 0.3s;
+            filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.2));
         }
-        .star-logo:hover { transform: scale(1.05); }
-        
-        .header-text { text-align: left; }
+        .header-text-content {
+            text-align: left;
+        }
         .header-title {
-            color: var(--star-red);
-            font-size: 3.5em;
+            color: var(--safari-red);
+            font-size: 3.2em;
             font-weight: 900;
             font-style: italic;
             margin: 0;
-            letter-spacing: -1px;
-            line-height: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            line-height: 1.1;
         }
         .sub-ribbon {
-            background: linear-gradient(90deg, #1b5e20, #4caf50, #1b5e20);
+            background: linear-gradient(90deg, #1b5e20, var(--jungle-green), #1b5e20);
             color: white;
             display: inline-block;
-            padding: 8px 25px;
-            border-radius: 50px;
-            font-weight: 600;
-            margin-top: 12px;
+            padding: 6px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-top: 10px;
             text-transform: uppercase;
-            font-size: 0.95em;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            letter-spacing: 1px;
+            font-size: 0.9em;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
-        /* 数据表格区 */
+        /* 表格样式：提升对比度与仪式感 */
         .table-container {
-            max-width: 1250px;
+            max-width: 1200px;
             margin: 0 auto;
+            overflow-x: auto;
             background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--star-red);
-            animation: fadeInUp 1s ease-out;
+            padding: 5px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(93, 64, 55, 0.2);
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            border: 2px solid var(--safari-red);
         }
-        thead {
-            background-color: var(--star-red);
-            color: white;
+        thead { 
+            background-color: var(--safari-red); 
+            color: white; 
         }
-        th {
-            padding: 22px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-size: 1.1em;
-            border-bottom: 3px solid var(--star-gold);
+        th { 
+            padding: 20px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            border-bottom: 4px solid var(--sunset-gold);
         }
-        td {
-            padding: 18px 22px;
-            border-bottom: 1px solid #eee;
+        td { 
+            padding: 18px 20px; 
+            border: 1px solid #f0caCC; 
+            text-align: left; 
         }
         tbody tr:nth-child(even) { background-color: var(--row-even); }
         tbody tr:nth-child(odd) { background-color: var(--row-odd); }
-        tbody tr:hover { background-color: #fff9c4; transition: 0.2s; }
-
-        /* 内容列样式 */
+        tbody tr:hover { background-color: #fff9c4; transition: 0.3s; }
+        
+        /* 活动列样式 */
         .activity-name {
-            font-weight: 800;
+            font-weight: bold;
             display: flex;
             align-items: center;
             gap: 15px;
-            color: #1a1a1a;
-            font-size: 1.15em;
+            font-size: 1.1em;
+            color: var(--earth-brown);
         }
-        .activity-name i {
-            color: var(--star-red);
-            font-size: 1.3em;
-            width: 30px;
-            text-align: center;
-        }
-        .description-text {
-            line-height: 1.6;
-            color: #444;
-            font-weight: 400;
-        }
+        .activity-name i { color: var(--safari-red); font-size: 1.4em; width: 35px; text-align: center; }
+        
+        /* 状态列样式 */
         .status-cell { text-align: center; }
-        .icon-check { color: #2e7d32; font-size: 2.5em; }
-        .icon-cross { color: #d32f2f; font-size: 2.5em; }
+        .icon-check { color: var(--jungle-green); font-size: 2.2em; }
+        .icon-cross { color: #d32f2f; font-size: 2.2em; }
         .status-note {
             display: block;
-            margin-top: 6px;
-            color: var(--star-red);
-            font-size: 0.85em;
-            font-weight: 800;
+            margin-top: 5px;
+            color: var(--safari-red);
+            font-size: 0.8em;
+            font-weight: bold;
             text-transform: uppercase;
         }
 
-        /* 底部信息栏 */
+        /* 页脚：还原原始标语布局 */
         .footer {
-            max-width: 1250px;
-            margin: 35px auto 0;
+            max-width: 1200px;
+            margin: 30px auto 0;
             background: linear-gradient(90deg, #6a0b10, #8b0000, #6a0b10);
-            color: var(--star-gold);
+            color: var(--sunset-gold);
             text-align: center;
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
-            font-weight: 700;
+            font-weight: bold;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
             flex-wrap: wrap;
-            box-shadow: var(--shadow);
         }
-        .footer span { display: flex; align-items: center; gap: 8px; }
+        .footer span { margin: 10px 20px; display: inline-block; }
+        .footer i { margin-right: 8px; }
 
-        /* 加载动画 */
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 响应式优化 */
+        /* 移动端优化 */
         @media (max-width: 768px) {
-            .header-title { font-size: 2.2em; text-align: center; }
-            .header-container { gap: 15px; }
-            th, td { padding: 12px; font-size: 0.9em; }
-            .icon-check, .icon-cross { font-size: 1.8em; }
-            .footer { flex-direction: column; gap: 15px; }
+            .header-container { flex-direction: column; text-align: center; }
+            .header-text-content { text-align: center; }
+            .header-title { font-size: 2.2em; }
+            .footer span { display: block; margin: 10px 0; }
         }
     </style>
 </head>
 <body>
 
+    <!-- 页眉布局还原 -->
     <div class="header-container">
-        <img src="https://drive.google.com/thumbnail?id=1Ku8X9ZPb2xdPe04CPWMKDXRE-1DHD5jx&sz=w500" 
-             alt="STAR Logo" class="star-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/616/616489.png';">
+        <img src="https://drive.google.com/thumbnail?id=1Ku8X9ZPb2xdPe04CPWMKDXRE-1DHD5jx&sz=w500" alt="STAR Logo" class="star-logo">
         
-        <div class="header-text">
+        <div class="header-text-content">
             <h1 class="header-title">Radiant Future, Shared Success.</h1>
-            <div class="sub-ribbon">
-                <i class="fas fa-guarantee"></i> Official Real-Time Incentive Board
-            </div>
+            <div class="sub-ribbon">Exclusive Rewards &nbsp;|&nbsp; Team Support &nbsp;|&nbsp; Create Excellence</div>
         </div>
     </div>
 
@@ -187,105 +179,77 @@
         <table>
             <thead>
                 <tr>
-                    <th width="25%"><i class="fas fa-trophy"></i> Activity Name</th>
-                    <th width="55%"><i class="fas fa-file-invoice-dollar"></i> Strategy Details</th>
-                    <th width="20%"><i class="fas fa-clock"></i> Status</th>
+                    <th width="25%"><i class="fas fa-gift"></i> Activities</th>
+                    <th width="55%"><i class="fas fa-clipboard-list"></i> Activity Description</th>
+                    <th width="20%"><i class="fas fa-thumbtack"></i> Long Term?</th>
                 </tr>
             </thead>
             <tbody id="table-body">
-                <tr>
-                    <td colspan="3" style="text-align:center; padding: 60px;">
-                        <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--star-red);"></i>
-                        <p style="margin-top:20px; font-weight:bold; color:var(--star-red);">Syncing with Global STAR Database...</p>
-                    </td>
-                </tr>
+                <tr><td colspan="3" style="text-align:center; padding: 50px;">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i><br>Syncing Global Database...
+                </td></tr>
             </tbody>
         </table>
     </div>
 
-    <div class="footer" id="dynamic-footer">
-        <span><i class="fas fa-shield-alt"></i> Verified Policy</span>
-        <span><i class="fas fa-sync-alt"></i> Auto-Updating</span>
-        <span id="sync-time"><i class="fas fa-hourglass-half"></i> Waiting for Data...</span>
+    <!-- 页脚还原 -->
+    <div class="footer">
+        <span><i class="fas fa-sliders-h"></i> Multiple Rewards</span>
+        <span><i class="fas fa-users"></i> Collective Success</span>
+        <span><i class="far fa-gem"></i> Forge the Future</span>
+        <span><i class="fas fa-star"></i> Advance Together</span>
     </div>
 
     <script>
-        /**
-         * STAR 策略看板核心逻辑
-         * Matt Gall 监制：GitHub 部署优化版
-         */
-
         const SHEET_ID = '2PACX-1vSjq8ZbYo162R5aIgK5t22QmXFNUPaDMxBtsTpVKhE2cil0XkFSESD35vLLJ4XvgwpX9aTTXqjJxaDH';
-        // 增加更严格的缓存消除机制
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?gid=0&single=true&output=csv&cachebuster=${new Date().getTime()}`;
+        const CSV_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?gid=0&single=true&output=csv&t=${new Date().getTime()}`;
 
-        function updateTable(data) {
+        function renderTable(data) {
             const tbody = document.getElementById('table-body');
-            const syncLabel = document.getElementById('sync-time');
-            
             tbody.innerHTML = ''; 
-            let activeCount = 0;
 
-            if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:40px;">No data received from Google Sheets.</td></tr>';
+            if (!data || data.length < 2) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No active records found.</td></tr>';
                 return;
             }
 
             data.forEach((row, index) => {
-                // 跳过标题行或完全空的第一列
+                // 跳过标题行并校验 A 列
                 if (index === 0 || !row[0] || row[0].trim() === "" || row[0].toLowerCase().includes('activity')) return;
 
                 const name = row[0].trim();
                 const icon = (row[1] && row[1].includes('fa-')) ? row[1].trim() : 'fas fa-star';
-                const desc = row[2] ? row[2].trim() : 'Contact management for details.';
+                const desc = row[2] ? row[2].trim() : 'Details pending update.';
                 
                 // 逻辑判断：TRUE/YES/Y/是
                 const isLongTerm = row[3] && /TRUE|YES|Y|是/i.test(row[3].trim());
-                const note = row[4] ? `<span class="status-note">${row[4]}</span>` : '';
+                const noteText = row[4] ? row[4].trim() : '';
+                const statusNote = noteText ? `<span class="status-note">${noteText}</span>` : '';
 
-                const statusIcon = isLongTerm 
+                const statusHtml = isLongTerm 
                     ? `<i class="fas fa-check-circle icon-check"></i>` 
-                    : `<i class="fas fa-exclamation-circle icon-cross"></i>${note}`;
+                    : `<i class="fas fa-times-circle icon-cross"></i>${statusNote}`;
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><div class="activity-name"><i class="${icon}"></i> ${name}</div></td>
-                    <td class="description-text">${desc}</td>
-                    <td class="status-cell">${statusIcon}</td>
+                    <td style="line-height:1.6; color:#444;">${desc}</td>
+                    <td class="status-cell">${statusHtml}</td>
                 `;
                 tbody.appendChild(tr);
-                activeCount++;
             });
+        }
 
-            syncLabel.innerHTML = `<i class="fas fa-check-circle"></i> Last Sync: ${new Date().toLocaleTimeString()} ($$${activeCount}$$ Active)`;
-
-            if (activeCount === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:40px;">Waiting for Google to publish data... (May take $$5$$ mins)</td></tr>';
+        Papa.parse(CSV_URL, {
+            download: true,
+            header: false,
+            complete: function(results) {
+                renderTable(results.data);
+            },
+            error: function() {
+                document.getElementById('table-body').innerHTML = '<tr><td colspan="3" style="color:red; text-align:center; padding: 30px;">Sync Interrupted. Please check network connection.</td></tr>';
             }
-        }
-
-        function fetchStarData() {
-            Papa.parse(CSV_URL, {
-                download: true,
-                header: false,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    updateTable(results.data);
-                },
-                error: function(err) {
-                    console.error("Link Error:", err);
-                    document.getElementById('table-body').innerHTML = `
-                        <tr><td colspan="3" style="text-align:center; color:var(--star-red); padding:40px;">
-                            <i class="fas fa-exclamation-triangle fa-2x"></i><br>
-                            Database Link Failed. Check "Publish to Web" settings in Google Sheets.
-                        </td></tr>`;
-                }
-            });
-        }
-
-        window.onload = fetchStarData;
-        // 每 $$5$$ 分钟自动检查一次更新
-        setInterval(fetchStarData, 300000); 
+        });
     </script>
 </body>
 </html>
