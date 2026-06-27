@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAR GROUP | Global Incentive Dashboard</title>
+    
+    <!-- 核心资源：图标库与数据解析插件 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    
+    <style>
+        :root {
+            --star-red: #a3141c;
+            --star-gold: #f9a826;
+            --bg-gradient: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 50%, #ffcc80 100%);
+            --row-even: #ffffff;
+            --row-odd: #fce8e9;
+            --shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 顶部品牌区 */
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            animation: fadeInDown 0.8s ease-out;
+        }
+        .star-logo {
+            height: 120px;
+            width: auto;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            transition: transform 0.3s;
+        }
+        .star-logo:hover { transform: scale(1.05); }
+        
+        .header-text { text-align: left; }
+        .header-title {
+            color: var(--star-red);
+            font-size: 3.5em;
+            font-weight: 900;
+            font-style: italic;
+            margin: 0;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+        .sub-ribbon {
+            background: linear-gradient(90deg, #1b5e20, #4caf50, #1b5e20);
+            color: white;
+            display: inline-block;
+            padding: 8px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-top: 12px;
+            text-transform: uppercase;
+            font-size: 0.95em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* 数据表格区 */
+        .table-container {
+            max-width: 1250px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--star-red);
+            animation: fadeInUp 1s ease-out;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: var(--star-red);
+            color: white;
+        }
+        th {
+            padding: 22px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-size: 1.1em;
+            border-bottom: 3px solid var(--star-gold);
+        }
+        td {
+            padding: 18px 22px;
+            border-bottom: 1px solid #eee;
+        }
+        tbody tr:nth-child(even) { background-color: var(--row-even); }
+        tbody tr:nth-child(odd) { background-color: var(--row-odd); }
+        tbody tr:hover { background-color: #fff9c4; transition: 0.2s; }
+
+        /* 内容列样式 */
+        .activity-name {
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #1a1a1a;
+            font-size: 1.15em;
+        }
+        .activity-name i {
+            color: var(--star-red);
+            font-size: 1.3em;
+            width: 30px;
+            text-align: center;
+        }
+        .description-text {
+            line-height: 1.6;
+            color: #444;
+            font-weight: 400;
+        }
+        .status-cell { text-align: center; }
+        .icon-check { color: #2e7d32; font-size: 2.5em; }
+        .icon-cross { color: #d32f2f; font-size: 2.5em; }
+        .status-note {
+            display: block;
+            margin-top: 6px;
+            color: var(--star-red);
+            font-size: 0.85em;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        /* 底部信息栏 */
+        .footer {
+            max-width: 1250px;
+            margin: 35px auto 0;
+            background: linear-gradient(90deg, #6a0b10, #8b0000, #6a0b10);
+            color: var(--star-gold);
+            text-align: center;
+            padding: 25px;
+            border-radius: 12px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow);
+        }
+        .footer span { display: flex; align-items: center; gap: 8px; }
+
+        /* 加载动画 */
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 响应式优化 */
+        @media (max-width: 768px) {
+            .header-title { font-size: 2.2em; text-align: center; }
+            .header-container { gap: 15px; }
+            th, td { padding: 12px; font-size: 0.9em; }
+            .icon-check, .icon-cross { font-size: 1.8em; }
+            .footer { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <!-- Logo 使用 Google Drive 缩略图接口 -->
+        <img src="https://drive.google.com/thumbnail?id=1Ku8X9ZPb2xdPe04CPWMKDXRE-1DHD5jx&sz=w500" 
+             alt="STAR Logo" class="star-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/616/616489.png';">
+        
+        <div class="header-text">
+            <h1 class="header-title">Radiant Future, Shared Success.</h1>
+            <div class="sub-ribbon">
+                <i class="fas fa-guarantee"></i> Official Real-Time Incentive Board
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th width="25%"><i class="fas fa-trophy"></i> Activity Name</th>
+                    <th width="55%"><i class="fas fa-file-invoice-dollar"></i> Strategy Details</th>
+                    <th width="20%"><i class="fas fa-clock"></i> Status</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr>
+                    <td colspan="3" style="text-align:center; padding: 60px;">
+                        <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--star-red);"></i>
+                        <p style="margin-top:20px; font-weight:bold; color:var(--star-red);">Syncing with Global STAR Database...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer" id="dynamic-footer">
+        <span><i class="fas fa-shield-alt"></i> Verified Policy</span>
+        <span><i class="fas fa-sync-alt"></i> Auto-Updating</span>
+        <span id="sync-time"><i class="fas fa-hourglass-half"></i> Waiting for Data...</span>
+    </div>
+
+    <script>
+        /**
+         * STAR 策略看板核心逻辑
+         * 由 Matt Gall 监制：集成了缓存穿透预防与数据结构校验
+         */
+
+        // 1. 配置数据源（增加 gid=0 确保指向第一张工作表，增加时间戳防止缓存）
+        const SHEET_ID = '2PACX-1vSjq8ZbYo162R5aIgK5t22QmXFNUPaDMxBtsTpVKhE2cil0XkFSESD35vLLJ4XvgwpX9aTTXqjJxaDH';
+        const CSV_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?gid=0&single=true&output=csv&t=${new Date().getTime()}`;
+
+        function updateTable(data) {
+            console.log("Data Received Successfully at:", new Date().toLocaleTimeString());
+            const tbody = document.getElementById('table-body');
+            const syncLabel = document.getElementById('sync-time');
+            
+            tbody.innerHTML = ''; // 清除加载动画
+            let activeCount = 0;
+
+            data.forEach((row, index) => {
+                // 逻辑过滤：跳过第一行(Header)，跳过第一列为空的行
+                if (index === 0 || !row[0] || row[0].trim() === "") return;
+
+                // 列映射逻辑:
+                // A: ActivityName | B: IconCode | C: Description | D: IsLongTerm | E: StatusNote
+                const name = row[0].trim();
+                const icon = (row[1] && row[1].includes('fa-')) ? row[1].trim() : 'fas fa-star';
+                const desc = row[2] ? row[2].trim() : 'No details provided.';
+                
+                // 判断长期性 (接受 TRUE, YES, Y, 是)
+                const isLongTerm = row[3] && /TRUE|YES|Y|是/i.test(row[3].trim());
+                const note = row[4] ? `<span class="status-note">${row[4]}</span>` : '';
+
+                const statusIcon = isLongTerm 
+                    ? `<i class="fas fa-check-circle icon-check"></i>` 
+                    : `<i class="fas fa-exclamation-circle icon-cross"></i>${note}`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div class="activity-name">
+                            <i class="${icon}"></i> ${name}
+                        </div>
+                    </td>
+                    <td class="description-text">${desc}</td>
+                    <td class="status-cell">${statusIcon}</td>
+                `;
+                tbody.appendChild(tr);
+                activeCount++;
+            });
+
+            // 更新页脚同步时间
+            syncLabel.innerHTML = `<i class="fas fa-check-circle"></i> Last Sync: ${new Date().toLocaleTimeString()} ($$${activeCount}$$ Active)`;
+
+            if (activeCount === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:40px;">No active incentive data found. Please update the Google Sheet.</td></tr>';
+            }
+        }
+
+        // 2. 执行数据抓取
+        function fetchStarData() {
+            Papa.parse(CSV_URL, {
+                download: true,
+                header: false,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    updateTable(results.data);
+                },
+                error: function(err) {
+                    console.error("Connection Error:", err);
+                    document.getElementById('table-body').innerHTML = `
+                        <tr><td colspan="3" style="text-align:center; color:var(--star-red); padding:40px;">
+                            <i class="fas fa-exclamation-triangle fa-2x"></i><br>
+                            System Sync Failed. Please ensure the Google Sheet is "Published to Web".
+                        </td></tr>`;
+                }
+            });
+        }
+
+        // 初始化
+        window.onload = fetchStarData;
+
+        // 每 $$10$$ 分钟自动静默刷新一次数据，确保看板即时性
+        setInterval(fetchStarData, 600000); 
+    </script>
+</body>
+</html>
