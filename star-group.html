@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STAR GROUP | Global Incentive Dashboard</title>
     
-    <!-- 核心资源：图标库与数据解析插件 -->
+    <!-- 网站标识 Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <!-- 核心资源 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     
@@ -169,7 +172,6 @@
 <body>
 
     <div class="header-container">
-        <!-- Logo 使用 Google Drive 缩略图接口 -->
         <img src="https://drive.google.com/thumbnail?id=1Ku8X9ZPb2xdPe04CPWMKDXRE-1DHD5jx&sz=w500" 
              alt="STAR Logo" class="star-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/616/616489.png';">
         
@@ -210,32 +212,34 @@
     <script>
         /**
          * STAR 策略看板核心逻辑
-         * 由 Matt Gall 监制：集成了缓存穿透预防与数据结构校验
+         * Matt Gall 监制：GitHub 部署优化版
          */
 
-        // 1. 配置数据源（增加 gid=0 确保指向第一张工作表，增加时间戳防止缓存）
         const SHEET_ID = '2PACX-1vSjq8ZbYo162R5aIgK5t22QmXFNUPaDMxBtsTpVKhE2cil0XkFSESD35vLLJ4XvgwpX9aTTXqjJxaDH';
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?gid=0&single=true&output=csv&t=${new Date().getTime()}`;
+        // 增加更严格的缓存消除机制
+        const CSV_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?gid=0&single=true&output=csv&cachebuster=${new Date().getTime()}`;
 
         function updateTable(data) {
-            console.log("Data Received Successfully at:", new Date().toLocaleTimeString());
             const tbody = document.getElementById('table-body');
             const syncLabel = document.getElementById('sync-time');
             
-            tbody.innerHTML = ''; // 清除加载动画
+            tbody.innerHTML = ''; 
             let activeCount = 0;
 
-            data.forEach((row, index) => {
-                // 逻辑过滤：跳过第一行(Header)，跳过第一列为空的行
-                if (index === 0 || !row[0] || row[0].trim() === "") return;
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:40px;">No data received from Google Sheets.</td></tr>';
+                return;
+            }
 
-                // 列映射逻辑:
-                // A: ActivityName | B: IconCode | C: Description | D: IsLongTerm | E: StatusNote
+            data.forEach((row, index) => {
+                // 跳过标题行或完全空的第一列
+                if (index === 0 || !row[0] || row[0].trim() === "" || row[0].toLowerCase().includes('activity')) return;
+
                 const name = row[0].trim();
                 const icon = (row[1] && row[1].includes('fa-')) ? row[1].trim() : 'fas fa-star';
-                const desc = row[2] ? row[2].trim() : 'No details provided.';
+                const desc = row[2] ? row[2].trim() : 'Contact management for details.';
                 
-                // 判断长期性 (接受 TRUE, YES, Y, 是)
+                // 逻辑判断：TRUE/YES/Y/是
                 const isLongTerm = row[3] && /TRUE|YES|Y|是/i.test(row[3].trim());
                 const note = row[4] ? `<span class="status-note">${row[4]}</span>` : '';
 
@@ -245,11 +249,7 @@
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>
-                        <div class="activity-name">
-                            <i class="${icon}"></i> ${name}
-                        </div>
-                    </td>
+                    <td><div class="activity-name"><i class="${icon}"></i> ${name}</div></td>
                     <td class="description-text">${desc}</td>
                     <td class="status-cell">${statusIcon}</td>
                 `;
@@ -257,15 +257,13 @@
                 activeCount++;
             });
 
-            // 更新页脚同步时间
             syncLabel.innerHTML = `<i class="fas fa-check-circle"></i> Last Sync: ${new Date().toLocaleTimeString()} ($$${activeCount}$$ Active)`;
 
             if (activeCount === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:40px;">No active incentive data found. Please update the Google Sheet.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:40px;">Waiting for Google to publish data... (May take $$5$$ mins)</td></tr>';
             }
         }
 
-        // 2. 执行数据抓取
         function fetchStarData() {
             Papa.parse(CSV_URL, {
                 download: true,
@@ -275,21 +273,19 @@
                     updateTable(results.data);
                 },
                 error: function(err) {
-                    console.error("Connection Error:", err);
+                    console.error("Link Error:", err);
                     document.getElementById('table-body').innerHTML = `
                         <tr><td colspan="3" style="text-align:center; color:var(--star-red); padding:40px;">
                             <i class="fas fa-exclamation-triangle fa-2x"></i><br>
-                            System Sync Failed. Please ensure the Google Sheet is "Published to Web".
+                            Database Link Failed. Check "Publish to Web" settings in Google Sheets.
                         </td></tr>`;
                 }
             });
         }
 
-        // 初始化
         window.onload = fetchStarData;
-
-        // 每 $$10$$ 分钟自动静默刷新一次数据，确保看板即时性
-        setInterval(fetchStarData, 600000); 
+        // 每 $$5$$ 分钟自动检查一次更新
+        setInterval(fetchStarData, 300000); 
     </script>
 </body>
 </html>
