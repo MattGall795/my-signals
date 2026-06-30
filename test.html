@@ -4,58 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STAR TEAM | Strategic Hub</title>
+    <!-- 1. 网站标识 -->
     <link rel="icon" type="image/png" href="favicon.png">
+    <!-- 2. 外部资源 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
         :root { --star-blue: #0f172a; --star-gold: #b5935a; --bg: #f1f5f9; }
-        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); margin: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; }
         
+        /* 导航 */
         .top-nav { position: fixed; top:0; width:100%; background:white; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; box-sizing:border-box; box-shadow:0 2px 10px rgba(0,0,0,0.1); z-index:100; }
         .logo { font-weight: 900; color: var(--star-blue); display: flex; align-items: center; gap: 10px; }
-        .logo img { height: 22px; }
+        .logo img { height: 24px; border-radius: 4px; }
         .lang-switch button { padding:6px 12px; border:1px solid var(--star-blue); background:none; cursor:pointer; font-weight:800; font-size:11px; margin-left:5px; border-radius:4px; }
         .lang-switch button.active { background:var(--star-blue); color:white; }
 
+        /* 主视图 */
         #hub-view { padding-top: 80px; min-height: 100vh; }
         .hero { background: var(--star-blue); color: white; padding: 50px 20px; text-align: center; border-bottom: 5px solid var(--star-gold); }
         .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; padding: 40px; max-width: 1200px; margin: 0 auto; }
         .card { background: white; padding: 35px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); border-color: var(--star-gold); }
+        .card:hover { transform: translateY(-5px); border-color: var(--star-gold); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
 
+        /* 表单与PDF区域 */
         #form-view { display: none; padding: 100px 0 60px; }
-        .pdf-wrap { width: 794px; margin: 0 auto; background: white; box-shadow: 0 0 30px rgba(0,0,0,0.15); }
-        #pdf-area { padding: 55px; box-sizing: border-box; background: white; min-height: 1123px; }
+        .pdf-wrap { width: 794px; margin: 0 auto; background: white; box-shadow: 0 0 30px rgba(0,0,0,0.2); }
+        #pdf-area { padding: 55px; box-sizing: border-box; background: white; min-height: 1050px; }
         
         .section-header { background: var(--star-blue); color: white; padding: 10px 15px; font-weight: 700; margin: 25px 0 12px; font-size: 12px; text-transform: uppercase; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 5px; table-layout: fixed; }
         td { border: 1px solid #222; padding: 12px; font-size: 13px; color: #000; }
         .label-cell { background: #f8fafc; font-weight: 700; width: 35%; }
-        input { width: 100%; border: none; border-bottom: 1px solid #ddd; outline: none; font-size: 13px; background: transparent; }
+        input { width: 100%; border: none; border-bottom: 1px solid #ddd; outline: none; font-size: 13px; background: transparent; padding: 4px 0; }
 
+        /* 声明区块 */
         .note-block { padding: 20px 0; font-size: 11px; line-height: 1.7; color: #334155; font-style: italic; border-top: 1px solid #e2e8f0; margin-top: 20px; }
 
-        /* 签名区改进：可填写 */
+        /* 增强签名区：手写体风格 */
         .sig-container { margin-top: 60px; display: flex; justify-content: space-between; }
-        .sig-box { width: 45%; }
-        .sig-input { width: 100%; border: none; border-bottom: 2px solid #000; font-family: 'Dancing Script', cursive; font-size: 16px; padding: 5px 0; outline: none; text-align: center; }
-        .sig-label { font-size: 10px; font-weight: 800; margin-top: 10px; text-transform: uppercase; color: var(--star-blue); }
+        .sig-box { width: 45%; text-align: center; }
+        .sig-input { 
+            width: 100%; 
+            border: none; 
+            border-bottom: 2px solid #000; 
+            font-family: 'Dancing Script', cursive; 
+            font-size: 22px; 
+            color: #1e293b;
+            padding: 5px 0; 
+            outline: none; 
+            text-align: center; 
+            background: transparent;
+        }
+        .sig-label { font-size: 10px; font-weight: 800; margin-top: 10px; text-transform: uppercase; color: var(--star-blue); letter-spacing: 1px; }
 
         .btn-download { background: var(--star-gold); color: white; padding: 20px 70px; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; display: block; margin: 40px auto; font-size: 16px; }
         .back-btn { margin: 0 0 20px 20px; background: none; border: none; color: var(--star-blue); font-weight: 800; cursor: pointer; }
 
-        #loader { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; font-weight: 800; }
+        /* 加载状态 */
+        #loader { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--star-gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
-    <!-- 引入艺术字体模拟签名 -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <div id="loader">
     <div class="spinner"></div>
-    <div id="loader-status">ESTABLISHING SECURE CONNECTION...</div>
+    <div style="font-weight: 800; color: var(--star-blue); letter-spacing: 2px;">SECURE DATA SYNCHRONIZATION...</div>
 </div>
 
 <nav class="top-nav">
@@ -72,26 +90,26 @@
 <div id="hub-view">
     <div class="hero">
         <h1 id="txt-title">STRATEGIC HUB</h1>
-        <p id="txt-subtitle">REQUISITION & RESOURCE MANAGEMENT</p>
+        <p id="txt-subtitle">RESOURCE REQUISITION SYSTEM</p>
     </div>
     <div class="hub-grid" id="card-container"></div>
 </div>
 
 <div id="form-view">
-    <button class="back-btn" onclick="location.reload()" id="txt-back">← BACK</button>
+    <button class="back-btn" onclick="location.reload()" id="txt-back">← BACK TO DASHBOARD</button>
     <div class="pdf-wrap">
         <div id="pdf-area">
             <div id="dynamic-content"></div>
             
-            <!-- 改进版：可填写的签名区 -->
+            <!-- 增强签名档：手写体支持 -->
             <div class="sig-container">
                 <div class="sig-box">
-                    <input type="text" class="sig-input" placeholder="Type Name & Date">
-                    <div class="sig-label" id="txt-sig-app">Applicant Signature</div>
+                    <input type="text" class="sig-input" placeholder="Sign Here">
+                    <div class="sig-label" id="txt-sig-app">Applicant Signature & Date</div>
                 </div>
                 <div class="sig-box">
-                    <input type="text" class="sig-input" placeholder="Strategy Approval ID">
-                    <div class="sig-label" id="txt-sig-auth">Authorized Approval</div>
+                    <input type="text" class="sig-input" placeholder="Approver Name">
+                    <div class="sig-label" id="txt-sig-auth">Strategic Hub Approval</div>
                 </div>
             </div>
         </div>
@@ -100,9 +118,9 @@
 </div>
 
 <script>
-    // 安全混淆后的数据源 URL (Base64)
-    const _0x5a21 = 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlNLSFp6QlRGWjhjNmJLaUZ3Ym9XZWZRUl9rSTUybUc2SXJDU2N2REZnQ2FvRXkzVFJoNVdrLWFmdFUxOW00LVZ3T3VnTGNMS0lsZGlBL3B1Yj9vdXRwdXQ9Y3N2';
-    const SHEET_CSV_URL = atob(_0x5a21); 
+    // 重新校验后的混淆 URL 字符串
+    const _0x4f2a = 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlNLSFp6QlRGWjhjNmJLaUZ3Ym9XZWZRUl9rSTUybUc2SXJDU2N2REZnQ2FvRXkzVFJoNVdrLWFmdFUxOW00LVZ3T3VnTGNMS0lsZGlBL3B1Yj9vdXRwdXQ9Y3N2';
+    const DATA_SRC = atob(_0x4f2a);
 
     let masterData = [];
     let currentLang = 'en';
@@ -110,19 +128,29 @@
 
     async function init() {
         try {
-            const response = await fetch(SHEET_CSV_URL);
+            const response = await fetch(DATA_SRC);
             const csvText = await response.text();
             Papa.parse(csvText, {
                 header: true,
                 skipEmptyLines: true,
                 complete: (results) => {
-                    masterData = results.data.filter(row => row.FormID);
-                    renderHub();
-                    document.getElementById('loader').style.display = 'none';
+                    // 数据清洗：移除表头和内容中的多余空格
+                    masterData = results.data.map(row => {
+                        let cleanRow = {};
+                        Object.keys(row).forEach(key => cleanRow[key.trim()] = row[key]);
+                        return cleanRow;
+                    }).filter(row => row.FormID);
+                    
+                    if (masterData.length > 0) {
+                        renderHub();
+                        document.getElementById('loader').style.display = 'none';
+                    } else {
+                        throw new Error("Empty Data");
+                    }
                 }
             });
         } catch (e) {
-            document.getElementById('loader-status').innerText = "Access Denied. Check Permissions.";
+            document.getElementById('loader').innerHTML = `<div style="color:red">CONNECTION ERROR. PLEASE REFRESH.</div>`;
         }
     }
 
@@ -131,9 +159,9 @@
         const uniqueForms = [...new Set(masterData.map(item => item.FormID))];
         container.innerHTML = uniqueForms.map(id => `
             <div class="card" onclick="openForm('${id}')">
-                <h3>${id.replace('_', ' ')}</h3>
-                <p>STAR Strategic Resource Portal</p>
-                <div style="margin-top:20px; font-size:11px; font-weight:800; color:var(--star-gold)">INITIATE DOCUMENT →</div>
+                <h3 style="text-transform:uppercase; margin:0 0 10px; font-size:18px;">${id.replace('_', ' ')}</h3>
+                <p style="font-size:12px; color:#64748b">Strategic Resource Requisition</p>
+                <div style="margin-top:20px; font-size:11px; font-weight:800; color:var(--star-gold)">PROCEED →</div>
             </div>
         `).join('');
     }
@@ -149,7 +177,7 @@
         
         let html = `
             <div style="text-align:center; border-bottom: 4px solid #0f172a; padding-bottom: 20px; margin-bottom: 30px;">
-                <h1 style="margin:0; font-size: 28px; text-transform:uppercase;">${formId.replace('_', ' ')}</h1>
+                <h1 style="margin:0; font-size: 26px; text-transform:uppercase;">${formId.replace('_', ' ')}</h1>
                 <p style="margin:8px 0 0; color:#b5935a; font-size:11px; font-weight:800; letter-spacing:4px;">STAR TEAM OFFICIAL DOCUMENT</p>
             </div>
         `;
@@ -188,8 +216,8 @@
 
     function updateUI() {
         const ui = {
-            en: { title: "STAR TEAM | STRATEGIC HUB", sub: "REQUISITION & RESOURCE MANAGEMENT", back: "← BACK TO HUB", dl: "DOWNLOAD PDF DOCUMENT", sigApp: "Applicant Name & Date", sigAuth: "Authorized Strategy Approval" },
-            fr: { title: "STAR TEAM | PÔLE STRATÉGIQUE", sub: "GESTION DES RESSOURCES", back: "← RETOUR", dl: "TÉLÉCHARGER LE PDF", sigApp: "Nom du demandeur et date", sigAuth: "Approbation de la stratégie" }
+            en: { title: "STAR TEAM | STRATEGIC HUB", sub: "RESOURCE REQUISITION SYSTEM", back: "← BACK TO DASHBOARD", dl: "DOWNLOAD PDF DOCUMENT", sigApp: "Applicant Signature & Date", sigAuth: "Strategic Hub Approval" },
+            fr: { title: "STAR TEAM | PÔLE STRATÉGIQUE", sub: "SYSTÈME DE RÉQUISITION", back: "← RETOUR", dl: "TÉLÉCHARGER LE PDF", sigApp: "Signature du demandeur et date", sigAuth: "Approbation du pôle stratégique" }
         };
         const active = ui[currentLang];
         document.getElementById('txt-title').innerText = active.title;
@@ -203,14 +231,14 @@
     function exportPDF() {
         const btn = document.getElementById('txt-dl');
         const element = document.getElementById('pdf-area');
-        btn.innerText = "LOCKING DOCUMENT...";
+        btn.innerText = "AUTHENTICATING & LOCKING...";
         
-        // 关键：将所有输入框的值同步到 DOM，包括签名栏
+        // 固化所有输入内容
         document.querySelectorAll('input').forEach(i => i.setAttribute('value', i.value));
 
         const opt = {
             margin: 0,
-            filename: `STAR_${activeFormId}_${new Date().toISOString().slice(0,10)}.pdf`,
+            filename: `STAR_${activeFormId}_${new Date().getTime()}.pdf`,
             image: { type: 'jpeg', quality: 1 },
             html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowWidth: 794 },
             jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
