@@ -1,244 +1,938 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STAR TEAM | Strategic Hub v10.0</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root { --star-blue: #0f172a; --star-gold: #b5935a; }
-        * { box-sizing: border-box; -webkit-print-color-adjust: exact; }
-        body { font-family: 'Inter', sans-serif; background: #f1f5f9; margin: 0; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>STAR TEAM | Strategic Hub</title>
 
-        /* UI Styling */
-        .top-nav { position: fixed; top:0; width:100%; background:white; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 30px; box-shadow:0 2px 10px rgba(0,0,0,0.1); z-index:1000; }
-        .lang-switch button { padding:6px 15px; border:1px solid var(--star-blue); background:none; cursor:pointer; font-weight:800; border-radius:4px; margin-left:8px; }
-        .lang-switch button.active { background:var(--star-blue); color:white; }
-        
-        #hub-view { padding: 100px 50px; text-align: center; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; display: inline-block; width: 320px; border: 1px solid #e2e8f0; transition: 0.3s; }
-        .card:hover { border-color: var(--star-gold); transform: translateY(-5px); }
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
-        #form-view { display: none; padding: 80px 0; }
-        .pdf-wrap { width: 850px; margin: 0 auto; background: white; box-shadow: 0 0 50px rgba(0,0,0,0.1); }
-        #pdf-area { width: 850px; padding: 60px; background: white; color: #000; min-height: 1100px; }
+  <style>
+    :root {
+      --bg: #f4efe7;
+      --panel: #ffffff;
+      --ink: #102033;
+      --muted: #5b6777;
+      --line: #d8d0c4;
+      --gold: #c89b4a;
+      --gold-2: #e2b45f;
+      --orange: #d97706;
+      --green: #1f7a4d;
+      --red: #b42318;
+      --shadow: 0 12px 30px rgba(16, 32, 51, 0.10);
+      --radius: 18px;
+    }
 
-        /* Document Styling */
-        .doc-header { border-bottom: 4px solid var(--star-blue); padding-bottom: 20px; margin-bottom: 25px; text-align: center; }
-        .section-header { background: var(--star-blue); color: white; padding: 12px 15px; font-weight: 800; font-size: 14px; text-transform: uppercase; margin-top: 30px; border: 1.5px solid #000; }
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
 
-        /* Tables & Inputs */
-        .matrix-table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1.5px solid #000; }
-        .matrix-table th { background: #f8fafc; border: 1.5px solid #000; padding: 10px; font-size: 10px; font-weight: 900; text-transform: uppercase; text-align: left; }
-        .matrix-table td { border: 1.5px solid #000; padding: 8px; height: 45px; }
-        
-        .info-grid { display: flex; flex-wrap: wrap; border-left: 1.5px solid #000; border-right: 1.5px solid #000; }
-        .info-box { border-bottom: 1.5px solid #000; border-right: 1.5px solid #000; padding: 10px; flex-grow: 1; min-height: 65px; }
-        .info-box:last-child { border-right: none; }
-        .w-100 { width: 100%; border-right: none !important; }
-        .w-50 { width: 50%; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(200,155,74,0.12), transparent 30%),
+        radial-gradient(circle at top right, rgba(217,119,6,0.10), transparent 26%),
+        linear-gradient(180deg, #faf7f2 0%, #f4efe7 100%);
+      color: var(--ink);
+    }
 
-        .label-text { font-size: 9px; font-weight: 900; color: #475569; text-transform: uppercase; display: block; margin-bottom: 5px; }
-        .field-input { width: 100%; border: none; outline: none; font-size: 15px; font-weight: 700; background: transparent; color: #000; }
+    /* Top bar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.85);
+      border-bottom: 1px solid rgba(16,32,51,0.08);
+      padding: 14px 18px;
+    }
 
-        /* Total Section */
-        .total-container { border: 1.5px solid #000; border-top: none; padding: 20px 30px; display: flex; justify-content: flex-end; align-items: center; background: #fff; }
-        .total-label { font-weight: 900; font-size: 18px; margin-right: 25px; text-transform: uppercase; }
-        .total-display { border-bottom: 3px solid var(--star-blue); min-width: 150px; text-align: right; font-size: 22px; font-weight: 900; padding: 0 10px; }
+    .topbar-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
 
-        .sig-container { margin-top: 80px; display: flex; justify-content: space-between; padding: 0 10px; }
-        .sig-box { width: 42%; border-top: 2.5px solid #000; padding-top: 12px; text-align: center; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
 
-        .btn-download { background: var(--star-gold); color: white; padding: 20px 60px; border: none; border-radius: 5px; font-weight: 800; cursor: pointer; display: block; margin: 40px auto; font-size: 16px; }
-    </style>
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--ink), #20344f);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+      flex: 0 0 auto;
+    }
+
+    .brand-text {
+      min-width: 0;
+    }
+
+    .brand-text h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      color: var(--ink);
+    }
+
+    .brand-text p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 1px solid rgba(16,32,51,0.12);
+      background: white;
+      color: var(--ink);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+      box-shadow: 0 4px 14px rgba(16,32,51,0.05);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--gold);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--ink), #20344f);
+      color: white;
+      border-color: transparent;
+    }
+
+    .btn.gold {
+      background: linear-gradient(135deg, var(--gold), var(--gold-2));
+      color: white;
+      border-color: transparent;
+    }
+
+    .btn.small {
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 10px;
+    }
+
+    /* layout */
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 22px 18px 40px;
+    }
+
+    .hero {
+      background:
+        linear-gradient(135deg, rgba(16,32,51,0.98), rgba(32,52,79,0.98)),
+        linear-gradient(135deg, #102033, #20344f);
+      color: white;
+      border-radius: 26px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      right: -90px;
+      top: -90px;
+      background: rgba(200,155,74,0.16);
+    }
+
+    .hero h2 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 3vw, 40px);
+      letter-spacing: 0.4px;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 800px;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.6;
+    }
+
+    /* dashboard */
+    #hubView {
+      display: block;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.86);
+      border: 1px solid rgba(16,32,51,0.08);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: 0.25s ease;
+      min-height: 170px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(200,155,74,0.6);
+    }
+
+    .card-tag {
+      display: inline-flex;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(200,155,74,0.12);
+      color: var(--gold);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.4px;
+      width: fit-content;
+    }
+
+    .card h3 {
+      margin: 14px 0 8px;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .card .go {
+      margin-top: 16px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    /* form view */
+    #formView {
+      display: none;
+    }
+
+    .form-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .form-shell {
+      background: rgba(255,255,255,0.95);
+      border: 1px solid rgba(16,32,51,0.08);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    /* A4 canvas */
+    #pdfArea {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: white;
+      color: #000;
+      padding: 14mm 14mm 16mm;
+    }
+
+    .doc-header {
+      border: 2px solid #111827;
+      background:
+        linear-gradient(135deg, rgba(16,32,51,0.98), rgba(32,52,79,0.98));
+      color: white;
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .doc-header .title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .doc-header h3 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .doc-header .subtitle {
+      margin-top: 6px;
+      color: rgba(255,255,255,0.82);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .doc-meta {
+      text-align: right;
+      font-size: 12px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.86);
+    }
+
+    .section {
+      margin-top: 14px;
+      border: 1.5px solid #111827;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .section-title {
+      background: linear-gradient(135deg, var(--gold), #9f7740);
+      color: white;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .section-body {
+      padding: 0;
+      background: white;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+    }
+
+    .field {
+      border-top: 1px solid #111827;
+      border-right: 1px solid #111827;
+      min-height: 74px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .field:nth-child(2n) { border-right: none; }
+
+    .field.full {
+      grid-column: 1 / -1;
+      border-right: none;
+    }
+
+    .label {
+      font-size: 10px;
+      color: #4b5563;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 7px;
+    }
+
+    .input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 15px;
+      font-weight: 700;
+      color: #111827;
+      background: transparent;
+      padding: 0;
+      min-height: 24px;
+    }
+
+    .input::placeholder {
+      color: #9ca3af;
+      font-weight: 600;
+    }
+
+    .textarea {
+      min-height: 92px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table.matrix {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .matrix th,
+    .matrix td {
+      border-top: 1px solid #111827;
+      border-right: 1px solid #111827;
+      padding: 8px;
+      vertical-align: top;
+    }
+
+    .matrix th:last-child,
+    .matrix td:last-child {
+      border-right: none;
+    }
+
+    .matrix th {
+      background: #f8f3ea;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.35px;
+      text-align: left;
+    }
+
+    .matrix td {
+      min-height: 42px;
+    }
+
+    .matrix .input {
+      font-size: 14px;
+    }
+
+    .total-bar {
+      border-top: 1.5px solid #111827;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      background: #faf7f2;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .total-label {
+      font-weight: 900;
+      text-transform: uppercase;
+      font-size: 14px;
+      color: #111827;
+    }
+
+    .total-value {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--ink);
+      min-width: 140px;
+      text-align: right;
+    }
+
+    .declaration {
+      padding: 12px 14px;
+      font-size: 12px;
+      line-height: 1.65;
+      color: #111827;
+    }
+
+    .sig-area {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .sig-box {
+      border-top: 2px solid #111827;
+      padding-top: 10px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .pdf-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .back-note {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* responsive */
+    @media (max-width: 900px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+      #pdfArea {
+        width: 100%;
+        min-height: auto;
+        padding: 14px;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .field {
+        border-right: none !important;
+      }
+      .sig-area {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* hide in pdf preview when needed */
+    .no-print {
+      /* keep visible on screen; pdf export uses same content */
+    }
+  </style>
 </head>
 <body>
 
-<nav class="top-nav">
-    <div style="font-weight:900; color:var(--star-blue); font-size:18px;">STAR TEAM | STRATEGIC PORTAL</div>
-    <div class="lang-switch">
-        <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
-        <button id="btn-fr" onclick="setLang('fr')">FR</button>
-    </div>
-</nav>
-
-<div id="hub-view">
-    <h1 id="txt-hub-title" style="font-size:32px; margin-bottom:40px;">STRATEGIC DOCUMENT HUB</h1>
-    <div id="card-container"></div>
-</div>
-
-<div id="form-view">
-    <button onclick="location.reload()" style="margin:0 auto 20px; display:block; cursor:pointer; font-weight:800; border:none; background:none;">← BACK TO DASHBOARD</button>
-    <div class="pdf-wrap">
-        <div id="pdf-area">
-            <div id="dynamic-content"></div>
-            <div class="sig-container">
-                <div class="sig-box" id="txt-sig-app">Applicant Signature & Date</div>
-                <div class="sig-box" id="txt-sig-auth">Authorized Strategic Approval</div>
-            </div>
+  <div class="topbar no-print">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-badge">S</div>
+        <div class="brand-text">
+          <h1 id="uiBrandTitle">STAR TEAM | Strategic Hub</h1>
+          <p id="uiBrandSub">Official bilingual application portal</p>
         </div>
-    </div>
-    <button class="btn-download" onclick="exportPDF()" id="txt-dl">DOWNLOAD OFFICIAL PDF</button>
-</div>
+      </div>
 
-<script>
+      <div class="actions">
+        <button class="btn small" onclick="setLang('en')" id="btnEn">EN</button>
+        <button class="btn small" onclick="setLang('fr')" id="btnFr">FR</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <div id="hubView">
+      <div class="hero">
+        <h2 id="hubTitle">Strategic Document Hub</h2>
+        <p id="hubDesc">
+          Select a form below to open a responsive bilingual application document.
+          Optimized for desktop and mobile, with direct A4 PDF export.
+        </p>
+      </div>
+
+      <div class="cards" id="cards"></div>
+    </div>
+
+    <div id="formView">
+      <div class="form-toolbar no-print">
+        <button class="btn" onclick="backToHub()">← Back</button>
+        <div class="back-note" id="formHint">Fill in the form and export directly as A4 PDF.</div>
+        <div class="actions">
+          <button class="btn primary" onclick="saveAndExportPDF()" id="btnExport">Download PDF</button>
+        </div>
+      </div>
+
+      <div class="form-shell">
+        <div id="pdfArea">
+          <div id="formContent"></div>
+
+          <div class="sig-area">
+            <div class="sig-box" id="sigApplicant">Applicant Signature & Date</div>
+            <div class="sig-box" id="sigApproval">Authorized Strategic Approval</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pdf-actions no-print">
+        <button class="btn gold" onclick="saveAndExportPDF()">Generate & Download PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbyybKa302wioZXcYt2TbzCe89eeHnyFZcGGzBjVUYCsH6GrSz-N5s7etmFGt6FlHr7LKA/exec';
+
     let masterData = [];
     let currentLang = 'en';
-    let activeFormId = ''; // 核心：锁定原始 ID
+    let activeFormId = '';
+    let activeFormTitle = '';
+
+    const ui = {
+      en: {
+        hubTitle: 'Strategic Document Hub',
+        hubDesc: 'Select a form below to open a responsive bilingual application document. Optimized for desktop and mobile, with direct A4 PDF export.',
+        brandTitle: 'STAR TEAM | Strategic Hub',
+        brandSub: 'Official bilingual application portal',
+        formHint: 'Fill in the form and export directly as A4 PDF.',
+        btnExport: 'Download PDF',
+        sigApplicant: 'Applicant Signature & Date',
+        sigApproval: 'Authorized Strategic Approval',
+        back: '← Back'
+      },
+      fr: {
+        hubTitle: 'Pôle de documents stratégiques',
+        hubDesc: 'Sélectionnez un formulaire ci-dessous pour ouvrir un document de candidature bilingue responsive. Optimisé pour ordinateur et mobile, avec export PDF A4 direct.',
+        brandTitle: 'STAR TEAM | Pôle Stratégique',
+        brandSub: 'Portail officiel bilingue de candidature',
+        formHint: 'Remplissez le formulaire puis exportez-le directement en PDF A4.',
+        btnExport: 'Télécharger le PDF',
+        sigApplicant: 'Signature & Date du demandeur',
+        sigApproval: 'Approbation stratégique autorisée',
+        back: '← Retour'
+      }
+    };
 
     async function init() {
+      try {
         const res = await fetch(API_URL);
         masterData = await res.json();
         renderHub();
+        applyUI();
+      } catch (e) {
+        document.getElementById('cards').innerHTML = `<div class="card"><h3>Error loading data</h3><p>Please check API connection.</p></div>`;
+        console.error(e);
+      }
     }
 
     function renderHub() {
-        const forms = [...new Set(masterData.map(i => i.FormID))];
-        document.getElementById('card-container').innerHTML = forms.map(id => 
-            `<div class="card" onclick="openForm('${id}')">
-                <h3 style="text-transform:uppercase;">${id.replace(/_/g,' ')}</h3>
-                <p style="font-size:12px; color:var(--star-gold); font-weight:800;">OPEN DOCUMENT →</p>
-            </div>`
-        ).join('');
+      const forms = [...new Set(masterData.map(i => i.FormID))];
+      const formMeta = {
+        'Office Establishment Application': {
+          tag: 'OFFICE',
+          descEn: 'Office establishment application with strategic goals and declarations.',
+          descFr: 'Demande d’établissement de bureau avec objectifs stratégiques et déclarations.'
+        },
+        'Networking & Social Subsidy Form': {
+          tag: 'EVENT',
+          descEn: 'Networking and social event subsidy request form.',
+          descFr: 'Formulaire de demande de subvention pour événement de réseautage.'
+        },
+        'Material & Resource Requisition': {
+          tag: 'SUPPLY',
+          descEn: 'Material and resource requisition with shipment information.',
+          descFr: 'Demande de matériel et ressources avec informations d’expédition.'
+        }
+      };
+
+      document.getElementById('cards').innerHTML = forms.map(id => {
+        const meta = formMeta[id] || {};
+        return `
+          <div class="card" onclick="openForm('${id}')">
+            <div>
+              <div class="card-tag">${meta.tag || 'FORM'}</div>
+              <h3>${id}</h3>
+              <p>${currentLang === 'fr' ? (meta.descFr || '') : (meta.descEn || '')}</p>
+            </div>
+            <div class="go">${currentLang === 'fr' ? 'OUVRIR →' : 'OPEN →'}</div>
+          </div>
+        `;
+      }).join('');
     }
 
     function openForm(id) {
-        activeFormId = id; // 记录当前 ID
-        document.getElementById('hub-view').style.display = 'none';
-        document.getElementById('form-view').style.display = 'block';
-        const fields = masterData.filter(i => i.FormID === id);
-        renderForm(fields);
+      activeFormId = id;
+      const firstRow = masterData.find(x => x.FormID === id);
+      activeFormTitle = firstRow ? firstRow.FormID : id;
+
+      document.getElementById('hubView').style.display = 'none';
+      document.getElementById('formView').style.display = 'block';
+
+      const fields = masterData.filter(i => i.FormID === id);
+      renderForm(fields);
+      applyUI();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function backToHub() {
+      document.getElementById('formView').style.display = 'none';
+      document.getElementById('hubView').style.display = 'block';
+      activeFormId = '';
+      activeFormTitle = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function renderForm(fields) {
-        let html = `<div class="doc-header">
-            <h1 style="text-transform:uppercase; margin:0; font-size:26px;">${activeFormId.replace(/_/g,' ')}</h1>
-            <p style="color:var(--star-gold); font-weight:800; letter-spacing:4px; font-size:11px; margin-top:5px;">STAR TEAM OFFICIAL STRATEGIC RELEASE</p>
-        </div>`;
+      let html = `
+        <div class="doc-header">
+          <div class="title">
+            <div>
+              <h3>${activeFormTitle}</h3>
+              <div class="subtitle">
+                STAR TEAM Official Application Document<br>
+                ${currentLang === 'fr' ? 'Version bilingue optimisée pour l’export PDF A4.' : 'Bilingual version optimized for A4 PDF export.'}
+              </div>
+            </div>
+            <div class="doc-meta">
+              ${new Date().toLocaleDateString()}<br>
+              ${currentLang === 'fr' ? 'Document officiel' : 'Official document'}
+            </div>
+          </div>
+        </div>
+      `;
 
-        let i = 0;
-        while (i < fields.length) {
-            const section = currentLang === 'en' ? fields[i].SectionEN : fields[i].SectionFR;
-            html += `<div class="section-header">${section}</div>`;
-            
-            let j = i;
-            let sectionFields = [];
-            while (j < fields.length && (currentLang === 'en' ? fields[j].SectionEN : fields[j].SectionFR) === section) {
-                sectionFields.push(fields[j]);
-                j++;
-            }
+      const sections = [];
+      fields.forEach(f => {
+        const sec = currentLang === 'en' ? f.SectionEN : f.SectionFR;
+        if (!sections.includes(sec)) sections.push(sec);
+      });
 
-            let k = 0;
-            while (k < sectionFields.length) {
-                const f = sectionFields[k];
-                const rows = parseInt(f.Rows) || 1;
-                const type = (f.Type || '').toLowerCase().trim();
+      sections.forEach(sec => {
+        const sectionFields = fields.filter(f => (currentLang === 'en' ? f.SectionEN : f.SectionFR) === sec);
+        html += `<div class="section">
+          <div class="section-title">${sec}</div>
+          <div class="section-body">
+        `;
 
-                if (type === 'total') {
-                    html += `<div class="total-container">
-                        <span class="total-label">${currentLang==='en'?f.LabelEN:f.LabelFR}</span>
-                        <div class="total-display" id="grand-total">0.00</div>
-                    </div>`;
-                    k++;
-                } 
-                else if (rows > 1) {
-                    let matrixCols = [];
-                    let m = k;
-                    while (m < sectionFields.length && (parseInt(sectionFields[m].Rows)||1) === rows && sectionFields[m].Type !== 'total') {
-                        matrixCols.push(sectionFields[m]);
-                        m++;
-                    }
-                    html += `<table class="matrix-table"><thead><tr>`;
-                    matrixCols.forEach(col => html += `<th>${currentLang==='en'?col.LabelEN:col.LabelFR}</th>`);
-                    html += `</tr></thead><tbody>`;
-                    for (let r = 0; r < rows; r++) {
-                        html += `<tr>`;
-                        matrixCols.forEach(col => {
-                            const isNum = col.Type.toLowerCase() === 'number';
-                            html += `<td><input type="text" class="field-input ${isNum?'calc-trigger':''}" oninput="autoCalc()"></td>`;
-                        });
-                        html += `</tr>`;
-                    }
-                    html += `</tbody></table>`;
-                    k = m;
-                } 
-                else {
-                    html += `<div class="info-grid">`;
-                    const f1 = sectionFields[k];
-                    const f2 = sectionFields[k+1];
-                    // 如果连续两个短字段，并排
-                    if (f2 && (parseInt(f2.Rows)||1) === 1 && f2.Type !== 'total' && f1.LabelEN.length < 25 && f2.LabelEN.length < 25) {
-                        html += renderBox(f1, 'w-50') + renderBox(f2, 'w-50');
-                        k += 2;
-                    } else {
-                        html += renderBox(f1, 'w-100');
-                        k += 1;
-                    }
-                    html += `</div>`;
-                }
-            }
-            i = j;
-        }
-        document.getElementById('dynamic-content').innerHTML = html;
-        updateUI();
-        autoCalc(); // 初始化计算一次
-    }
+        const hasNote = sectionFields.some(f => (f.Type || '').toLowerCase().trim() === 'note');
+        sectionFields.forEach(f => {
+          const type = (f.Type || '').toLowerCase().trim();
+          const label = currentLang === 'en' ? f.LabelEN : f.LabelFR;
 
-    function renderBox(f, cls) {
-        const label = currentLang === 'en' ? f.LabelEN : f.LabelFR;
-        const isNum = f.Type.toLowerCase() === 'number';
-        return `<div class="info-box ${cls}">
-            <span class="label-text">${label}</span>
-            <input type="text" class="field-input ${isNum?'calc-trigger':''}" oninput="autoCalc()">
-        </div>`;
-    }
+          if (type === 'note') {
+            html += `<div class="declaration">${escapeHtml(label).replace(/\n/g, '<br>')}</div>`;
+            return;
+          }
 
-    // 核心自动计算引擎
-    function autoCalc() {
-        let total = 0;
-        document.querySelectorAll('.calc-trigger').forEach(input => {
-            const val = parseFloat(input.value) || 0;
-            total += val;
+          if (type === 'total') {
+            html += `
+              <div class="total-bar">
+                <div class="total-label">${label}</div>
+                <div class="total-value" id="grandTotal">0.00</div>
+              </div>
+            `;
+            return;
+          }
+
+          const rows = parseInt(f.Rows || 1, 10);
+
+          if (rows > 1) {
+            html += renderMatrix(sectionFields);
+            return;
+          }
         });
-        const totalDisplay = document.getElementById('grand-total');
-        if (totalDisplay) {
-            totalDisplay.innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        if (!hasNote) {
+          const simpleFields = sectionFields.filter(f => {
+            const type = (f.Type || '').toLowerCase().trim();
+            return type !== 'note' && type !== 'total' && parseInt(f.Rows || 1, 10) === 1;
+          });
+
+          if (simpleFields.length) {
+            html += `<div class="grid">`;
+            simpleFields.forEach(f => {
+              const label = currentLang === 'en' ? f.LabelEN : f.LabelFR;
+              const type = (f.Type || '').toLowerCase().trim();
+              const isTextarea = /address|objectives|justification|remarks|details|plan|description/i.test(label);
+              const full = isTextarea || label.length > 34 ? 'full' : '';
+              html += `
+                <div class="field ${full}">
+                  <div class="label">${label}</div>
+                  ${
+                    isTextarea
+                      ? `<textarea class="input textarea ${type === 'number' ? 'calc-trigger' : ''}" oninput="autoCalc()" placeholder="${label}"></textarea>`
+                      : `<input class="input ${type === 'number' ? 'calc-trigger' : ''}" type="${type === 'date' ? 'date' : 'text'}" oninput="autoCalc()" placeholder="${label}" />`
+                  }
+                </div>
+              `;
+            });
+            html += `</div>`;
+          }
         }
+
+        html += `</div></div>`;
+      });
+
+      document.getElementById('formContent').innerHTML = html;
+      autoCalc();
+    }
+
+    function renderMatrix(sectionFields) {
+      const matrixFields = sectionFields.filter(f => parseInt(f.Rows || 1, 10) > 1 && (f.Type || '').toLowerCase().trim() !== 'total');
+      if (!matrixFields.length) return '';
+
+      const rows = parseInt(matrixFields[0].Rows || 1, 10);
+
+      let html = `
+        <div class="table-wrap">
+          <table class="matrix">
+            <thead>
+              <tr>
+      `;
+      matrixFields.forEach(f => {
+        const label = currentLang === 'en' ? f.LabelEN : f.LabelFR;
+        html += `<th>${label}</th>`;
+      });
+      html += `</tr></thead><tbody>`;
+
+      for (let r = 0; r < rows; r++) {
+        html += `<tr>`;
+        matrixFields.forEach(f => {
+          const type = (f.Type || '').toLowerCase().trim();
+          const isNum = type === 'number';
+          html += `
+            <td>
+              <input class="input ${isNum ? 'calc-trigger' : ''}" type="text" oninput="autoCalc()" />
+            </td>
+          `;
+        });
+        html += `</tr>`;
+      }
+
+      html += `</tbody></table></div>`;
+      return html;
+    }
+
+    function autoCalc() {
+      let total = 0;
+      document.querySelectorAll('.calc-trigger').forEach(el => {
+        const val = parseFloat((el.value || '').replace(/[^\d.]/g, ''));
+        if (!isNaN(val)) total += val;
+      });
+
+      const out = document.getElementById('grandTotal');
+      if (out) {
+        out.innerText = total.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+    }
+
+    function applyUI() {
+      const t = ui[currentLang];
+      document.getElementById('uiBrandTitle').innerText = t.brandTitle;
+      document.getElementById('uiBrandSub').innerText = t.brandSub;
+      document.getElementById('hubTitle').innerText = t.hubTitle;
+      document.getElementById('hubDesc').innerText = t.hubDesc;
+      document.getElementById('formHint').innerText = t.formHint;
+      document.getElementById('btnExport').innerText = t.btnExport;
+      document.getElementById('sigApplicant').innerText = t.sigApplicant;
+      document.getElementById('sigApproval').innerText = t.sigApproval;
+      document.getElementById('btnEn').classList.toggle('primary', currentLang === 'en');
+      document.getElementById('btnFr').classList.toggle('primary', currentLang === 'fr');
+      document.getElementById('btnEn').classList.toggle('gold', currentLang === 'en');
+      document.getElementById('btnFr').classList.toggle('gold', currentLang === 'fr');
+      if (activeFormId) renderHub();
     }
 
     function setLang(lang) {
-        currentLang = lang;
-        document.querySelectorAll('.lang-switch button').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-'+lang).classList.add('active');
-        if (activeFormId) openForm(activeFormId); // 使用 activeFormId 重新渲染，解决语言切换失效
+      currentLang = lang;
+      applyUI();
+      if (activeFormId) {
+        const fields = masterData.filter(i => i.FormID === activeFormId);
+        renderForm(fields);
+      } else {
+        renderHub();
+      }
     }
 
-    function updateUI() {
-        const ui = {
-            en: { dl: "DOWNLOAD OFFICIAL PDF", sigApp: "Applicant Signature & Date", sigAuth: "Authorized Strategic Approval", hub: "STRATEGIC DOCUMENT HUB" },
-            fr: { dl: "TÉLÉCHARGER LE PDF OFFICIEL", sigApp: "Signature & Date du demandeur", sigAuth: "Approbation Stratégique", hub: "PÔLE DE DOCUMENTS" }
-        };
-        const active = ui[currentLang];
-        document.getElementById('txt-dl').innerText = active.dl;
-        document.getElementById('txt-sig-app').innerText = active.sigApp;
-        document.getElementById('txt-sig-auth').innerText = active.sigAuth;
-        document.getElementById('txt-hub-title').innerText = active.hub;
+    function saveAndExportPDF() {
+      const element = document.getElementById('pdfArea');
+
+      // 先把输入框值转换为静态文本，提升 PDF 稳定性
+      const cloned = element.cloneNode(true);
+      cloned.querySelectorAll('input, textarea').forEach(el => {
+        const value = el.value || '';
+        const span = document.createElement('div');
+        span.textContent = value;
+        span.style.cssText = `
+          min-height: 24px;
+          font-size: 15px;
+          font-weight: 700;
+          color: #111827;
+          white-space: pre-wrap;
+          word-break: break-word;
+        `;
+        el.parentNode.replaceChild(span, el);
+      });
+
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'fixed';
+      wrapper.style.left = '-99999px';
+      wrapper.style.top = '0';
+      wrapper.style.width = '210mm';
+      wrapper.appendChild(cloned);
+      document.body.appendChild(wrapper);
+
+      const opt = {
+        margin: 0,
+        filename: `${activeFormId || 'STAR_FORM'}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          scrollX: 0,
+          scrollY: 0,
+          backgroundColor: '#ffffff'
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait'
+        },
+        pagebreak: { mode: ['css', 'legacy'] }
+      };
+
+      html2pdf()
+        .set(opt)
+        .from(wrapper)
+        .save()
+        .then(() => {
+          document.body.removeChild(wrapper);
+        })
+        .catch(err => {
+          console.error(err);
+          document.body.removeChild(wrapper);
+          alert('PDF generation failed.');
+        });
     }
 
-    function exportPDF() {
-        const element = document.getElementById('pdf-area');
-        // 将 input 的实时值固化到 HTML 属性中，以便 PDF 捕获
-        document.querySelectorAll('input').forEach(i => i.setAttribute('value', i.value));
-        html2pdf().set({
-            margin: [30, 0, 30, 0],
-            filename: `STAR_${activeFormId}.pdf`,
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
-        }).from(element).save();
+    function escapeHtml(str) {
+      return String(str || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
     }
+
     init();
-</script>
+  </script>
 </body>
 </html>
