@@ -3,60 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STAR TEAM | Strategic Hub v8.1</title>
+    <title>STAR TEAM | Strategic Hub v9.0</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --star-blue: #0f172a; --star-gold: #b5935a; --border: #000; }
+        :root { --star-blue: #0f172a; --star-gold: #b5935a; }
         * { box-sizing: border-box; -webkit-print-color-adjust: exact; }
         body { font-family: 'Inter', sans-serif; background: #f1f5f9; margin: 0; }
 
+        /* UI */
         .top-nav { position: fixed; top:0; width:100%; background:white; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 30px; box-shadow:0 2px 10px rgba(0,0,0,0.1); z-index:1000; }
         .lang-switch button { padding:6px 15px; border:1px solid var(--star-blue); background:none; cursor:pointer; font-weight:800; border-radius:4px; margin-left:8px; }
         .lang-switch button.active { background:var(--star-blue); color:white; }
         
-        #hub-view { padding-top: 100px; text-align: center; }
-        .hub-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 40px; }
-        .card { background: white; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; width: 300px; transition: 0.3s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .card:hover { border-color: var(--star-gold); transform: translateY(-3px); }
-
         #form-view { display: none; padding: 80px 0; }
-        .pdf-wrap { width: 820px; margin: 0 auto; background: white; box-shadow: 0 0 30px rgba(0,0,0,0.1); }
-        #pdf-area { width: 820px; padding: 60px; background: white; min-height: 1120px; color: #000; position: relative; }
+        .pdf-wrap { width: 850px; margin: 0 auto; background: white; }
+        #pdf-area { width: 850px; padding: 50px; background: white; color: #000; }
 
-        .doc-header { border-bottom: 4px solid var(--star-blue); padding-bottom: 20px; margin-bottom: 30px; text-align: center; }
-        .section-header { background: var(--star-blue); color: white; padding: 10px 15px; font-weight: 800; font-size: 13px; text-transform: uppercase; margin-top: 25px; border: 1.5px solid #000; border-bottom: none; }
-        
-        /* 动态矩阵引擎 */
-        .grid-container { display: flex; flex-wrap: wrap; border: 1.5px solid #000; border-bottom: none; }
-        .field-col { border-right: 1.5px solid #000; display: flex; flex-direction: column; }
-        .field-col:last-child { border-right: none; }
-        
-        .cell-label { background: #f1f5f9; border-bottom: 1.5px solid #000; padding: 8px 10px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: #1e293b; min-height: 35px; display: flex; align-items: center; }
-        .cell-input-wrap { border-bottom: 1.5px solid #000; padding: 8px 10px; min-height: 45px; display: flex; align-items: center; }
-        .field-input { width: 100%; border: none; outline: none; font-size: 13px; font-weight: 600; background: transparent; }
+        /* Header */
+        .doc-header { border-bottom: 4px solid var(--star-blue); padding-bottom: 20px; margin-bottom: 20px; text-align: center; }
+        .section-header { background: var(--star-blue); color: white; padding: 10px 15px; font-weight: 800; font-size: 14px; text-transform: uppercase; margin-top: 25px; border: 1px solid #000; }
 
-        /* 总计项特殊样式 */
-        .total-row { width: 100%; background: #f8fafc; border-bottom: 1.5px solid #000; display: flex; align-items: center; justify-content: flex-end; padding: 12px 20px; }
-        .total-label { font-weight: 900; font-size: 14px; text-transform: uppercase; margin-right: 20px; color: var(--star-blue); }
-        .total-input { width: 150px; border: none; border-bottom: 2px solid var(--star-blue); font-size: 16px; font-weight: 900; text-align: right; outline: none; background: transparent; }
-
-        /* 宽度类 */
-        .w-100 { width: 100%; }
+        /* 基础块布局 (Rows = 1) */
+        .info-grid { display: flex; flex-wrap: wrap; border-left: 1px solid #000; border-right: 1px solid #000; }
+        .info-box { border-bottom: 1px solid #000; border-right: 1px solid #000; padding: 10px; flex-grow: 1; min-height: 60px; }
+        .info-box:last-child { border-right: none; }
+        .w-100 { width: 100%; border-right: none !important; }
         .w-50 { width: 50%; }
-        .w-25 { width: 25%; }
-        .w-15 { width: 15%; }
 
-        .sig-container { margin-top: 70px; display: flex; justify-content: space-between; }
-        .sig-box { width: 45%; border-top: 2px solid #000; padding-top: 10px; text-align: center; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        /* 矩阵布局 (Rows > 1) - 真正的表格逻辑 */
+        .matrix-table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid #000; }
+        .matrix-table th { background: #f1f5f9; border: 1px solid #000; padding: 8px; font-size: 10px; font-weight: 900; text-transform: uppercase; text-align: left; }
+        .matrix-table td { border: 1px solid #000; padding: 5px; height: 40px; }
+        .matrix-table input { width: 100%; border: none; outline: none; font-size: 13px; font-weight: 600; background: transparent; }
+
+        /* 总计行 */
+        .total-box { border: 1px solid #000; border-top: none; padding: 15px 25px; display: flex; justify-content: flex-end; align-items: center; background: #fff; }
+        .total-label { font-weight: 900; font-size: 16px; margin-right: 20px; }
+        .total-val { border-bottom: 2px solid #000; width: 150px; text-align: right; font-size: 18px; font-weight: 900; }
+
+        .label-text { font-size: 9px; font-weight: 800; color: #444; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .input-text { width: 100%; border: none; outline: none; font-size: 14px; font-weight: 600; }
+
+        .sig-container { margin-top: 60px; display: flex; justify-content: space-between; padding: 0 20px; }
+        .sig-box { width: 40%; border-top: 2px solid #000; padding-top: 10px; text-align: center; font-size: 11px; font-weight: 800; text-transform: uppercase; }
 
         .btn-download { background: var(--star-gold); color: white; padding: 18px 60px; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; display: block; margin: 40px auto; }
+        #hub-view { padding: 100px 50px; text-align: center; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; display: inline-block; width: 300px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
 
 <nav class="top-nav">
-    <div style="font-weight:900; color:var(--star-blue)">STAR TEAM | STRATEGIC PORTAL</div>
+    <div style="font-weight:900;">STAR TEAM | STRATEGIC PORTAL</div>
     <div class="lang-switch">
         <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
         <button id="btn-fr" onclick="setLang('fr')">FR</button>
@@ -64,29 +64,27 @@
 </nav>
 
 <div id="hub-view">
-    <h1 id="txt-title" style="font-size:36px; margin-top:50px; color:var(--star-blue)">STRATEGIC HUB</h1>
-    <div class="hub-grid" id="card-container"></div>
+    <h1 id="txt-title">STRATEGIC HUB</h1>
+    <div id="card-container"></div>
 </div>
 
 <div id="form-view">
-    <button onclick="location.reload()" style="margin:0 auto 20px; display:block; cursor:pointer; font-weight:800; border:none; background:none; color:var(--star-blue);">← BACK TO HUB</button>
     <div class="pdf-wrap">
         <div id="pdf-area">
             <div id="dynamic-content"></div>
             <div class="sig-container">
-                <div class="sig-box" id="txt-sig-app">Applicant Signature & Date</div>
-                <div class="sig-box" id="txt-sig-auth">Authorized Strategic Approval</div>
+                <div class="sig-box" id="txt-sig-app">Applicant Signature</div>
+                <div class="sig-box" id="txt-sig-auth">Authorized Approval</div>
             </div>
         </div>
     </div>
-    <button class="btn-download" onclick="exportPDF()" id="txt-dl">DOWNLOAD OFFICIAL PDF</button>
+    <button class="btn-download" onclick="exportPDF()" id="txt-dl">DOWNLOAD PDF</button>
 </div>
 
 <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbyybKa302wioZXcYt2TbzCe89eeHnyFZcGGzBjVUYCsH6GrSz-N5s7etmFGt6FlHr7LKA/exec'; 
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyybKa302wioZXcYt2TbzCe89eeHnyFZcGGzBjVUYCsH6GrSz-N5s7etmFGt6FlHr7LKA/exec';
     let masterData = [];
     let currentLang = 'en';
-    let activeFormId = '';
 
     async function init() {
         const res = await fetch(API_URL);
@@ -95,78 +93,108 @@
     }
 
     function renderHub() {
-        const container = document.getElementById('card-container');
         const forms = [...new Set(masterData.map(i => i.FormID))];
-        container.innerHTML = forms.map(id => `<div class="card" onclick="openForm('${id}')"><h3 style="text-transform:uppercase; margin:0; font-size:18px;">${id.replace(/_/g,' ')}</h3><p style="margin:10px 0 0; font-size:11px; color:#64748b; font-weight:700;">PROCEED TO DOCUMENT →</p></div>`).join('');
+        document.getElementById('card-container').innerHTML = forms.map(id => 
+            `<div class="card" onclick="openForm('${id}')"><h3>${id.replace(/_/g,' ')}</h3></div>`
+        ).join('');
     }
 
     function openForm(id) {
-        activeFormId = id;
         document.getElementById('hub-view').style.display = 'none';
         document.getElementById('form-view').style.display = 'block';
-        
         const fields = masterData.filter(i => i.FormID === id);
-        const container = document.getElementById('dynamic-content');
-        
+        renderForm(fields);
+    }
+
+    function renderForm(fields) {
         let html = `<div class="doc-header">
-            <h1 style="margin:0; font-size:28px; text-transform:uppercase;">${id.replace(/_/g,' ')}</h1>
-            <p style="margin:8px 0 0; color:var(--star-gold); font-size:11px; letter-spacing:5px; font-weight:800;">STAR TEAM OFFICIAL DOCUMENT</p>
+            <h1 style="text-transform:uppercase; margin:0;">${fields[0].FormID.replace(/_/g,' ')}</h1>
+            <p style="color:var(--star-gold); font-weight:800; letter-spacing:3px; font-size:12px;">OFFICIAL STRATEGIC DOCUMENT</p>
         </div>`;
 
-        let currentSection = "";
-        let gridOpen = false;
-
-        fields.forEach((field) => {
-            const label = (currentLang === 'en' ? field.LabelEN : field.LabelFR);
-            const section = (currentLang === 'en' ? field.SectionEN : field.SectionFR);
-            const type = (field.Type || 'text').toLowerCase().trim();
-            const rowCount = parseInt(field.Rows) || 1;
-
-            if (section !== currentSection) {
-                if (gridOpen) html += `</div>`; 
-                html += `<div class="section-header">${section}</div><div class="grid-container">`;
-                currentSection = section;
-                gridOpen = true;
+        let i = 0;
+        while (i < fields.length) {
+            const section = currentLang === 'en' ? fields[i].SectionEN : fields[i].SectionFR;
+            html += `<div class="section-header">${section}</div>`;
+            
+            // 检查当前 Section 下的字段
+            let j = i;
+            let sectionFields = [];
+            while (j < fields.length && (currentLang === 'en' ? fields[j].SectionEN : fields[j].SectionFR) === section) {
+                sectionFields.push(fields[j]);
+                j++;
             }
 
-            // 总计项特殊渲染逻辑
-            if (type === 'total') {
-                html += `<div class="total-row">
-                    <span class="total-label">${label}</span>
-                    <input type="text" class="total-input" placeholder="0.00">
-                </div>`;
-            } else {
-                // 正常列渲染逻辑
-                let wClass = "w-100";
-                if (type === 'number' || label.length < 8) wClass = "w-15";
-                else if (["tel", "email", "date"].includes(type)) wClass = "w-50";
-                else if (label.toLowerCase().includes("name") || label.toLowerCase().includes("matériau") || label.toLowerCase().includes("specification")) wClass = "w-25";
+            // 在 Section 内部进行渲染
+            let k = 0;
+            while (k < sectionFields.length) {
+                const field = sectionFields[k];
+                const rows = parseInt(field.Rows) || 1;
+                const type = (field.Type || '').toLowerCase().trim();
 
-                html += `<div class="field-col ${wClass}">
-                    <div class="cell-label">${label}</div>`;
-                for(let i=0; i < rowCount; i++) {
-                    html += `<div class="cell-input-wrap"><input type="text" class="field-input"></div>`;
+                if (type === 'total') {
+                    html += `<div class="total-box"><span class="total-label">${currentLang==='en'?field.LabelEN:field.LabelFR}</span><div class="total-val"></div></div>`;
+                    k++;
+                } 
+                else if (rows > 1) {
+                    // 矩阵模式：连续寻找 Rows > 1 的字段组成表格
+                    let matrixCols = [];
+                    let m = k;
+                    while (m < sectionFields.length && parseInt(sectionFields[m].Rows) === rows && sectionFields[m].Type !== 'total') {
+                        matrixCols.push(sectionFields[m]);
+                        m++;
+                    }
+                    
+                    html += `<table class="matrix-table"><thead><tr>`;
+                    matrixCols.forEach(col => html += `<th>${currentLang==='en'?col.LabelEN:col.LabelFR}</th>`);
+                    html += `</tr></thead><tbody>`;
+                    for (let r = 0; r < rows; r++) {
+                        html += `<tr>`;
+                        matrixCols.forEach(() => html += `<td><input type="text"></td>`);
+                        html += `</tr>`;
+                    }
+                    html += `</tbody></table>`;
+                    k = m; // 跳过已处理的矩阵列
+                } 
+                else {
+                    // 普通模式 (Rows = 1)
+                    html += `<div class="info-grid">`;
+                    // 尝试并排显示两个短字段
+                    const f1 = sectionFields[k];
+                    const f2 = sectionFields[k+1];
+                    if (f2 && (parseInt(f2.Rows)||1) === 1 && f2.Type !== 'total' && f1.LabelEN.length < 20 && f2.LabelEN.length < 20) {
+                        html += renderInfoBox(f1, 'w-50') + renderInfoBox(f2, 'w-50');
+                        k += 2;
+                    } else {
+                        html += renderInfoBox(f1, 'w-100');
+                        k += 1;
+                    }
+                    html += `</div>`;
                 }
-                html += `</div>`;
             }
-        });
-
-        container.innerHTML = html + `</div>`;
+            i = j;
+        }
+        document.getElementById('dynamic-content').innerHTML = html;
         updateUI();
+    }
+
+    function renderInfoBox(f, cls) {
+        const label = currentLang === 'en' ? f.LabelEN : f.LabelFR;
+        return `<div class="info-box ${cls}"><span class="label-text">${label}</span><input type="text" class="input-text"></div>`;
     }
 
     function setLang(lang) {
         currentLang = lang;
         document.querySelectorAll('.lang-switch button').forEach(b => b.classList.remove('active'));
         document.getElementById('btn-'+lang).classList.add('active');
-        if (activeFormId) openForm(activeFormId);
-        updateUI();
+        const activeID = document.querySelector('.doc-header h1').innerText.replace(/ /g,'_');
+        if(activeID) openForm(activeID);
     }
 
     function updateUI() {
         const ui = {
-            en: { dl: "DOWNLOAD OFFICIAL PDF", sigApp: "Applicant Signature & Date", sigAuth: "Authorized Strategic Approval" },
-            fr: { dl: "TÉLÉCHARGER LE PDF OFFICIEL", sigApp: "Signature du demandeur & Date", sigAuth: "Approbation Stratégique" }
+            en: { dl: "DOWNLOAD PDF DOCUMENT", sigApp: "Applicant Signature & Date", sigAuth: "Authorized Strategic Approval" },
+            fr: { dl: "TÉLÉCHARGER LE PDF", sigApp: "Signature & Date du demandeur", sigAuth: "Approbation Stratégique" }
         };
         const active = ui[currentLang];
         document.getElementById('txt-dl').innerText = active.dl;
@@ -178,10 +206,9 @@
         const element = document.getElementById('pdf-area');
         document.querySelectorAll('input').forEach(i => i.setAttribute('value', i.value));
         html2pdf().set({
-            margin: 0,
-            filename: `STAR_OFFICIAL_${activeFormId}.pdf`,
-            image: { type: 'jpeg', quality: 1 },
-            html2canvas: { scale: 2, useCORS: true, width: 820 },
+            margin: [20, 0, 20, 0],
+            filename: 'STAR_DOCUMENT.pdf',
+            html2canvas: { scale: 2 },
             jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
         }).from(element).save();
     }
