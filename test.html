@@ -1,938 +1,1418 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>STAR TEAM | Strategic Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STAR TEAM Application Portal</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    :root {
+    :root{
       --bg: #f4efe7;
-      --panel: #ffffff;
-      --ink: #102033;
-      --muted: #5b6777;
-      --line: #d8d0c4;
-      --gold: #c89b4a;
-      --gold-2: #e2b45f;
-      --orange: #d97706;
-      --green: #1f7a4d;
-      --red: #b42318;
-      --shadow: 0 12px 30px rgba(16, 32, 51, 0.10);
-      --radius: 18px;
+      --bg-2: #f8f4ee;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #102033;
+      --primary-2: #18324f;
+      --accent: #c89b4a;
+      --accent-2: #d97706;
+      --success: #198754;
+      --border: rgba(16,32,51,.12);
+      --shadow: 0 18px 40px rgba(16,32,51,.10);
+      --radius: 20px;
     }
 
-    * {
-      box-sizing: border-box;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:"Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(200,155,74,0.12), transparent 30%),
-        radial-gradient(circle at top right, rgba(217,119,6,0.10), transparent 26%),
-        linear-gradient(180deg, #faf7f2 0%, #f4efe7 100%);
-      color: var(--ink);
+        radial-gradient(circle at top left, rgba(200,155,74,.10), transparent 30%),
+        radial-gradient(circle at top right, rgba(16,32,51,.10), transparent 28%),
+        var(--bg);
+      color:var(--text);
     }
 
-    /* Top bar */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      backdrop-filter: blur(10px);
-      background: rgba(255,255,255,0.85);
-      border-bottom: 1px solid rgba(16,32,51,0.08);
-      padding: 14px 18px;
+    .app-shell{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
     }
 
-    .topbar-inner {
-      max-width: 1280px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+    .topbar{
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color:#fff;
+      padding:16px 20px;
+      position:sticky;
+      top:0;
+      z-index:50;
+      box-shadow:0 8px 24px rgba(0,0,0,.14);
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
+    .topbar-inner{
+      max-width:1280px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
     }
 
-    .brand-badge {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, var(--ink), #20344f);
-      display: grid;
-      place-items: center;
-      color: white;
-      font-weight: 900;
-      box-shadow: var(--shadow);
-      flex: 0 0 auto;
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:240px;
     }
 
-    .brand-text {
-      min-width: 0;
+    .logo-badge{
+      width:46px;
+      height:46px;
+      border-radius:14px;
+      background: linear-gradient(135deg, var(--accent), #f0d28a);
+      display:grid;
+      place-items:center;
+      color:var(--primary);
+      font-weight:800;
+      box-shadow:0 10px 24px rgba(200,155,74,.32);
+      flex:0 0 auto;
     }
 
-    .brand-text h1 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      color: var(--ink);
+    .brand-text h1{
+      margin:0;
+      font-size:18px;
+      line-height:1.1;
+      letter-spacing:.2px;
     }
 
-    .brand-text p {
-      margin: 2px 0 0;
-      font-size: 12px;
-      color: var(--muted);
+    .brand-text p{
+      margin:4px 0 0;
+      color:rgba(255,255,255,.72);
+      font-size:12px;
     }
 
-    .actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
+    .toolbar{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
     }
 
-    .btn {
-      border: 1px solid rgba(16,32,51,0.12);
-      background: white;
-      color: var(--ink);
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: 0.2s ease;
-      box-shadow: 0 4px 14px rgba(16,32,51,0.05);
+    button, select{
+      font:inherit;
     }
 
-    .btn:hover {
-      transform: translateY(-1px);
-      border-color: var(--gold);
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:11px 16px;
+      cursor:pointer;
+      transition:.2s ease;
+      font-weight:600;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      white-space:nowrap;
     }
 
-    .btn.primary {
-      background: linear-gradient(135deg, var(--ink), #20344f);
-      color: white;
-      border-color: transparent;
+    .btn:hover{ transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0); }
+
+    .btn-primary{
+      background: linear-gradient(135deg, var(--accent), #f0d28a);
+      color:var(--primary);
     }
 
-    .btn.gold {
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      color: white;
-      border-color: transparent;
+    .btn-secondary{
+      background: rgba(255,255,255,.10);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.16);
+      backdrop-filter: blur(8px);
     }
 
-    .btn.small {
-      padding: 8px 12px;
-      font-size: 13px;
-      border-radius: 10px;
+    .btn-ghost{
+      background:#fff;
+      color:var(--primary);
+      border:1px solid var(--border);
     }
 
-    /* layout */
-    .page {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 22px 18px 40px;
+    .lang-select{
+      border:none;
+      border-radius:14px;
+      padding:11px 14px;
+      background: rgba(255,255,255,.10);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.16);
+      outline:none;
     }
 
-    .hero {
-      background:
-        linear-gradient(135deg, rgba(16,32,51,0.98), rgba(32,52,79,0.98)),
-        linear-gradient(135deg, #102033, #20344f);
-      color: white;
-      border-radius: 26px;
-      padding: 28px;
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 20px;
+    .container{
+      width:100%;
+      max-width:1280px;
+      margin:0 auto;
+      padding:24px 18px 40px;
+      flex:1;
     }
 
-    .hero::after {
-      content: '';
-      position: absolute;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      right: -90px;
-      top: -90px;
-      background: rgba(200,155,74,0.16);
+    .hero{
+      display:grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap:18px;
+      margin-bottom:22px;
     }
 
-    .hero h2 {
-      margin: 0 0 8px;
-      font-size: clamp(24px, 3vw, 40px);
-      letter-spacing: 0.4px;
+    .hero-card{
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.80));
+      border:1px solid rgba(255,255,255,.6);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
     }
 
-    .hero p {
-      margin: 0;
-      max-width: 800px;
-      color: rgba(255,255,255,0.82);
-      line-height: 1.6;
+    .hero-main{
+      padding:28px;
+      position:relative;
+      min-height:220px;
     }
 
-    /* dashboard */
-    #hubView {
-      display: block;
+    .hero-main::after{
+      content:"";
+      position:absolute;
+      right:-30px;
+      top:-30px;
+      width:180px;
+      height:180px;
+      border-radius:50%;
+      background: radial-gradient(circle, rgba(200,155,74,.22), transparent 68%);
+      pointer-events:none;
     }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
-      margin-top: 18px;
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(16,32,51,.06);
+      color:var(--primary);
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.4px;
+      text-transform:uppercase;
     }
 
-    .card {
-      background: rgba(255,255,255,0.86);
-      border: 1px solid rgba(16,32,51,0.08);
-      border-radius: 22px;
-      padding: 20px;
-      box-shadow: var(--shadow);
-      cursor: pointer;
-      transition: 0.25s ease;
-      min-height: 170px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+    .hero-title{
+      margin:16px 0 10px;
+      font-size:34px;
+      line-height:1.12;
+      color:var(--primary);
+      letter-spacing:-.6px;
     }
 
-    .card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(200,155,74,0.6);
+    .hero-desc{
+      margin:0;
+      color:var(--muted);
+      max-width:780px;
+      line-height:1.75;
+      font-size:15px;
     }
 
-    .card-tag {
-      display: inline-flex;
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(200,155,74,0.12);
-      color: var(--gold);
-      font-weight: 800;
-      font-size: 12px;
-      letter-spacing: 0.4px;
-      width: fit-content;
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin-top:22px;
     }
 
-    .card h3 {
-      margin: 14px 0 8px;
-      font-size: 18px;
-      line-height: 1.35;
+    .stat{
+      background:rgba(16,32,51,.04);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
     }
 
-    .card p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.5;
-      font-size: 14px;
+    .stat .value{
+      font-size:22px;
+      font-weight:800;
+      color:var(--primary);
+      margin-bottom:4px;
     }
 
-    .card .go {
-      margin-top: 16px;
-      font-weight: 900;
-      color: var(--ink);
+    .stat .label{
+      font-size:12px;
+      color:var(--muted);
     }
 
-    /* form view */
-    #formView {
-      display: none;
+    .hero-side{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      justify-content:center;
     }
 
-    .form-toolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
+    .quick-card{
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color:#fff;
+      border-radius:18px;
+      padding:18px;
+      box-shadow:var(--shadow);
     }
 
-    .form-shell {
-      background: rgba(255,255,255,0.95);
-      border: 1px solid rgba(16,32,51,0.08);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
+    .quick-card h3{
+      margin:0 0 8px;
+      font-size:18px;
     }
 
-    /* A4 canvas */
-    #pdfArea {
-      width: 210mm;
-      min-height: 297mm;
-      margin: 0 auto;
-      background: white;
-      color: #000;
-      padding: 14mm 14mm 16mm;
+    .quick-card p{
+      margin:0;
+      color:rgba(255,255,255,.78);
+      font-size:13px;
+      line-height:1.7;
     }
 
-    .doc-header {
-      border: 2px solid #111827;
-      background:
-        linear-gradient(135deg, rgba(16,32,51,0.98), rgba(32,52,79,0.98));
-      color: white;
-      border-radius: 16px;
-      padding: 16px 18px;
-      margin-bottom: 14px;
-      position: relative;
-      overflow: hidden;
+    .section-title{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      margin:26px 0 14px;
+      flex-wrap:wrap;
     }
 
-    .doc-header .title {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: flex-start;
-      flex-wrap: wrap;
+    .section-title h2{
+      margin:0;
+      font-size:22px;
+      color:var(--primary);
     }
 
-    .doc-header h3 {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
+    .section-title p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
     }
 
-    .doc-header .subtitle {
-      margin-top: 6px;
-      color: rgba(255,255,255,0.82);
-      font-size: 12px;
-      line-height: 1.5;
+    .home-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
     }
 
-    .doc-meta {
-      text-align: right;
-      font-size: 12px;
-      line-height: 1.6;
-      color: rgba(255,255,255,0.86);
+    .form-card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:20px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      transition:.2s ease;
+      min-height:220px;
     }
 
-    .section {
-      margin-top: 14px;
-      border: 1.5px solid #111827;
-      border-radius: 14px;
-      overflow: hidden;
+    .form-card:hover{
+      transform:translateY(-2px);
     }
 
-    .section-title {
-      background: linear-gradient(135deg, var(--gold), #9f7740);
-      color: white;
-      padding: 10px 14px;
-      font-size: 13px;
-      font-weight: 900;
-      letter-spacing: 0.4px;
-      text-transform: uppercase;
+    .form-card .tag{
+      width:max-content;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(200,155,74,.14);
+      color:#8a6417;
+      font-weight:700;
     }
 
-    .section-body {
-      padding: 0;
-      background: white;
+    .form-card h3{
+      margin:0;
+      font-size:20px;
+      color:var(--primary);
+      line-height:1.3;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0;
+    .form-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+      flex:1;
     }
 
-    .field {
-      border-top: 1px solid #111827;
-      border-right: 1px solid #111827;
-      min-height: 74px;
-      padding: 10px 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+    .form-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
     }
 
-    .field:nth-child(2n) { border-right: none; }
-
-    .field.full {
-      grid-column: 1 / -1;
-      border-right: none;
+    .pill{
+      border-radius:999px;
+      padding:7px 12px;
+      font-size:12px;
+      border:1px solid var(--border);
+      color:var(--muted);
+      background:#fff;
     }
 
-    .label {
-      font-size: 10px;
-      color: #4b5563;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      margin-bottom: 7px;
+    .panel{
+      background:rgba(255,255,255,.85);
+      border:1px solid rgba(255,255,255,.6);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
     }
 
-    .input {
-      width: 100%;
-      border: none;
-      outline: none;
-      font-size: 15px;
-      font-weight: 700;
-      color: #111827;
-      background: transparent;
-      padding: 0;
-      min-height: 24px;
+    .form-shell{
+      display:none;
     }
 
-    .input::placeholder {
-      color: #9ca3af;
-      font-weight: 600;
+    .form-head{
+      padding:22px 22px 16px;
+      background: linear-gradient(180deg, rgba(16,32,51,.98), rgba(16,32,51,.90));
+      color:#fff;
     }
 
-    .textarea {
-      min-height: 92px;
-      resize: vertical;
-      line-height: 1.5;
+    .form-head .meta{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
     }
 
-    .table-wrap {
-      overflow-x: auto;
+    .form-head h2{
+      margin:10px 0 8px;
+      font-size:26px;
+      line-height:1.2;
     }
 
-    table.matrix {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
+    .form-head p{
+      margin:0;
+      color:rgba(255,255,255,.75);
+      font-size:14px;
+      line-height:1.7;
+      max-width:900px;
     }
 
-    .matrix th,
-    .matrix td {
-      border-top: 1px solid #111827;
-      border-right: 1px solid #111827;
-      padding: 8px;
-      vertical-align: top;
+    .form-body{
+      padding:18px;
+      background:rgba(255,255,255,.95);
     }
 
-    .matrix th:last-child,
-    .matrix td:last-child {
-      border-right: none;
+    .form-section{
+      margin-bottom:18px;
+      border:1px solid var(--border);
+      border-radius:18px;
+      overflow:hidden;
+      background:#fff;
     }
 
-    .matrix th {
-      background: #f8f3ea;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.35px;
-      text-align: left;
+    .form-section-header{
+      background:linear-gradient(135deg, rgba(16,32,51,.06), rgba(200,155,74,.10));
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
     }
 
-    .matrix td {
-      min-height: 42px;
+    .form-section-header h3{
+      margin:0;
+      color:var(--primary);
+      font-size:18px;
     }
 
-    .matrix .input {
-      font-size: 14px;
+    .form-section-header small{
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
     }
 
-    .total-bar {
-      border-top: 1.5px solid #111827;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 16px;
-      background: #faf7f2;
-      gap: 16px;
-      flex-wrap: wrap;
+    .section-content{
+      padding:16px;
     }
 
-    .total-label {
-      font-weight: 900;
-      text-transform: uppercase;
-      font-size: 14px;
-      color: #111827;
+    .grid-2{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
     }
 
-    .total-value {
-      font-size: 22px;
-      font-weight: 900;
-      color: var(--ink);
-      min-width: 140px;
-      text-align: right;
+    .grid-1{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
     }
 
-    .declaration {
-      padding: 12px 14px;
-      font-size: 12px;
-      line-height: 1.65;
-      color: #111827;
+    .field-card{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      background:var(--bg-2);
     }
 
-    .sig-area {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
+    .field-label{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:8px;
+      color:var(--primary);
+      font-size:13px;
+      font-weight:700;
+      line-height:1.5;
     }
 
-    .sig-box {
-      border-top: 2px solid #111827;
-      padding-top: 10px;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
+    .field-label .type{
+      font-size:11px;
+      color:var(--muted);
+      font-weight:600;
+      padding:4px 8px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--border);
+      flex:0 0 auto;
     }
 
-    .pdf-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      margin-top: 16px;
-      flex-wrap: wrap;
+    .field-input, .field-textarea, .field-select{
+      width:100%;
+      border:1px solid rgba(16,32,51,.14);
+      border-radius:14px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+      transition:.2s ease;
+      font:inherit;
     }
 
-    .back-note {
-      font-size: 12px;
-      color: var(--muted);
+    .field-input:focus, .field-textarea:focus, .field-select:focus{
+      border-color:rgba(200,155,74,.9);
+      box-shadow:0 0 0 4px rgba(200,155,74,.16);
     }
 
-    /* responsive */
-    @media (max-width: 900px) {
-      .cards {
-        grid-template-columns: 1fr;
+    .field-input{
+      height:46px;
+      padding:0 14px;
+    }
+
+    .field-textarea{
+      min-height:112px;
+      padding:12px 14px;
+      resize:vertical;
+      line-height:1.65;
+    }
+
+    .hint{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.6;
+    }
+
+    .note-panel{
+      border-radius:18px;
+      border:1px solid rgba(200,155,74,.24);
+      background: linear-gradient(180deg, rgba(200,155,74,.10), rgba(255,255,255,.95));
+      overflow:hidden;
+    }
+
+    .note-title{
+      padding:14px 16px;
+      background:rgba(200,155,74,.14);
+      color:var(--primary);
+      font-weight:800;
+      border-bottom:1px solid rgba(200,155,74,.16);
+    }
+
+    .note-content{
+      padding:16px;
+      color:var(--text);
+      line-height:1.75;
+      font-size:14px;
+      white-space:pre-wrap;
+    }
+
+    .note-content ul{
+      margin:8px 0 8px 18px;
+      padding:0;
+    }
+
+    .matrix-wrap{
+      overflow:auto;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:#fff;
+    }
+
+    table.matrix{
+      width:100%;
+      border-collapse:collapse;
+      min-width:760px;
+    }
+
+    .matrix th, .matrix td{
+      border-bottom:1px solid rgba(16,32,51,.10);
+      padding:12px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:13px;
+    }
+
+    .matrix th{
+      background:rgba(16,32,51,.05);
+      color:var(--primary);
+      font-weight:800;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    .matrix input, .matrix textarea{
+      width:100%;
+      border:1px solid rgba(16,32,51,.14);
+      border-radius:12px;
+      padding:10px 12px;
+      font:inherit;
+      outline:none;
+      background:#fff;
+    }
+
+    .matrix textarea{
+      min-height:42px;
+      resize:vertical;
+    }
+
+    .total-bar{
+      margin-top:16px;
+      padding:16px;
+      border-radius:16px;
+      background:linear-gradient(135deg, rgba(16,32,51,.96), rgba(24,50,79,.96));
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .total-bar .label{
+      font-size:14px;
+      opacity:.86;
+    }
+
+    .total-bar .value{
+      font-size:28px;
+      font-weight:800;
+      color:#fff;
+    }
+
+    .footer-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      margin-top:18px;
+    }
+
+    .divider{
+      height:1px;
+      background:var(--border);
+      margin:18px 0;
+    }
+
+    .empty{
+      padding:34px 16px;
+      text-align:center;
+      color:var(--muted);
+    }
+
+    .muted{
+      color:var(--muted);
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    /* PDF area */
+    #pdfArea{
+      display:none;
+      width:210mm;
+      min-height:297mm;
+      background:#fff;
+      color:#111827;
+      padding:14mm;
+      font-family:"Inter", sans-serif;
+    }
+
+    #pdfArea .pdf-header{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:flex-start;
+      border-bottom:2px solid #102033;
+      padding-bottom:12px;
+      margin-bottom:14px;
+    }
+
+    #pdfArea .pdf-brand{
+      font-weight:800;
+      font-size:18px;
+      color:#102033;
+    }
+
+    #pdfArea .pdf-sub{
+      margin-top:4px;
+      font-size:11px;
+      color:#6b7280;
+      line-height:1.6;
+    }
+
+    #pdfArea h2{
+      margin:0;
+      font-size:22px;
+      color:#102033;
+    }
+
+    #pdfArea .pdf-section{
+      margin:14px 0;
+      border:1px solid #dbe2ea;
+      border-radius:12px;
+      overflow:hidden;
+    }
+
+    #pdfArea .pdf-section-title{
+      background:#f3f6fa;
+      color:#102033;
+      padding:10px 12px;
+      font-weight:800;
+      border-bottom:1px solid #dbe2ea;
+    }
+
+    #pdfArea .pdf-section-content{
+      padding:12px;
+    }
+
+    #pdfArea .pdf-field{
+      margin-bottom:10px;
+    }
+
+    #pdfArea .pdf-label{
+      font-weight:700;
+      font-size:12px;
+      color:#102033;
+      margin-bottom:4px;
+    }
+
+    #pdfArea .pdf-value{
+      font-size:12px;
+      color:#111827;
+      line-height:1.7;
+      white-space:pre-wrap;
+    }
+
+    #pdfArea table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+
+    #pdfArea th, #pdfArea td{
+      border:1px solid #dbe2ea;
+      padding:8px;
+      vertical-align:top;
+      text-align:left;
+    }
+
+    #pdfArea th{
+      background:#f3f6fa;
+      color:#102033;
+    }
+
+    @media (max-width: 1024px){
+      .hero{
+        grid-template-columns:1fr;
       }
-      #pdfArea {
-        width: 100%;
-        min-height: auto;
-        padding: 14px;
-      }
-      .grid {
-        grid-template-columns: 1fr;
-      }
-      .field {
-        border-right: none !important;
-      }
-      .sig-area {
-        grid-template-columns: 1fr;
+      .home-grid{
+        grid-template-columns:repeat(2,1fr);
       }
     }
 
-    /* hide in pdf preview when needed */
-    .no-print {
-      /* keep visible on screen; pdf export uses same content */
+    @media (max-width: 768px){
+      .hero-main{
+        padding:22px;
+      }
+      .hero-title{
+        font-size:28px;
+      }
+      .hero-stats{
+        grid-template-columns:1fr;
+      }
+      .home-grid{
+        grid-template-columns:1fr;
+      }
+      .grid-2{
+        grid-template-columns:1fr;
+      }
+      .form-head h2{
+        font-size:22px;
+      }
+      .toolbar{
+        width:100%;
+        justify-content:flex-start;
+      }
+      .brand{
+        min-width:auto;
+      }
     }
   </style>
 </head>
 <body>
-
-  <div class="topbar no-print">
+<div class="app-shell">
+  <div class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <div class="brand-badge">S</div>
+        <div class="logo-badge">ST</div>
         <div class="brand-text">
-          <h1 id="uiBrandTitle">STAR TEAM | Strategic Hub</h1>
-          <p id="uiBrandSub">Official bilingual application portal</p>
+          <h1>STAR TEAM Application Portal</h1>
+          <p>Official forms, structured data, and printable PDF export</p>
         </div>
       </div>
 
-      <div class="actions">
-        <button class="btn small" onclick="setLang('en')" id="btnEn">EN</button>
-        <button class="btn small" onclick="setLang('fr')" id="btnFr">FR</button>
+      <div class="toolbar">
+        <button class="btn btn-secondary" id="backBtn" onclick="goHome()">← Home</button>
+        <select class="lang-select" id="langSelect" onchange="switchLang(this.value)">
+          <option value="EN">English</option>
+          <option value="FR">Français</option>
+          <option value="CN">中文</option>
+        </select>
+        <button class="btn btn-primary" onclick="downloadPDF()">Download PDF</button>
       </div>
     </div>
   </div>
 
-  <div class="page">
-
-    <div id="hubView">
+  <div class="container">
+    <!-- Home -->
+    <div id="homeView">
       <div class="hero">
-        <h2 id="hubTitle">Strategic Document Hub</h2>
-        <p id="hubDesc">
-          Select a form below to open a responsive bilingual application document.
-          Optimized for desktop and mobile, with direct A4 PDF export.
-        </p>
-      </div>
+        <div class="hero-card hero-main">
+          <div class="kicker">Official Portal</div>
+          <h2 class="hero-title">Structured Forms for Applications, Office Data, and Strategic Objectives</h2>
+          <p class="hero-desc">
+            This interface is designed to present your multilingual table data in a cleaner, more professional way.
+            Long notes are separated into dedicated explanation blocks, ordinary fields are rendered as cards, and
+            multi-row items are rendered as tables. The result is better readability on desktop, mobile, and PDF.
+          </p>
 
-      <div class="cards" id="cards"></div>
-    </div>
-
-    <div id="formView">
-      <div class="form-toolbar no-print">
-        <button class="btn" onclick="backToHub()">← Back</button>
-        <div class="back-note" id="formHint">Fill in the form and export directly as A4 PDF.</div>
-        <div class="actions">
-          <button class="btn primary" onclick="saveAndExportPDF()" id="btnExport">Download PDF</button>
+          <div class="hero-stats">
+            <div class="stat">
+              <div class="value" id="statForms">3</div>
+              <div class="label">Available forms</div>
+            </div>
+            <div class="stat">
+              <div class="value" id="statSections">0</div>
+              <div class="label">Sections loaded</div>
+            </div>
+            <div class="stat">
+              <div class="value" id="statFields">0</div>
+              <div class="label">Fields configured</div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="form-shell">
-        <div id="pdfArea">
-          <div id="formContent"></div>
-
-          <div class="sig-area">
-            <div class="sig-box" id="sigApplicant">Applicant Signature & Date</div>
-            <div class="sig-box" id="sigApproval">Authorized Strategic Approval</div>
+        <div class="hero-card hero-side">
+          <div class="quick-card">
+            <h3>What changed</h3>
+            <p>
+              The layout now distinguishes between note, input, and table content, which avoids the
+              spreadsheet-like appearance and improves the overall user experience.
+            </p>
+          </div>
+          <div class="quick-card" style="background:linear-gradient(135deg, #c89b4a, #f0d28a); color:#102033;">
+            <h3>Best for</h3>
+            <p style="color:rgba(16,32,51,.82);">
+              Official application systems, institutional forms, multilingual registrations, and printable records.
+            </p>
           </div>
         </div>
       </div>
 
-      <div class="pdf-actions no-print">
-        <button class="btn gold" onclick="saveAndExportPDF()">Generate & Download PDF</button>
+      <div class="section-title">
+        <div>
+          <h2>Forms</h2>
+          <p>Select a form to open, edit, and export it as PDF.</p>
+        </div>
+        <div class="pill">Responsive · Multilingual · Auto-save</div>
+      </div>
+
+      <div class="home-grid" id="homeGrid"></div>
+    </div>
+
+    <!-- Form -->
+    <div id="formView" class="form-shell">
+      <div class="panel">
+        <div class="form-head">
+          <div class="meta">
+            <div>
+              <div class="kicker" style="background:rgba(255,255,255,.12); color:#fff;">Current Form</div>
+              <h2 id="currentFormTitle">Form Title</h2>
+              <p id="currentFormDesc">Description</p>
+            </div>
+            <div class="form-actions">
+              <span class="pill" id="draftState">Draft saved locally</span>
+              <span class="pill" id="currentLocalePill">Language: EN</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-body" id="formBody"></div>
+
+        <div class="form-body">
+          <div class="footer-actions">
+            <button class="btn btn-ghost" onclick="goHome()">Back to Home</button>
+            <button class="btn btn-primary" onclick="downloadPDF()">Download PDF</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbyybKa302wioZXcYt2TbzCe89eeHnyFZcGGzBjVUYCsH6GrSz-N5s7etmFGt6FlHr7LKA/exec';
+  <!-- PDF area -->
+  <div id="pdfArea"></div>
+</div>
 
-    let masterData = [];
-    let currentLang = 'en';
-    let activeFormId = '';
-    let activeFormTitle = '';
-
-    const ui = {
-      en: {
-        hubTitle: 'Strategic Document Hub',
-        hubDesc: 'Select a form below to open a responsive bilingual application document. Optimized for desktop and mobile, with direct A4 PDF export.',
-        brandTitle: 'STAR TEAM | Strategic Hub',
-        brandSub: 'Official bilingual application portal',
-        formHint: 'Fill in the form and export directly as A4 PDF.',
-        btnExport: 'Download PDF',
-        sigApplicant: 'Applicant Signature & Date',
-        sigApproval: 'Authorized Strategic Approval',
-        back: '← Back'
-      },
-      fr: {
-        hubTitle: 'Pôle de documents stratégiques',
-        hubDesc: 'Sélectionnez un formulaire ci-dessous pour ouvrir un document de candidature bilingue responsive. Optimisé pour ordinateur et mobile, avec export PDF A4 direct.',
-        brandTitle: 'STAR TEAM | Pôle Stratégique',
-        brandSub: 'Portail officiel bilingue de candidature',
-        formHint: 'Remplissez le formulaire puis exportez-le directement en PDF A4.',
-        btnExport: 'Télécharger le PDF',
-        sigApplicant: 'Signature & Date du demandeur',
-        sigApproval: 'Approbation stratégique autorisée',
-        back: '← Retour'
-      }
-    };
-
-    async function init() {
-      try {
-        const res = await fetch(API_URL);
-        masterData = await res.json();
-        renderHub();
-        applyUI();
-      } catch (e) {
-        document.getElementById('cards').innerHTML = `<div class="card"><h3>Error loading data</h3><p>Please check API connection.</p></div>`;
-        console.error(e);
-      }
-    }
-
-    function renderHub() {
-      const forms = [...new Set(masterData.map(i => i.FormID))];
-      const formMeta = {
-        'Office Establishment Application': {
-          tag: 'OFFICE',
-          descEn: 'Office establishment application with strategic goals and declarations.',
-          descFr: 'Demande d’établissement de bureau avec objectifs stratégiques et déclarations.'
+<script>
+  // ----------------------------
+  // Demo data structure
+  // Replace this with your real spreadsheet converted JSON.
+  // ----------------------------
+  const forms = [
+    {
+      id: "form1",
+      nameEN: "Office Establishment Application",
+      nameFR: "Demande d'établissement du bureau",
+      nameCN: "办公室设立申请表",
+      descEN: "Applicant identity, office profile, and strategic objectives.",
+      descFR: "Identité du candidat, profil du bureau et objectifs stratégiques.",
+      descCN: "申请人身份、办公室资料和战略目标。",
+      sections: [
+        {
+          sectionEN: "I. Applicant Profile",
+          sectionFR: "I. Profil du candidat",
+          sectionCN: "I. 申请人资料",
+          items: [
+            { type:"text", labelEN:"Applicant Full Name", labelFR:"Nom complet du candidat", labelCN:"申请人全名", key:"applicant_name", rows:1, required:true },
+            { type:"number", labelEN:"STAR Identity / Rank (VIP3+)", labelFR:"Identité STAR / Rang (VIP3+)", labelCN:"STAR身份 / 等级（VIP3+）", key:"vip_rank", rows:1 },
+            { type:"text", labelEN:"Affiliated Team Name", labelFR:"Nom de l'équipe affiliée", labelCN:"所属团队名称", key:"team_name", rows:1 },
+            { type:"text", labelEN:"Contact Email / Phone", labelFR:"Courriel / Téléphone", labelCN:"联系邮箱 / 电话", key:"contact_info", rows:1 },
+            { type:"textarea", labelEN:"Detailed Address (City, Country, Postal Code)", labelFR:"Adresse détaillée (ville, pays, code postal)", labelCN:"详细地址（城市、国家、邮编）", key:"address", rows:1 }
+          ]
         },
-        'Networking & Social Subsidy Form': {
-          tag: 'EVENT',
-          descEn: 'Networking and social event subsidy request form.',
-          descFr: 'Formulaire de demande de subvention pour événement de réseautage.'
+        {
+          sectionEN: "II. Office Specifications",
+          sectionFR: "II. Spécifications du bureau",
+          sectionCN: "II. 办公室规格",
+          items: [
+            { type:"text", labelEN:"Office Area (sqm)", labelFR:"Surface du bureau (m²)", labelCN:"办公室面积（平方米）", key:"office_area", rows:1 },
+            { type:"number", labelEN:"Maximum Capacity (Pax)", labelFR:"Capacité maximale (personnes)", labelCN:"最大容量（人）", key:"capacity", rows:1 },
+            { type:"number", labelEN:"Monthly Rent (USDT)", labelFR:"Loyer mensuel (USDT)", labelCN:"月租金（USDT）", key:"rent", rows:1 },
+            { type:"date", labelEN:"Expected Opening Date", labelFR:"Date d'ouverture prévue", labelCN:"预计开业日期", key:"opening_date", rows:1 }
+          ]
         },
-        'Material & Resource Requisition': {
-          tag: 'SUPPLY',
-          descEn: 'Material and resource requisition with shipment information.',
-          descFr: 'Demande de matériel et ressources avec informations d’expédition.'
+        {
+          sectionEN: "III. Strategic Objectives",
+          sectionFR: "III. Objectifs stratégiques",
+          sectionCN: "III. 战略目标",
+          items: [
+            { type:"text", labelEN:"Target New ACM Registrations", labelFR:"Objectif : Nouvelles inscriptions ACM", labelCN:"目标：新增 ACM 注册", key:"target_acm", rows:1 },
+            { type:"number", labelEN:"Target Team VIP Rank Growth", labelFR:"Objectif : Amélioration du rang VIP", labelCN:"目标：团队 VIP 等级提升", key:"target_vip", rows:1 },
+            { type:"note", labelEN:"Primary Objectives", labelFR:"Objectifs principaux", labelCN:"主要目标", key:"primary_note", rows:1,
+              contentEN: `
+1. Eligibility
+Only VIP3 and above senior applicants may apply. The office must be a real and operational location.
+
+2. Office Types
+- STAR Team Communication Office
+- STAR Recruitment and Training Office
+- STAR Market Development Office
+
+3. Purpose
+- Team training and member support
+- ACM registration support
+- Investment and market exchange
+- Team meetings and expansion
+
+4. Development Plan
+Applicants must submit a clear plan for expected ACM registrations, VIP growth, and operational capacity.
+
+5. Applicant Declaration
+The office is for official STAR use only and must follow support rules and evaluation criteria.
+              `,
+              contentFR: `
+1. Admissibilité
+Seuls les agents seniors de niveau VIP3 et plus peuvent postuler. Le bureau doit être un lieu réel et opérationnel.
+
+2. Types de bureau
+- Bureau de communication de l’équipe STAR
+- Bureau de recrutement et de formation STAR
+- Bureau de développement du marché STAR
+
+3. Objectif
+- Formation de l’équipe et soutien aux membres
+- Aide à l’inscription à l’ACM
+- Investissement et échanges de marché
+- Réunions et expansion de l’équipe
+
+4. Plan de développement
+Les candidats doivent soumettre un plan clair concernant les inscriptions ACM attendues, la croissance VIP et la capacité opérationnelle.
+
+5. Déclaration du candidat
+Le bureau est réservé à l’usage officiel de STAR et doit respecter les règles de soutien et les critères d’évaluation.
+              `,
+              contentCN: `
+1. 资格要求
+仅 VIP3 及以上高级申请人可申请。办公室必须是真实且正常运营的地点。
+
+2. 办公室类型
+- STAR 团队沟通办公室
+- STAR 招募与培训办公室
+- STAR 市场开发办公室
+
+3. 目的
+- 团队培训与成员支持
+- ACM 注册支持
+- 投资与市场交流
+- 团队会议与扩展
+
+4. 发展计划
+申请人必须提交清晰计划，包括预计 ACM 注册数、VIP 增长和运营能力。
+
+5. 申请人声明
+办公室仅供 STAR 官方使用，并必须遵守支持规则和评估标准。
+              `
+            }
+          ]
         }
-      };
-
-      document.getElementById('cards').innerHTML = forms.map(id => {
-        const meta = formMeta[id] || {};
-        return `
-          <div class="card" onclick="openForm('${id}')">
-            <div>
-              <div class="card-tag">${meta.tag || 'FORM'}</div>
-              <h3>${id}</h3>
-              <p>${currentLang === 'fr' ? (meta.descFr || '') : (meta.descEn || '')}</p>
-            </div>
-            <div class="go">${currentLang === 'fr' ? 'OUVRIR →' : 'OPEN →'}</div>
-          </div>
-        `;
-      }).join('');
+      ]
+    },
+    {
+      id: "form2",
+      nameEN: "Office Registration Details",
+      nameFR: "Détails d'enregistrement du bureau",
+      nameCN: "办公室登记信息",
+      descEN: "A cleaner registration layout for office-related submissions.",
+      descFR: "Une présentation plus propre pour les soumissions liées aux bureaux.",
+      descCN: "适用于办公室相关提交的更清晰登记布局。",
+      sections: [
+        {
+          sectionEN: "Office Registration",
+          sectionFR: "Enregistrement du bureau",
+          sectionCN: "办公室登记",
+          items: [
+            { type:"text", labelEN:"Office Name", labelFR:"Nom du bureau", labelCN:"办公室名称", key:"office_name", rows:1 },
+            { type:"text", labelEN:"Region / City", labelFR:"Région / Ville", labelCN:"区域 / 城市", key:"region", rows:1 },
+            { type:"textarea", labelEN:"Office Description", labelFR:"Description du bureau", labelCN:"办公室描述", key:"office_desc", rows:1 },
+            { type:"date", labelEN:"Registration Date", labelFR:"Date d'enregistrement", labelCN:"登记日期", key:"reg_date", rows:1 }
+          ]
+        },
+        {
+          sectionEN: "Operational Note",
+          sectionFR: "Note opérationnelle",
+          sectionCN: "运营说明",
+          items: [
+            { type:"note", labelEN:"Instructions", labelFR:"Instructions", labelCN:"说明", key:"ops_note", rows:1,
+              contentEN:"Please complete all fields accurately. The office must be active and reachable during verification.",
+              contentFR:"Veuillez remplir tous les champs avec exactitude. Le bureau doit être actif et joignable lors de la vérification.",
+              contentCN:"请准确填写所有字段。核实期间，办公室必须处于正常运作并可联系。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: "form3",
+      nameEN: "Strategic Objectives Summary",
+      nameFR: "Résumé des objectifs stratégiques",
+      nameCN: "战略目标汇总",
+      descEN: "A summary form for project objectives and performance targets.",
+      descFR: "Un formulaire de résumé pour les objectifs et les cibles de performance.",
+      descCN: "用于项目目标和绩效指标的汇总表。",
+      sections: [
+        {
+          sectionEN: "Objectives",
+          sectionFR: "Objectifs",
+          sectionCN: "目标",
+          items: [
+            { type:"text", labelEN:"Project Title", labelFR:"Titre du projet", labelCN:"项目名称", key:"project_title", rows:1 },
+            { type:"textarea", labelEN:"Primary Objectives", labelFR:"Objectifs principaux", labelCN:"主要目标", key:"objectives", rows:1 },
+            { type:"number", labelEN:"Expected Registrations", labelFR:"Inscriptions attendues", labelCN:"预计注册数量", key:"expected_reg", rows:1 },
+            { type:"number", labelEN:"Expected Revenue", labelFR:"Revenu prévu", labelCN:"预计收入", key:"expected_revenue", rows:1 },
+          ]
+        }
+      ]
     }
+  ];
 
-    function openForm(id) {
-      activeFormId = id;
-      const firstRow = masterData.find(x => x.FormID === id);
-      activeFormTitle = firstRow ? firstRow.FormID : id;
+  const state = {
+    currentLang: "EN",
+    currentFormId: null,
+    drafts: JSON.parse(localStorage.getItem("star_team_drafts") || "{}")
+  };
 
-      document.getElementById('hubView').style.display = 'none';
-      document.getElementById('formView').style.display = 'block';
+  const elHome = document.getElementById("homeView");
+  const elForm = document.getElementById("formView");
+  const elHomeGrid = document.getElementById("homeGrid");
+  const elFormBody = document.getElementById("formBody");
+  const elCurrentTitle = document.getElementById("currentFormTitle");
+  const elCurrentDesc = document.getElementById("currentFormDesc");
+  const elCurrentLocalePill = document.getElementById("currentLocalePill");
+  const elPdfArea = document.getElementById("pdfArea");
 
-      const fields = masterData.filter(i => i.FormID === id);
-      renderForm(fields);
-      applyUI();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+  function getText(obj, lang){
+    if(lang === "FR") return obj.fr || obj.FR || obj.french || "";
+    if(lang === "CN") return obj.cn || obj.CN || obj.chinese || "";
+    return obj.en || obj.EN || obj.english || "";
+  }
 
-    function backToHub() {
-      document.getElementById('formView').style.display = 'none';
-      document.getElementById('hubView').style.display = 'block';
-      activeFormId = '';
-      activeFormTitle = '';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+  function t(form, keyBase){
+    if(state.currentLang === "FR") return form[keyBase + "FR"] || form[keyBase + "EN"] || form[keyBase + "CN"] || "";
+    if(state.currentLang === "CN") return form[keyBase + "CN"] || form[keyBase + "EN"] || form[keyBase + "FR"] || "";
+    return form[keyBase + "EN"] || form[keyBase + "FR"] || form[keyBase + "CN"] || "";
+  }
 
-    function renderForm(fields) {
-      let html = `
-        <div class="doc-header">
-          <div class="title">
-            <div>
-              <h3>${activeFormTitle}</h3>
-              <div class="subtitle">
-                STAR TEAM Official Application Document<br>
-                ${currentLang === 'fr' ? 'Version bilingue optimisée pour l’export PDF A4.' : 'Bilingual version optimized for A4 PDF export.'}
-              </div>
-            </div>
-            <div class="doc-meta">
-              ${new Date().toLocaleDateString()}<br>
-              ${currentLang === 'fr' ? 'Document officiel' : 'Official document'}
-            </div>
-          </div>
+  function getFormTitle(form){
+    return state.currentLang === "FR" ? form.nameFR : state.currentLang === "CN" ? form.nameCN : form.nameEN;
+  }
+
+  function getFormDesc(form){
+    return state.currentLang === "FR" ? form.descFR : state.currentLang === "CN" ? form.descCN : form.descEN;
+  }
+
+  function autoSectionLabel(section){
+    return state.currentLang === "FR" ? section.sectionFR : state.currentLang === "CN" ? section.sectionCN : section.sectionEN;
+  }
+
+  function autoLabel(item){
+    return state.currentLang === "FR" ? item.labelFR : state.currentLang === "CN" ? item.labelCN : item.labelEN;
+  }
+
+  function autoNote(item){
+    return state.currentLang === "FR" ? item.contentFR : state.currentLang === "CN" ? item.contentCN : item.contentEN;
+  }
+
+  function saveDraft(formId){
+    const inputs = elFormBody.querySelectorAll("[data-key]");
+    const draft = {};
+    inputs.forEach(input => {
+      draft[input.dataset.key] = input.value;
+    });
+    state.drafts[formId] = draft;
+    localStorage.setItem("star_team_drafts", JSON.stringify(state.drafts));
+    document.getElementById("draftState").textContent = "Draft saved locally";
+  }
+
+  function loadDraft(formId){
+    return state.drafts[formId] || {};
+  }
+
+  function isLongLabel(label){
+    return label.length > 34;
+  }
+
+  function shouldTextarea(item){
+    return item.type === "textarea" || item.type === "note" || item.rows > 1;
+  }
+
+  function openForm(formId){
+    state.currentFormId = formId;
+    const form = forms.find(f => f.id === formId);
+    if(!form) return;
+
+    elHome.classList.add("hidden");
+    elForm.style.display = "block";
+    document.getElementById("backBtn").classList.remove("hidden");
+
+    elCurrentTitle.textContent = getFormTitle(form);
+    elCurrentDesc.textContent = getFormDesc(form);
+    elCurrentLocalePill.textContent = "Language: " + state.currentLang;
+
+    renderForm(form);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function goHome(){
+    elForm.style.display = "none";
+    elHome.classList.remove("hidden");
+    document.getElementById("backBtn").classList.add("hidden");
+    state.currentFormId = null;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function renderHome(){
+    elHomeGrid.innerHTML = forms.map(form => `
+      <div class="form-card">
+        <div class="tag">${form.id.toUpperCase()}</div>
+        <h3>${getFormTitle(form)}</h3>
+        <p>${getFormDesc(form)}</p>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="openForm('${form.id}')">Open Form</button>
+          <span class="pill">${form.sections.length} sections</span>
         </div>
+      </div>
+    `).join("");
+
+    const sectionCount = forms.reduce((sum, f) => sum + f.sections.length, 0);
+    const fieldCount = forms.reduce((sum, f) => sum + f.sections.reduce((a, s) => a + s.items.length, 0), 0);
+    document.getElementById("statSections").textContent = sectionCount;
+    document.getElementById("statFields").textContent = fieldCount;
+  }
+
+  function renderForm(form){
+    const draft = loadDraft(form.id);
+
+    let html = "";
+    form.sections.forEach((section, sectionIndex) => {
+      const sectionLabel = autoSectionLabel(section);
+
+      html += `
+        <div class="form-section">
+          <div class="form-section-header">
+            <h3>${sectionLabel}</h3>
+            <small>${section.items.length} items</small>
+          </div>
+          <div class="section-content">
       `;
 
-      const sections = [];
-      fields.forEach(f => {
-        const sec = currentLang === 'en' ? f.SectionEN : f.SectionFR;
-        if (!sections.includes(sec)) sections.push(sec);
-      });
+      const normalItems = section.items.filter(item => item.type !== "note");
+      const noteItems = section.items.filter(item => item.type === "note");
 
-      sections.forEach(sec => {
-        const sectionFields = fields.filter(f => (currentLang === 'en' ? f.SectionEN : f.SectionFR) === sec);
-        html += `<div class="section">
-          <div class="section-title">${sec}</div>
-          <div class="section-body">
-        `;
+      if(normalItems.length){
+        html += `<div class="grid-2">`;
+        normalItems.forEach(item => {
+          const label = autoLabel(item);
+          const value = draft[item.key] || "";
+          const useTextarea = shouldTextarea(item) || isLongLabel(label);
 
-        const hasNote = sectionFields.some(f => (f.Type || '').toLowerCase().trim() === 'note');
-        sectionFields.forEach(f => {
-          const type = (f.Type || '').toLowerCase().trim();
-          const label = currentLang === 'en' ? f.LabelEN : f.LabelFR;
-
-          if (type === 'note') {
-            html += `<div class="declaration">${escapeHtml(label).replace(/\n/g, '<br>')}</div>`;
-            return;
-          }
-
-          if (type === 'total') {
-            html += `
-              <div class="total-bar">
-                <div class="total-label">${label}</div>
-                <div class="total-value" id="grandTotal">0.00</div>
-              </div>
-            `;
-            return;
-          }
-
-          const rows = parseInt(f.Rows || 1, 10);
-
-          if (rows > 1) {
-            html += renderMatrix(sectionFields);
-            return;
-          }
-        });
-
-        if (!hasNote) {
-          const simpleFields = sectionFields.filter(f => {
-            const type = (f.Type || '').toLowerCase().trim();
-            return type !== 'note' && type !== 'total' && parseInt(f.Rows || 1, 10) === 1;
-          });
-
-          if (simpleFields.length) {
-            html += `<div class="grid">`;
-            simpleFields.forEach(f => {
-              const label = currentLang === 'en' ? f.LabelEN : f.LabelFR;
-              const type = (f.Type || '').toLowerCase().trim();
-              const isTextarea = /address|objectives|justification|remarks|details|plan|description/i.test(label);
-              const full = isTextarea || label.length > 34 ? 'full' : '';
-              html += `
-                <div class="field ${full}">
-                  <div class="label">${label}</div>
-                  ${
-                    isTextarea
-                      ? `<textarea class="input textarea ${type === 'number' ? 'calc-trigger' : ''}" oninput="autoCalc()" placeholder="${label}"></textarea>`
-                      : `<input class="input ${type === 'number' ? 'calc-trigger' : ''}" type="${type === 'date' ? 'date' : 'text'}" oninput="autoCalc()" placeholder="${label}" />`
-                  }
-                </div>
-              `;
-            });
-            html += `</div>`;
-          }
-        }
-
-        html += `</div></div>`;
-      });
-
-      document.getElementById('formContent').innerHTML = html;
-      autoCalc();
-    }
-
-    function renderMatrix(sectionFields) {
-      const matrixFields = sectionFields.filter(f => parseInt(f.Rows || 1, 10) > 1 && (f.Type || '').toLowerCase().trim() !== 'total');
-      if (!matrixFields.length) return '';
-
-      const rows = parseInt(matrixFields[0].Rows || 1, 10);
-
-      let html = `
-        <div class="table-wrap">
-          <table class="matrix">
-            <thead>
-              <tr>
-      `;
-      matrixFields.forEach(f => {
-        const label = currentLang === 'en' ? f.LabelEN : f.LabelFR;
-        html += `<th>${label}</th>`;
-      });
-      html += `</tr></thead><tbody>`;
-
-      for (let r = 0; r < rows; r++) {
-        html += `<tr>`;
-        matrixFields.forEach(f => {
-          const type = (f.Type || '').toLowerCase().trim();
-          const isNum = type === 'number';
           html += `
-            <td>
-              <input class="input ${isNum ? 'calc-trigger' : ''}" type="text" oninput="autoCalc()" />
-            </td>
+            <div class="field-card ${useTextarea ? 'grid-span-full' : ''}" style="${useTextarea ? 'grid-column:1/-1;' : ''}">
+              <div class="field-label">
+                <span>${label}${item.required ? ' <span style="color:#d97706">*</span>' : ''}</span>
+                <span class="type">${item.type.toUpperCase()}</span>
+              </div>
+              ${
+                item.type === "date" ? `
+                  <input class="field-input" type="date" data-key="${item.key}" value="${escapeHtml(value)}" oninput="saveDraft('${form.id}');updateTotal();">
+                ` : item.type === "number" ? `
+                  <input class="field-input" type="number" data-key="${item.key}" value="${escapeHtml(value)}" oninput="saveDraft('${form.id}');updateTotal();">
+                ` : `
+                  <${useTextarea ? 'textarea' : 'input'} class="${useTextarea ? 'field-textarea' : 'field-input'}"
+                    ${useTextarea ? '' : 'type="text"'}
+                    data-key="${item.key}"
+                    oninput="saveDraft('${form.id}');updateTotal();">${useTextarea ? escapeHtml(value) : ''}</${useTextarea ? 'textarea' : 'input'}>
+                `
+              }
+              ${item.rows > 1 ? `<div class="hint">Multi-row field</div>` : ``}
+            </div>
           `;
         });
-        html += `</tr>`;
+        html += `</div>`;
       }
 
-      html += `</tbody></table></div>`;
-      return html;
+      if(noteItems.length){
+        html += `<div style="display:grid; gap:14px; margin-top:14px;">`;
+        noteItems.forEach(item => {
+          html += `
+            <div class="note-panel">
+              <div class="note-title">${autoLabel(item)}</div>
+              <div class="note-content">${formatNote(autoNote(item))}</div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+
+      html += `</div></div>`;
+    });
+
+    const totalValue = calculateTotal(form.id);
+    html += `
+      <div class="total-bar">
+        <div>
+          <div class="label">Auto-calculated total</div>
+          <div class="muted" style="font-size:12px; margin-top:4px;">Sum of numeric inputs entered in the current form</div>
+        </div>
+        <div class="value" id="totalValue">${totalValue}</div>
+      </div>
+    `;
+
+    elFormBody.innerHTML = html;
+    updateTotal();
+  }
+
+  function calculateTotal(formId){
+    const form = forms.find(f => f.id === formId);
+    if(!form) return "0";
+    const draft = loadDraft(formId);
+    let total = 0;
+
+    form.sections.forEach(section => {
+      section.items.forEach(item => {
+        if(item.type === "number"){
+          const n = parseFloat(draft[item.key]);
+          if(!isNaN(n)) total += n;
+        }
+      });
+    });
+
+    return total.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  }
+
+  function updateTotal(){
+    if(!state.currentFormId) return;
+    const totalEl = document.getElementById("totalValue");
+    if(totalEl) totalEl.textContent = calculateTotal(state.currentFormId);
+  }
+
+  function switchLang(lang){
+    state.currentLang = lang;
+    document.getElementById("currentLocalePill").textContent = "Language: " + lang;
+    renderHome();
+    if(state.currentFormId){
+      openForm(state.currentFormId);
+    }
+  }
+
+  function formatNote(text){
+    if(!text) return "";
+    const lines = text.trim().split(/\n+/).map(s => s.trim()).filter(Boolean);
+    return lines.map(line => {
+      if(/^\d+\./.test(line)){
+        return `<div style="font-weight:800; margin-top:8px;">${escapeHtml(line)}</div>`;
+      }
+      if(/^-\s+/.test(line)){
+        return `<div style="margin-left:18px;">• ${escapeHtml(line.replace(/^-\s+/, ""))}</div>`;
+      }
+      return `<div>${escapeHtml(line)}</div>`;
+    }).join("");
+  }
+
+  function escapeHtml(str){
+    return String(str ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  async function downloadPDF(){
+    if(!state.currentFormId){
+      alert("Please open a form first.");
+      return;
     }
 
-    function autoCalc() {
-      let total = 0;
-      document.querySelectorAll('.calc-trigger').forEach(el => {
-        const val = parseFloat((el.value || '').replace(/[^\d.]/g, ''));
-        if (!isNaN(val)) total += val;
+    const form = forms.find(f => f.id === state.currentFormId);
+    if(!form) return;
+
+    const draft = loadDraft(form.id);
+    const title = getFormTitle(form);
+    const desc = getFormDesc(form);
+
+    let pdfHtml = `
+      <div class="pdf-header">
+        <div>
+          <div class="pdf-brand">STAR TEAM Application Portal</div>
+          <div class="pdf-sub">Official document export · ${new Date().toLocaleString()}</div>
+        </div>
+        <div style="text-align:right;">
+          <h2>${escapeHtml(title)}</h2>
+          <div class="pdf-sub">${escapeHtml(desc)}</div>
+        </div>
+      </div>
+    `;
+
+    form.sections.forEach(section => {
+      pdfHtml += `
+        <div class="pdf-section">
+          <div class="pdf-section-title">${escapeHtml(autoSectionLabel(section))}</div>
+          <div class="pdf-section-content">
+      `;
+
+      section.items.forEach(item => {
+        const label = escapeHtml(autoLabel(item));
+        const val = escapeHtml(draft[item.key] || "");
+
+        if(item.type === "note"){
+          pdfHtml += `
+            <div class="pdf-field">
+              <div class="pdf-label">${label}</div>
+              <div class="pdf-value">${escapeHtml(stripHtml(autoNote(item)))}</div>
+            </div>
+          `;
+        } else {
+          pdfHtml += `
+            <div class="pdf-field">
+              <div class="pdf-label">${label}</div>
+              <div class="pdf-value">${val || "-"}</div>
+            </div>
+          `;
+        }
       });
 
-      const out = document.getElementById('grandTotal');
-      if (out) {
-        out.innerText = total.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
-      }
+      pdfHtml += `
+          </div>
+        </div>
+      `;
+    });
+
+    const total = calculateTotal(form.id);
+    pdfHtml += `
+      <div class="pdf-section">
+        <div class="pdf-section-title">Summary</div>
+        <div class="pdf-section-content">
+          <div class="pdf-field">
+            <div class="pdf-label">Auto-calculated total</div>
+            <div class="pdf-value">${escapeHtml(total)}</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    elPdfArea.innerHTML = pdfHtml;
+    elPdfArea.style.display = "block";
+
+    const opt = {
+      margin: [8, 8, 8, 8],
+      filename: `${form.id}_${state.currentLang}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+    };
+
+    try{
+      await html2pdf().set(opt).from(elPdfArea).save();
+    }catch(err){
+      console.error(err);
+      alert("PDF generation failed.");
+    }finally{
+      elPdfArea.style.display = "none";
     }
+  }
 
-    function applyUI() {
-      const t = ui[currentLang];
-      document.getElementById('uiBrandTitle').innerText = t.brandTitle;
-      document.getElementById('uiBrandSub').innerText = t.brandSub;
-      document.getElementById('hubTitle').innerText = t.hubTitle;
-      document.getElementById('hubDesc').innerText = t.hubDesc;
-      document.getElementById('formHint').innerText = t.formHint;
-      document.getElementById('btnExport').innerText = t.btnExport;
-      document.getElementById('sigApplicant').innerText = t.sigApplicant;
-      document.getElementById('sigApproval').innerText = t.sigApproval;
-      document.getElementById('btnEn').classList.toggle('primary', currentLang === 'en');
-      document.getElementById('btnFr').classList.toggle('primary', currentLang === 'fr');
-      document.getElementById('btnEn').classList.toggle('gold', currentLang === 'en');
-      document.getElementById('btnFr').classList.toggle('gold', currentLang === 'fr');
-      if (activeFormId) renderHub();
-    }
+  function stripHtml(html){
+    const div = document.createElement("div");
+    div.innerHTML = html || "";
+    return div.textContent || div.innerText || "";
+  }
 
-    function setLang(lang) {
-      currentLang = lang;
-      applyUI();
-      if (activeFormId) {
-        const fields = masterData.filter(i => i.FormID === activeFormId);
-        renderForm(fields);
-      } else {
-        renderHub();
-      }
-    }
-
-    function saveAndExportPDF() {
-      const element = document.getElementById('pdfArea');
-
-      // 先把输入框值转换为静态文本，提升 PDF 稳定性
-      const cloned = element.cloneNode(true);
-      cloned.querySelectorAll('input, textarea').forEach(el => {
-        const value = el.value || '';
-        const span = document.createElement('div');
-        span.textContent = value;
-        span.style.cssText = `
-          min-height: 24px;
-          font-size: 15px;
-          font-weight: 700;
-          color: #111827;
-          white-space: pre-wrap;
-          word-break: break-word;
-        `;
-        el.parentNode.replaceChild(span, el);
-      });
-
-      const wrapper = document.createElement('div');
-      wrapper.style.position = 'fixed';
-      wrapper.style.left = '-99999px';
-      wrapper.style.top = '0';
-      wrapper.style.width = '210mm';
-      wrapper.appendChild(cloned);
-      document.body.appendChild(wrapper);
-
-      const opt = {
-        margin: 0,
-        filename: `${activeFormId || 'STAR_FORM'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          scrollX: 0,
-          scrollY: 0,
-          backgroundColor: '#ffffff'
-        },
-        jsPDF: {
-          unit: 'mm',
-          format: 'a4',
-          orientation: 'portrait'
-        },
-        pagebreak: { mode: ['css', 'legacy'] }
-      };
-
-      html2pdf()
-        .set(opt)
-        .from(wrapper)
-        .save()
-        .then(() => {
-          document.body.removeChild(wrapper);
-        })
-        .catch(err => {
-          console.error(err);
-          document.body.removeChild(wrapper);
-          alert('PDF generation failed.');
-        });
-    }
-
-    function escapeHtml(str) {
-      return String(str || '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
-    }
-
-    init();
-  </script>
+  // init
+  document.getElementById("backBtn").classList.add("hidden");
+  renderHome();
+</script>
 </body>
 </html>
