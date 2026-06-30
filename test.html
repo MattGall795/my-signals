@@ -3,56 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STAR TEAM | Strategic Hub</title>
-    <!-- 依赖库 -->
+    <title>STAR TEAM | Strategic Hub v2.1</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         :root { --star-blue: #0f172a; --star-gold: #b5935a; --bg: #f1f5f9; }
         body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); margin: 0; color: #1e293b; }
         
-        /* 导航与语言 */
+        /* 导航 */
         .top-nav { position: fixed; top: 0; width: 100%; background: white; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 100; }
         .lang-switch button { padding: 6px 12px; border: 1px solid var(--star-blue); background: none; cursor: pointer; font-weight: 800; font-size: 11px; margin-left: 5px; border-radius: 4px; }
         .lang-switch button.active { background: var(--star-blue); color: white; }
 
-        /* 仪表盘 */
-        .hero { background: var(--star-blue); color: white; padding: 100px 20px 60px; text-align: center; border-bottom: 5px solid var(--star-gold); }
+        /* 首页仪表盘 */
+        #hub-view { padding-top: 60px; }
+        .hero { background: var(--star-blue); color: white; padding: 60px 20px; text-align: center; border-bottom: 5px solid var(--star-gold); }
         .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
-        .card { background: white; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
+        .card { background: white; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s; position: relative; }
         .card:hover { transform: translateY(-5px); border-color: var(--star-gold); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
-        .card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--star-gold); }
 
-        /* 表单页面 */
-        #form-view { display: none; padding: 80px 10px 40px; }
-        .paper { background: white; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 15mm; box-sizing: border-box; box-shadow: 0 0 40px rgba(0,0,0,0.1); }
-        .back-btn { background: none; border: none; color: var(--star-blue); font-weight: 800; cursor: pointer; font-size: 14px; margin-bottom: 20px; }
+        /* 表单与PDF区域 */
+        #form-view { display: none; padding: 80px 0 40px; }
+        .paper-container { width: 210mm; margin: 0 auto; background: #fff; }
         
-        /* 表格样式 */
-        .section-header { background: var(--star-blue); color: white; padding: 10px 15px; font-weight: 700; margin: 25px 0 10px; font-size: 12px; text-transform: uppercase; border-left: 5px solid var(--star-gold); }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        td { border: 1px solid #cbd5e1; padding: 12px; font-size: 11px; }
-        .label-cell { background: #f8fafc; font-weight: 700; width: 35%; color: var(--star-blue); }
-        input { width: 100%; border: none; border-bottom: 1px solid #e2e8f0; outline: none; padding: 4px; font-size: 12px; background: transparent; }
-        input:focus { border-bottom-color: var(--star-gold); }
+        /* 关键：PDF 捕获区域 */
+        #pdf-area { 
+            width: 210mm; 
+            min-height: 297mm; 
+            padding: 20mm; 
+            box-sizing: border-box; 
+            background: white; 
+            position: relative;
+        }
+        
+        .section-header { background: var(--star-blue); color: white; padding: 8px 12px; font-weight: 700; margin: 20px 0 10px; font-size: 11px; text-transform: uppercase; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 5px; }
+        td { border: 1px solid #000; padding: 10px; font-size: 12px; color: #000; }
+        .label-cell { background: #f0f0f0; font-weight: 700; width: 35%; }
+        
+        input { width: 100%; border: none; border-bottom: 1px solid #ccc; outline: none; font-size: 12px; padding: 2px 0; }
+        
+        .btn-download { background: var(--star-gold); color: white; padding: 15px 50px; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; display: block; margin: 30px auto; }
+        .back-btn { margin-left: 20px; background: none; border: none; color: var(--star-blue); font-weight: 800; cursor: pointer; }
 
-        /* 下载按钮 */
-        .btn-download { background: var(--star-gold); color: white; padding: 18px 50px; border: none; border-radius: 50px; font-weight: 800; cursor: pointer; display: block; margin: 40px auto; font-size: 16px; box-shadow: 0 10px 20px rgba(181,147,90,0.3); }
-        
-        #loader { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; font-weight: 800; color: var(--star-blue); }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--star-gold); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #loader { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; font-weight: 800; }
     </style>
 </head>
 <body>
 
-<div id="loader">
-    <div class="spinner"></div>
-    <div id="loader-text">SYNCING WITH GLOBAL STRATEGY DATA...</div>
-</div>
+<div id="loader">SYNCING DATA...</div>
 
 <nav class="top-nav">
-    <div style="font-weight: 900; letter-spacing: 1px; color: var(--star-blue);">STAR TEAM <span style="color:var(--star-gold)">HUB</span></div>
+    <div style="font-weight: 900; color: var(--star-blue);">STAR TEAM</div>
     <div class="lang-switch">
         <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
         <button id="btn-fr" onclick="setLang('fr')">FR</button>
@@ -61,35 +63,34 @@
 
 <div id="hub-view">
     <div class="hero">
-        <h1 id="txt-title" style="margin:0; font-size: 32px;">STRATEGIC HUB</h1>
-        <p id="txt-subtitle" style="opacity: 0.8; font-size: 14px; margin-top: 10px;">REQUISITION & RESOURCE MANAGEMENT</p>
+        <h1 id="txt-title">STRATEGIC HUB</h1>
+        <p id="txt-subtitle">RESOURCE MANAGEMENT SYSTEM</p>
     </div>
     <div class="hub-grid" id="card-container"></div>
 </div>
 
 <div id="form-view">
-    <div class="max-container" style="max-width: 210mm; margin: 0 auto;">
-        <button class="back-btn" onclick="location.reload()" id="txt-back">← BACK TO DASHBOARD</button>
-        <div class="paper" id="pdf-area">
+    <button class="back-btn" onclick="location.reload()" id="txt-back">← BACK</button>
+    <div class="paper-container">
+        <div id="pdf-area">
             <div id="dynamic-content"></div>
-            <!-- 固定签名区 -->
-            <div style="margin-top: 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+            <!-- Signature Area -->
+            <div style="margin-top: 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 50px;">
                 <div>
-                    <div style="border-bottom: 1px solid #000; height: 40px;"></div>
-                    <p style="font-size: 9px; font-weight: 800; margin-top: 5px;">APPLICANT SIGNATURE & DATE</p>
+                    <div style="border-bottom: 1.5px solid #000; height: 40px;"></div>
+                    <p style="font-size: 10px; font-weight: 800; margin-top: 5px; text-transform: uppercase;">Applicant Signature</p>
                 </div>
                 <div>
-                    <div style="border-bottom: 1px solid #000; height: 40px;"></div>
-                    <p style="font-size: 9px; font-weight: 800; margin-top: 5px;">STAR TEAM AUDIT APPROVAL</p>
+                    <div style="border-bottom: 1.5px solid #000; height: 40px;"></div>
+                    <p style="font-size: 10px; font-weight: 800; margin-top: 5px; text-transform: uppercase;">Strategic Approval</p>
                 </div>
             </div>
         </div>
-        <button class="btn-download" onclick="exportPDF()" id="txt-dl">GENERATE DOCUMENT</button>
     </div>
+    <button class="btn-download" onclick="exportPDF()" id="txt-dl">DOWNLOAD PDF</button>
 </div>
 
 <script>
-    // 您的专属谷歌 CSV 链接
     const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKHJzBTPFZ8c6bKiFwboWefQR_kI52mG6IrCScvDFgCaoEy3TRh5Wk-aftU19m4-VwOugLc0IKldiA/pub?output=csv'; 
 
     let masterData = [];
@@ -106,24 +107,19 @@
                 complete: (results) => {
                     masterData = results.data;
                     renderHub();
-                    setTimeout(() => document.getElementById('loader').style.display = 'none', 800);
+                    document.getElementById('loader').style.display = 'none';
                 }
             });
-        } catch (error) {
-            document.getElementById('loader-text').innerText = "CONNECTION FAILED. CHECK GOOGLE SHEET PUBLISHING.";
-        }
+        } catch (e) { document.getElementById('loader').innerText = "Sync Error."; }
     }
 
     function renderHub() {
         const container = document.getElementById('card-container');
-        // 根据 FormID 列去重
         const uniqueForms = [...new Set(masterData.map(item => item.FormID))].filter(id => id);
-        
         container.innerHTML = uniqueForms.map(id => `
             <div class="card" onclick="openForm('${id}')">
-                <h3 style="text-transform:uppercase; margin:0 0 10px; color:var(--star-blue)">${id.replace('_', ' ')}</h3>
-                <p style="font-size:12px; color:#64748b; margin:0;">Strategic Requisition System</p>
-                <div style="margin-top:20px; font-size:10px; font-weight:800; color:var(--star-gold)">OPEN FORM →</div>
+                <h3 style="text-transform:uppercase; margin:0 0 10px;">${id.replace('_', ' ')}</h3>
+                <div style="font-size:10px; font-weight:800; color:var(--star-gold)">SELECT REQUISITION →</div>
             </div>
         `).join('');
     }
@@ -132,15 +128,14 @@
         activeFormId = formId;
         document.getElementById('hub-view').style.display = 'none';
         document.getElementById('form-view').style.display = 'block';
-        window.scrollTo(0,0);
         
         const formFields = masterData.filter(item => item.FormID === formId);
         const container = document.getElementById('dynamic-content');
         
         let html = `
-            <div style="text-align:center; border-bottom: 2px solid var(--star-blue); padding-bottom: 20px; margin-bottom: 20px;">
-                <h1 style="margin:0; font-size: 24px; color:var(--star-blue); text-transform:uppercase;">${formId.replace('_', ' ')}</h1>
-                <p style="margin:5px 0 0; color:var(--star-gold); font-size:10px; font-weight:800; letter-spacing:2px;">OFFICIAL STRATEGIC REQUISITION</p>
+            <div style="text-align:center; border-bottom: 3px solid #0f172a; padding-bottom: 15px; margin-bottom: 20px;">
+                <h1 style="margin:0; font-size: 26px; text-transform:uppercase;">${formId.replace('_', ' ')}</h1>
+                <p style="margin:5px 0 0; color:#b5935a; font-size:11px; font-weight:800; letter-spacing:3px;">STAR TEAM OFFICIAL DOCUMENT</p>
             </div>
         `;
 
@@ -152,14 +147,8 @@
                 html += `<div class="section-header">${secTitle}</div><table>`;
                 currentSection = secTitle;
             }
-            
             const label = currentLang === 'en' ? field.LabelEN : field.LabelFR;
-            html += `
-                <tr>
-                    <td class="label-cell">${label}</td>
-                    <td><input type="${field.Type || 'text'}" placeholder="..."></td>
-                </tr>
-            `;
+            html += `<tr><td class="label-cell">${label}</td><td><input type="${field.Type || 'text'}"></td></tr>`;
         });
         
         html += `</table>`;
@@ -177,8 +166,8 @@
 
     function updateUI() {
         const ui = {
-            en: { title: "STAR TEAM | STRATEGIC HUB", sub: "REQUISITION & RESOURCE MANAGEMENT", back: "← BACK TO DASHBOARD", dl: "GENERATE DOCUMENT" },
-            fr: { title: "STAR TEAM | PÔLE STRATÉGIQUE", sub: "GESTION DES RESSOURCES ET RÉQUISITIONS", back: "← RETOUR AU TABLEAU DE BORD", dl: "GÉNÉRER LE DOCUMENT" }
+            en: { title: "STAR TEAM | STRATEGIC HUB", sub: "RESOURCE MANAGEMENT SYSTEM", back: "← BACK", dl: "DOWNLOAD PDF" },
+            fr: { title: "STAR TEAM | PÔLE STRATÉGIQUE", sub: "SYSTÈME DE GESTION", back: "← RETOUR", dl: "TÉLÉCHARGER LE PDF" }
         };
         document.getElementById('txt-title').innerText = ui[currentLang].title;
         document.getElementById('txt-subtitle').innerText = ui[currentLang].sub;
@@ -188,21 +177,36 @@
 
     function exportPDF() {
         const btn = document.getElementById('txt-dl');
-        btn.innerText = "PROCESSING...";
+        btn.innerText = "...PROCESSING...";
         
-        // 捕获输入值
-        document.querySelectorAll('input').forEach(i => i.setAttribute('value', i.value));
+        // 关键步骤：同步 input 值到 DOM，否则 PDF 可能不显示填写内容
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.setAttribute('value', input.value);
+            // 临时隐藏边框使 PDF 更整洁
+            input.style.borderBottom = 'none';
+        });
 
         const element = document.getElementById('pdf-area');
+        
+        // 修正偏移的核心配置
         const opt = {
-            margin: 0,
-            filename: `STAR_${activeFormId}_${new Date().getTime()}.pdf`,
+            margin: [10, 0, 10, 0], // 上, 左, 下, 右 (mm)
+            filename: `STAR_${activeFormId}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true, 
+                letterRendering: true,
+                scrollY: 0, // 关键：防止滚动导致的位移
+                windowWidth: 1000 // 锁定宽度渲染
+            },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
+
         html2pdf().set(opt).from(element).save().then(() => {
-            btn.innerText = currentLang === 'en' ? "GENERATE DOCUMENT" : "GÉNÉRER LE DOCUMENT";
+            btn.innerText = currentLang === 'en' ? "DOWNLOAD PDF" : "TÉLÉCHARGER LE PDF";
+            inputs.forEach(input => input.style.borderBottom = '1px solid #ccc'); // 恢复边框
         });
     }
 
