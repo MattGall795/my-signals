@@ -70,3 +70,173 @@
     <div class="logo">STAR TEAM <span style="color:var(--star-gold)">STRATEGY</span></div>
     <div class="lang-switch">
         <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
+        <button id="btn-fr" onclick="setLang('fr')">FR</button>
+    </div>
+</nav>
+
+<div id="hub-view">
+    <div class="hero">
+        <h1 id="txt-title" style="margin:0; font-size: 32px;">STRATEGIC HUB</h1>
+        <p id="txt-subtitle" style="opacity: 0.8; font-size: 14px; margin-top: 10px;">REQUISITION & RESOURCE MANAGEMENT</p>
+    </div>
+    <div class="hub-grid" id="card-container"></div>
+</div>
+
+<div id="form-view">
+    <button class="back-btn" onclick="location.reload()" id="txt-back">← BACK TO DASHBOARD</button>
+    <div class="pdf-wrap">
+        <div id="pdf-area">
+            <div id="dynamic-content"></div>
+            
+            <!-- 自动注入签名区 -->
+            <div class="sig-container">
+                <div class="sig-box">
+                    <div class="sig-line"></div>
+                    <div class="sig-label" id="txt-sig-app">Applicant Signature & Date</div>
+                </div>
+                <div class="sig-box">
+                    <div class="sig-line"></div>
+                    <div class="sig-label" id="txt-sig-auth">Authorized Approval (STAR Team)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="btn-download" onclick="exportPDF()" id="txt-dl">DOWNLOAD PDF DOCUMENT</button>
+</div>
+
+<script>
+    // 您的谷歌表格数据源
+    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKHJzBTPFZ8c6bKiFwboWefQR_kI52mG6IrCScvDFgCaoEy3TRh5Wk-aftU19m4-VwOugLc0IKldiA/pub?output=csv'; 
+
+    let masterData = [];
+    let currentLang = 'en';
+    let activeFormId = '';
+
+    async function init() {
+        try {
+            const response = await fetch(SHEET_CSV_URL);
+            const csvText = await response.text();
+            Papa.parse(csvText, {
+                header: true,
+                skipEmptyLines: true,
+                complete: (results) => {
+                    masterData = results.data;
+                    renderHub();
+                    setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+                }
+            });
+        } catch (e) { 
+            document.getElementById('loader').innerText = "CONNECTION FAILED. CHECK NETWORK."; 
+        }
+    }
+
+    function renderHub() {
+        const container = document.getElementById('card-container');
+        const uniqueForms = [...new Set(masterData.map(item => item.FormID))].filter(id => id);
+        container.innerHTML = uniqueForms.map(id => `
+            <div class="card" onclick="openForm('${id}')">
+                <h3>${id.replace('_', ' ')}</h3>
+                <p>Official Requisition Portal</p>
+                <div style="margin-top:20px; font-size:11px; font-weight:800; color:var(--star-gold)">OPEN DOCUMENT →</div>
+            </div>
+        `).join('');
+    }
+
+    function openForm(formId) {
+        activeFormId = formId;
+        document.getElementById('hub-view').style.display = 'none';
+        document.getElementById('form-view').style.display = 'block';
+        window.scrollTo(0,0);
+        
+        const formFields = masterData.filter(item => item.FormID === formId);
+        const container = document.getElementById('dynamic-content');
+        
+        let html = `
+            <div class="doc-header">
+                <h1 style="margin:0; font-size: 28px; text-transform:uppercase;">${formId.replace('_', ' ')}</h1>
+                <p style="margin:8px 0 0; color:var(--star-gold); font-size:11px; font-weight:800; letter-spacing:4px;">STAR TEAM OFFICIAL REQUISITION</p>
+            </div>
+        `;
+
+        let currentSection = "";
+        formFields.forEach(field => {
+            const secTitle = currentLang === 'en' ? field.SectionEN : field.SectionFR;
+            const label = currentLang === 'en' ? field.LabelEN : field.LabelFR;
+            const type = (field.Type || 'text').toLowerCase().trim();
+
+            if (secTitle !== currentSection) {
+                if (currentSection !== "") html += `</table>`;
+                html += `<div class="section-header">${secTitle}</div><table style="width:100%; border-collapse:collapse;">`;
+                currentSection = secTitle;
+            }
+
+            // 处理特殊声明行 (Type: note)
+            if (type === 'note') {
+                html += `</table><div class="note-block">${label}</div><table style="width:100%; border-collapse:collapse;">`;
+            } else {
+                html += `<tr><td class="label-cell">${label}</td><td><input type="${type}"></td></tr>`;
+            }
+        });
+        
+        html += `</table>`;
+        container.innerHTML = html;
+        updateUI();
+    }
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('.lang-switch button').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + lang).classList.add('active');
+        if (activeFormId) openForm(activeFormId);
+        updateUI();
+    }
+
+    function updateUI() {
+        const ui = {
+            en: { title: "STAR TEAM | STRATEGIC HUB", sub: "REQUISITION & RESOURCE MANAGEMENT", back: "← BACK TO DASHBOARD", dl: "DOWNLOAD PDF DOCUMENT", sigApp: "Applicant Signature & Date", sigAuth: "Authorized Approval (STAR Team)" },
+            fr: { title: "STAR TEAM | PÔLE STRATÉGIQUE", sub: "GESTION DES RESSOURCES ET RÉQUISITIONS", back: "← RETOUR AU TABLEAU DE BORD", dl: "TÉLÉCHARGER LE PDF", sigApp: "Signature du demandeur et date", sigAuth: "Approbation autorisée (STAR Team)" }
+        };
+        const active = ui[currentLang];
+        document.getElementById('txt-title').innerText = active.title;
+        document.getElementById('txt-subtitle').innerText = active.sub;
+        document.getElementById('txt-back').innerText = active.back;
+        document.getElementById('txt-dl').innerText = active.dl;
+        document.getElementById('txt-sig-app').innerText = active.sigApp;
+        document.getElementById('txt-sig-auth').innerText = active.sigAuth;
+    }
+
+    function exportPDF() {
+        const btn = document.getElementById('txt-dl');
+        const element = document.getElementById('pdf-area');
+        btn.innerText = "GENERATING DOCUMENT...";
+        
+        // 同步输入内容到 DOM
+        document.querySelectorAll('input').forEach(i => i.setAttribute('value', i.value));
+
+        const opt = {
+            margin: 0,
+            filename: `STAR_${activeFormId}_${new Date().getTime()}.pdf`,
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true,
+                scrollX: 0,
+                scrollY: 0,
+                x: 0, 
+                y: 0,
+                windowWidth: 794 // 锁定宽度渲染，防止偏移
+            },
+            jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            btn.innerText = currentLang === 'en' ? "DOWNLOAD PDF DOCUMENT" : "TÉLÉCHARGER LE PDF";
+        });
+    }
+
+    init();
+</script>
+
+<style> @keyframes spin { to { transform: rotate(360deg); } } </style>
+</body>
+</html>
