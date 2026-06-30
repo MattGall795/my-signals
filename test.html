@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STAR TEAM | Strategic Hub v7.0</title>
+    <title>STAR TEAM | Strategic Hub v8.1</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -17,32 +17,40 @@
         
         #hub-view { padding-top: 100px; text-align: center; }
         .hub-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 40px; }
-        .card { background: white; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; width: 300px; transition: 0.3s; }
+        .card { background: white; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; width: 300px; transition: 0.3s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .card:hover { border-color: var(--star-gold); transform: translateY(-3px); }
 
         #form-view { display: none; padding: 80px 0; }
-        .pdf-wrap { width: 800px; margin: 0 auto; background: white; }
-        #pdf-area { width: 800px; padding: 60px; background: white; min-height: 1100px; color: #000; position: relative; }
+        .pdf-wrap { width: 820px; margin: 0 auto; background: white; box-shadow: 0 0 30px rgba(0,0,0,0.1); }
+        #pdf-area { width: 820px; padding: 60px; background: white; min-height: 1120px; color: #000; position: relative; }
 
         .doc-header { border-bottom: 4px solid var(--star-blue); padding-bottom: 20px; margin-bottom: 30px; text-align: center; }
-        .section-header { background: var(--star-blue); color: white; padding: 10px 15px; font-weight: 800; font-size: 13px; text-transform: uppercase; margin-top: 25px; border: 1px solid #000; border-bottom: none; }
+        .section-header { background: var(--star-blue); color: white; padding: 10px 15px; font-weight: 800; font-size: 13px; text-transform: uppercase; margin-top: 25px; border: 1.5px solid #000; border-bottom: none; }
         
-        /* 核心布局引擎 */
-        .grid-container { display: flex; flex-wrap: wrap; border: 1px solid #000; border-bottom: none; }
-        .field { border-bottom: 1px solid #000; border-right: 1px solid #000; padding: 10px 12px; display: flex; flex-direction: column; min-height: 65px; }
-        .field:last-child { border-right: none; }
+        /* 动态矩阵引擎 */
+        .grid-container { display: flex; flex-wrap: wrap; border: 1.5px solid #000; border-bottom: none; }
+        .field-col { border-right: 1.5px solid #000; display: flex; flex-direction: column; }
+        .field-col:last-child { border-right: none; }
         
-        /* 宽度控制：支持 1, 2, 4 列 */
-        .w-100 { width: 100%; border-right: none !important; }
+        .cell-label { background: #f1f5f9; border-bottom: 1.5px solid #000; padding: 8px 10px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: #1e293b; min-height: 35px; display: flex; align-items: center; }
+        .cell-input-wrap { border-bottom: 1.5px solid #000; padding: 8px 10px; min-height: 45px; display: flex; align-items: center; }
+        .field-input { width: 100%; border: none; outline: none; font-size: 13px; font-weight: 600; background: transparent; }
+
+        /* 总计项特殊样式 */
+        .total-row { width: 100%; background: #f8fafc; border-bottom: 1.5px solid #000; display: flex; align-items: center; justify-content: flex-end; padding: 12px 20px; }
+        .total-label { font-weight: 900; font-size: 14px; text-transform: uppercase; margin-right: 20px; color: var(--star-blue); }
+        .total-input { width: 150px; border: none; border-bottom: 2px solid var(--star-blue); font-size: 16px; font-weight: 900; text-align: right; outline: none; background: transparent; }
+
+        /* 宽度类 */
+        .w-100 { width: 100%; }
         .w-50 { width: 50%; }
         .w-25 { width: 25%; }
-        
-        .field-label { font-size: 9px; font-weight: 800; color: #555; text-transform: uppercase; margin-bottom: 5px; }
-        .field-input { width: 100%; border: none; outline: none; font-size: 14px; font-weight: 600; background: transparent; }
+        .w-15 { width: 15%; }
 
-        .sig-container { margin-top: 80px; display: flex; justify-content: space-between; }
+        .sig-container { margin-top: 70px; display: flex; justify-content: space-between; }
         .sig-box { width: 45%; border-top: 2px solid #000; padding-top: 10px; text-align: center; font-size: 10px; font-weight: 800; text-transform: uppercase; }
 
-        .btn-download { background: var(--star-gold); color: white; padding: 15px 50px; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; display: block; margin: 30px auto; }
+        .btn-download { background: var(--star-gold); color: white; padding: 18px 60px; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; display: block; margin: 40px auto; }
     </style>
 </head>
 <body>
@@ -56,22 +64,22 @@
 </nav>
 
 <div id="hub-view">
-    <h1 id="txt-title">STRATEGIC HUB</h1>
+    <h1 id="txt-title" style="font-size:36px; margin-top:50px; color:var(--star-blue)">STRATEGIC HUB</h1>
     <div class="hub-grid" id="card-container"></div>
 </div>
 
 <div id="form-view">
-    <button onclick="location.reload()" style="margin:0 auto 20px; display:block; cursor:pointer; font-weight:800; border:none; background:none;">← BACK TO DASHBOARD</button>
+    <button onclick="location.reload()" style="margin:0 auto 20px; display:block; cursor:pointer; font-weight:800; border:none; background:none; color:var(--star-blue);">← BACK TO HUB</button>
     <div class="pdf-wrap">
         <div id="pdf-area">
             <div id="dynamic-content"></div>
             <div class="sig-container">
                 <div class="sig-box" id="txt-sig-app">Applicant Signature & Date</div>
-                <div class="sig-box" id="txt-sig-auth">Authorized Approval</div>
+                <div class="sig-box" id="txt-sig-auth">Authorized Strategic Approval</div>
             </div>
         </div>
     </div>
-    <button class="btn-download" onclick="exportPDF()" id="txt-dl">DOWNLOAD PDF</button>
+    <button class="btn-download" onclick="exportPDF()" id="txt-dl">DOWNLOAD OFFICIAL PDF</button>
 </div>
 
 <script>
@@ -89,7 +97,7 @@
     function renderHub() {
         const container = document.getElementById('card-container');
         const forms = [...new Set(masterData.map(i => i.FormID))];
-        container.innerHTML = forms.map(id => `<div class="card" onclick="openForm('${id}')"><h3 style="text-transform:uppercase">${id.replace(/_/g,' ')}</h3></div>`).join('');
+        container.innerHTML = forms.map(id => `<div class="card" onclick="openForm('${id}')"><h3 style="text-transform:uppercase; margin:0; font-size:18px;">${id.replace(/_/g,' ')}</h3><p style="margin:10px 0 0; font-size:11px; color:#64748b; font-weight:700;">PROCEED TO DOCUMENT →</p></div>`).join('');
     }
 
     function openForm(id) {
@@ -102,30 +110,45 @@
         
         let html = `<div class="doc-header">
             <h1 style="margin:0; font-size:28px; text-transform:uppercase;">${id.replace(/_/g,' ')}</h1>
-            <p style="margin:5px 0 0; color:var(--star-gold); font-size:11px; letter-spacing:4px; font-weight:800;">STAR TEAM OFFICIAL DOCUMENT</p>
+            <p style="margin:8px 0 0; color:var(--star-gold); font-size:11px; letter-spacing:5px; font-weight:800;">STAR TEAM OFFICIAL DOCUMENT</p>
         </div>`;
 
         let currentSection = "";
-        fields.forEach((field, index) => {
+        let gridOpen = false;
+
+        fields.forEach((field) => {
             const label = (currentLang === 'en' ? field.LabelEN : field.LabelFR);
             const section = (currentLang === 'en' ? field.SectionEN : field.SectionFR);
-            const type = (field.Type || 'text').toLowerCase();
+            const type = (field.Type || 'text').toLowerCase().trim();
+            const rowCount = parseInt(field.Rows) || 1;
 
             if (section !== currentSection) {
-                if (currentSection !== "") html += `</div>`; // Close grid
+                if (gridOpen) html += `</div>`; 
                 html += `<div class="section-header">${section}</div><div class="grid-container">`;
                 currentSection = section;
+                gridOpen = true;
             }
 
-            // 智能宽度逻辑：数字类型占据 1/4 (w-25)，电话邮箱占据 1/2 (w-50)，其余全行 (w-100)
-            let wClass = "w-100";
-            if (type === 'number' || label.length < 10) wClass = "w-25";
-            else if (type === 'tel' || type === 'email' || type === 'date') wClass = "w-50";
+            // 总计项特殊渲染逻辑
+            if (type === 'total') {
+                html += `<div class="total-row">
+                    <span class="total-label">${label}</span>
+                    <input type="text" class="total-input" placeholder="0.00">
+                </div>`;
+            } else {
+                // 正常列渲染逻辑
+                let wClass = "w-100";
+                if (type === 'number' || label.length < 8) wClass = "w-15";
+                else if (["tel", "email", "date"].includes(type)) wClass = "w-50";
+                else if (label.toLowerCase().includes("name") || label.toLowerCase().includes("matériau") || label.toLowerCase().includes("specification")) wClass = "w-25";
 
-            html += `<div class="field ${wClass}">
-                <span class="field-label">${label}</span>
-                <input type="text" class="field-input">
-            </div>`;
+                html += `<div class="field-col ${wClass}">
+                    <div class="cell-label">${label}</div>`;
+                for(let i=0; i < rowCount; i++) {
+                    html += `<div class="cell-input-wrap"><input type="text" class="field-input"></div>`;
+                }
+                html += `</div>`;
+            }
         });
 
         container.innerHTML = html + `</div>`;
@@ -142,8 +165,8 @@
 
     function updateUI() {
         const ui = {
-            en: { dl: "DOWNLOAD OFFICIAL PDF", sigApp: "Applicant Signature & Date", sigAuth: "Strategic Hub Approval" },
-            fr: { dl: "TÉLÉCHARGER LE PDF", sigApp: "Signature du demandeur & Date", sigAuth: "Approbation autorisée" }
+            en: { dl: "DOWNLOAD OFFICIAL PDF", sigApp: "Applicant Signature & Date", sigAuth: "Authorized Strategic Approval" },
+            fr: { dl: "TÉLÉCHARGER LE PDF OFFICIEL", sigApp: "Signature du demandeur & Date", sigAuth: "Approbation Stratégique" }
         };
         const active = ui[currentLang];
         document.getElementById('txt-dl').innerText = active.dl;
@@ -156,9 +179,9 @@
         document.querySelectorAll('input').forEach(i => i.setAttribute('value', i.value));
         html2pdf().set({
             margin: 0,
-            filename: `STAR_DOCUMENT.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, width: 800 },
+            filename: `STAR_OFFICIAL_${activeFormId}.pdf`,
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2, useCORS: true, width: 820 },
             jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
         }).from(element).save();
     }
