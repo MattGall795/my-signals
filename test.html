@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STAR TEAM | Strategic Hub v6.0</title>
+    <title>STAR TEAM | Strategic Hub v7.0</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -11,7 +11,6 @@
         * { box-sizing: border-box; -webkit-print-color-adjust: exact; }
         body { font-family: 'Inter', sans-serif; background: #f1f5f9; margin: 0; }
 
-        /* UI */
         .top-nav { position: fixed; top:0; width:100%; background:white; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 30px; box-shadow:0 2px 10px rgba(0,0,0,0.1); z-index:1000; }
         .lang-switch button { padding:6px 15px; border:1px solid var(--star-blue); background:none; cursor:pointer; font-weight:800; border-radius:4px; margin-left:8px; }
         .lang-switch button.active { background:var(--star-blue); color:white; }
@@ -19,44 +18,34 @@
         #hub-view { padding-top: 100px; text-align: center; }
         .hub-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 40px; }
         .card { background: white; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; width: 300px; transition: 0.3s; }
-        .card:hover { border-color: var(--star-gold); transform: translateY(-3px); }
 
-        /* PDF Area - 强制 A4 比例 */
         #form-view { display: none; padding: 80px 0; }
-        .pdf-wrap { width: 800px; margin: 0 auto; background: white; box-shadow: 0 0 30px rgba(0,0,0,0.1); }
+        .pdf-wrap { width: 800px; margin: 0 auto; background: white; }
         #pdf-area { width: 800px; padding: 60px; background: white; min-height: 1100px; color: #000; position: relative; }
 
-        /* 表单样式 */
         .doc-header { border-bottom: 4px solid var(--star-blue); padding-bottom: 20px; margin-bottom: 30px; text-align: center; }
-        .section-header { background: var(--star-blue); color: white; padding: 10px 15px; font-weight: 800; font-size: 13px; text-transform: uppercase; margin-top: 25px; border: 1px solid #000; }
+        .section-header { background: var(--star-blue); color: white; padding: 10px 15px; font-weight: 800; font-size: 13px; text-transform: uppercase; margin-top: 25px; border: 1px solid #000; border-bottom: none; }
         
-        /* 布局引擎：防止边框重叠 */
-        .row { display: flex; flex-wrap: wrap; border-left: 1px solid #000; border-right: 1px solid #000; margin-top: -1px; }
-        .field { border-bottom: 1px solid #000; padding: 10px 12px; min-height: 60px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #000; }
+        /* 核心布局引擎 */
+        .grid-container { display: flex; flex-wrap: wrap; border: 1px solid #000; border-bottom: none; }
+        .field { border-bottom: 1px solid #000; border-right: 1px solid #000; padding: 10px 12px; display: flex; flex-direction: column; min-height: 65px; }
         .field:last-child { border-right: none; }
         
-        /* 宽度控制 */
+        /* 宽度控制：支持 1, 2, 4 列 */
         .w-100 { width: 100%; border-right: none !important; }
         .w-50 { width: 50%; }
         .w-25 { width: 25%; }
         
-        .field-label { font-size: 10px; font-weight: 800; color: #444; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .field-input { width: 100%; border: none; outline: none; font-size: 14px; font-weight: 600; background: transparent; padding: 2px 0; }
+        .field-label { font-size: 9px; font-weight: 800; color: #555; text-transform: uppercase; margin-bottom: 5px; }
+        .field-input { width: 100%; border: none; outline: none; font-size: 14px; font-weight: 600; background: transparent; }
 
-        .note-block { width: 100%; padding: 15px; font-size: 11px; font-style: italic; background: #fdfdfd; border: 1px solid #000; border-top: none; line-height: 1.5; }
-
-        /* 签名 */
-        .sig-container { margin-top: 60px; display: flex; justify-content: space-between; }
+        .sig-container { margin-top: 80px; display: flex; justify-content: space-between; }
         .sig-box { width: 45%; border-top: 2px solid #000; padding-top: 10px; text-align: center; font-size: 10px; font-weight: 800; text-transform: uppercase; }
 
         .btn-download { background: var(--star-gold); color: white; padding: 15px 50px; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; display: block; margin: 30px auto; }
-
-        #loader { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; }
     </style>
 </head>
 <body>
-
-<div id="loader"><div style="font-weight:900; letter-spacing:3px;">STAR TEAM SECURE ACCESS...</div></div>
 
 <nav class="top-nav">
     <div style="font-weight:900; color:var(--star-blue)">STAR TEAM | STRATEGIC PORTAL</div>
@@ -92,18 +81,15 @@
     let activeFormId = '';
 
     async function init() {
-        try {
-            const res = await fetch(API_URL);
-            masterData = await res.json();
-            renderHub();
-            document.getElementById('loader').style.display = 'none';
-        } catch (e) { console.error("API Error"); }
+        const res = await fetch(API_URL);
+        masterData = await res.json();
+        renderHub();
     }
 
     function renderHub() {
         const container = document.getElementById('card-container');
         const forms = [...new Set(masterData.map(i => i.FormID))];
-        container.innerHTML = forms.map(id => `<div class="card" onclick="openForm('${id}')"><h3 style="text-transform:uppercase">${id.replace(/_/g,' ')}</h3><p style="font-size:11px;color:#667">Official STAR Resource</p></div>`).join('');
+        container.innerHTML = forms.map(id => `<div class="card" onclick="openForm('${id}')"><h3 style="text-transform:uppercase">${id.replace(/_/g,' ')}</h3></div>`).join('');
     }
 
     function openForm(id) {
@@ -115,51 +101,31 @@
         const container = document.getElementById('dynamic-content');
         
         let html = `<div class="doc-header">
-            <h1 style="margin:0; font-size:28px;">${id.replace(/_/g,' ')}</h1>
-            <p style="margin:5px 0 0; color:var(--star-gold); font-size:11px; letter-spacing:4px; font-weight:800;">STAR TEAM STRATEGIC DOCUMENT</p>
+            <h1 style="margin:0; font-size:28px; text-transform:uppercase;">${id.replace(/_/g,' ')}</h1>
+            <p style="margin:5px 0 0; color:var(--star-gold); font-size:11px; letter-spacing:4px; font-weight:800;">STAR TEAM OFFICIAL DOCUMENT</p>
         </div>`;
 
         let currentSection = "";
-        let isRowOpen = false;
-
         fields.forEach((field, index) => {
             const label = (currentLang === 'en' ? field.LabelEN : field.LabelFR);
             const section = (currentLang === 'en' ? field.SectionEN : field.SectionFR);
             const type = (field.Type || 'text').toLowerCase();
 
-            // 如果遇到新区域
             if (section !== currentSection) {
-                if (isRowOpen) html += `</div>`; 
-                html += `<div class="section-header">${section}</div>`;
-                html += `<div class="row">`; // 开启第一个新行
+                if (currentSection !== "") html += `</div>`; // Close grid
+                html += `<div class="section-header">${section}</div><div class="grid-container">`;
                 currentSection = section;
-                isRowOpen = true;
             }
 
-            // 布局决策逻辑
-            // 文本、地址等：占100% (w-100)
-            // 电话、邮箱：占50% (w-50)
-            // 数量、单位、单价、金额：占25% (w-25)
-            let widthClass = "w-100";
-            if (["number", "unit", "price", "currency"].includes(type) || label.length < 10) {
-                widthClass = "w-25";
-            } else if (["tel", "email", "date"].includes(type)) {
-                widthClass = "w-50";
-            }
+            // 智能宽度逻辑：数字类型占据 1/4 (w-25)，电话邮箱占据 1/2 (w-50)，其余全行 (w-100)
+            let wClass = "w-100";
+            if (type === 'number' || label.length < 10) wClass = "w-25";
+            else if (type === 'tel' || type === 'email' || type === 'date') wClass = "w-50";
 
-            // 特殊处理：如果是 Note 类型
-            if (type === 'note') {
-                if (isRowOpen) { html += `</div>`; isRowOpen = false; }
-                html += `<div class="note-block">${label}</div>`;
-            } else {
-                if (!isRowOpen) { html += `<div class="row">`; isRowOpen = true; }
-                html += `<div class="field ${widthClass}">
-                    <span class="field-label">${label}</span>
-                    <input type="text" class="field-input">
-                </div>`;
-                
-                // 如果当前字段是 100% 宽度，或者是当前 Row 的最后一个，考虑闭合行逻辑（这里由 Flex-wrap 自动处理，但为了边框严丝合缝，我们保持 row 的开启状态）
-            }
+            html += `<div class="field ${wClass}">
+                <span class="field-label">${label}</span>
+                <input type="text" class="field-input">
+            </div>`;
         });
 
         container.innerHTML = html + `</div>`;
@@ -176,11 +142,10 @@
 
     function updateUI() {
         const ui = {
-            en: { hub: "STRATEGIC HUB", dl: "DOWNLOAD OFFICIAL PDF", sigApp: "Applicant Signature & Date", sigAuth: "Strategic Hub Approval" },
-            fr: { hub: "PÔLE STRATÉGIQUE", dl: "TÉLÉCHARGER LE PDF", sigApp: "Signature du demandeur & Date", sigAuth: "Approbation autorisée" }
+            en: { dl: "DOWNLOAD OFFICIAL PDF", sigApp: "Applicant Signature & Date", sigAuth: "Strategic Hub Approval" },
+            fr: { dl: "TÉLÉCHARGER LE PDF", sigApp: "Signature du demandeur & Date", sigAuth: "Approbation autorisée" }
         };
         const active = ui[currentLang];
-        document.getElementById('txt-title').innerText = active.hub;
         document.getElementById('txt-dl').innerText = active.dl;
         document.getElementById('txt-sig-app').innerText = active.sigApp;
         document.getElementById('txt-sig-auth').innerText = active.sigAuth;
@@ -189,14 +154,13 @@
     function exportPDF() {
         const element = document.getElementById('pdf-area');
         document.querySelectorAll('input').forEach(i => i.setAttribute('value', i.value));
-        const opt = {
+        html2pdf().set({
             margin: 0,
-            filename: `STAR_DOC.pdf`,
+            filename: `STAR_DOCUMENT.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, width: 800, windowWidth: 800 },
+            html2canvas: { scale: 2, useCORS: true, width: 800 },
             jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
+        }).from(element).save();
     }
     init();
 </script>
