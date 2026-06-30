@@ -148,23 +148,27 @@
         `).join('');
     }
 
-    function openForm(formId) {
+        function openForm(formId) {
         activeFormId = formId;
         document.getElementById('hub-view').style.display = 'none';
         document.getElementById('form-view').style.display = 'block';
         
+        // 核心修复：每次打开时重新过滤当前语言对应的字段
         const formFields = masterData.filter(item => item.FormID === formId);
         const container = document.getElementById('dynamic-content');
         
+        // 动态标题（支持中英法）
+        const displayTitle = formId.replace(/_/g, ' ');
         let html = `<div style="text-align:center; border-bottom: 5px solid #0f172a; padding-bottom: 20px; margin-bottom: 35px;">
-                <h1 style="margin:0; font-size: 28px; text-transform:uppercase; letter-spacing:1px;">${formId.replace(/_/g, ' ')}</h1>
+                <h1 style="margin:0; font-size: 28px; text-transform:uppercase;">${displayTitle}</h1>
                 <p style="margin:10px 0 0; color:#b5935a; font-size:11px; font-weight:800; letter-spacing:5px;">STAR TEAM OFFICIAL DOCUMENT</p>
             </div>`;
 
         let currentSection = "";
         formFields.forEach(field => {
-            const secTitle = currentLang === 'en' ? field.SectionEN : field.SectionFR;
-            const label = currentLang === 'en' ? field.LabelEN : field.LabelFR;
+            // 严格取值：如果法文为空，则回退到英文
+            const secTitle = (currentLang === 'fr' ? field.SectionFR : field.SectionEN) || field.SectionEN;
+            const label = (currentLang === 'fr' ? field.LabelFR : field.LabelEN) || field.LabelEN;
             const type = (field.Type || 'text').toLowerCase().trim();
 
             if (secTitle !== currentSection) {
@@ -181,7 +185,9 @@
         });
         container.innerHTML = html + `</table>`;
         updateUI();
+        window.scrollTo(0,0); // 切换后回到顶部
     }
+
 
     function setLang(lang) {
         currentLang = lang;
