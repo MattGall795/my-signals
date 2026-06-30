@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAR TEAM | Strategic Requisition Hub</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root { --star-blue: #0f172a; --star-gold: #b5935a; --text: #334155; --border: #cbd5e1; }
+        body { font-family: 'Inter', -apple-system, Arial, sans-serif; background: #f1f5f9; margin: 0; color: var(--text); }
+
+        /* Professional Language Switcher */
+        .lang-switch { position: fixed; top: 20px; right: 20px; z-index: 1000; background: white; border: 2px solid var(--star-blue); border-radius: 8px; overflow: hidden; display: flex; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .lang-btn { padding: 8px 15px; font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; border: none; }
+        .lang-btn.active { background: var(--star-blue); color: white; }
+        .lang-btn:not(.active) { background: white; color: var(--star-blue); }
+
+        /* Dashboard */
+        #home-screen { padding: 40px 15px; text-align: center; }
+        .hero { background: var(--star-blue); color: white; padding: 40px 20px; border-bottom: 5px solid var(--star-gold); border-radius: 0 0 20px 20px; margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
+        .card { background: white; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s; text-align: left; }
+        .card:hover { transform: translateY(-5px); border-color: var(--star-gold); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+
+        /* Layout Fixes */
+        #form-container { display: none; padding: 20px 0; }
+        .top-bar { max-width: 210mm; margin: 0 auto 10px; display: flex; justify-content: space-between; padding: 0 10px; }
+        .btn-back { background: var(--star-blue); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 700; }
+
+        .viewport { width: 100%; overflow-x: auto; padding-bottom: 50px; }
+        .paper { background: white; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 15mm 15mm; box-sizing: border-box; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.15); }
+
+        /* Table & Text Styling */
+        .header { text-align: center; border-bottom: 2px solid var(--star-blue); padding-bottom: 10px; margin-bottom: 15px; }
+        .header h1 { margin: 0; font-size: 22px; text-transform: uppercase; color: var(--star-blue); }
+        .header p { margin: 5px 0 0; font-size: 10px; color: var(--star-gold); font-weight: 700; letter-spacing: 2px; }
+
+        .section-title { background: var(--star-blue); color: white; padding: 8px 12px; font-size: 11px; font-weight: 700; margin: 15px 0 10px; text-transform: uppercase; border-left: 5px solid var(--star-gold); }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; }
+        td { border: 1px solid var(--border); padding: 8px; font-size: 10px; vertical-align: middle; }
+        .label { background: #f8fafc; width: 140px; font-weight: 700; color: var(--star-blue); font-size: 9px; text-transform: uppercase; }
+
+        input, textarea { width: 100%; border: none; border-bottom: 1px solid #e2e8f0; padding: 4px; font-size: 11px; background: transparent; outline: none; box-sizing: border-box; font-family: inherit; }
+        input:focus { border-bottom-color: var(--star-gold); background: #fcfcfc; }
+
+        /* Rules Grid (Dual Language Support) */
+        .rules-grid { font-size: 9px; line-height: 1.4; color: #475569; column-count: 2; column-gap: 20px; margin: 10px 0; padding: 12px; background: #f8fafc; border: 1px solid #edf2f7; text-align: justify; }
+        .rule-item { margin-bottom: 8px; }
+        .rule-item b { color: var(--star-blue); display: block; text-decoration: underline; margin-bottom: 2px; }
+
+        .footer-grid { margin-top: 30px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; }
+        .sig-box { border-bottom: 1.5px solid #000; padding-bottom: 5px; }
+        .sig-box span { display: block; font-size: 9px; font-weight: 700; color: #64748b; margin-top: 5px; text-transform: uppercase; }
+        
+        .info-box { border: 2px dashed #ef4444; padding: 12px; background: #fffafb; border-radius: 4px; }
+        .info-box p { margin: 0; font-size: 9.5px; color: #b91c1c; font-weight: 700; text-transform: uppercase; line-height: 1.4; }
+
+        .action-bar { text-align: center; padding: 40px 0 100px; }
+        .btn-download { background: var(--star-gold); color: white; padding: 20px 60px; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 800; box-shadow: 0 4px 15px rgba(181,147,90,0.4); transition: 0.3s; }
+        .btn-download:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+<div class="lang-switch">
+    <button class="lang-btn active" onclick="setLang('en')" id="btn-en">ENGLISH</button>
+    <button class="lang-btn" onclick="setLang('fr')" id="btn-fr">FRANÇAIS</button>
+</div>
+
+<div id="home-screen">
+    <div class="hero">
+        <h1 class="t" data-en="STAR TEAM | REQUISITION HUB" data-fr="STAR TEAM | PÔLE DE RÉQUISITION">STAR TEAM | REQUISITION HUB</h1>
+        <p class="t" data-en="STRATEGIC RESOURCE MANAGEMENT SYSTEM" data-fr="SYSTÈME DE GESTION DES RESSOURCES STRATÉGIQUES">STRATEGIC RESOURCE MANAGEMENT SYSTEM</p>
+    </div>
+    <div class="grid">
+        <div class="card" onclick="showForm('form-office')">
+            <h3 class="t" data-en="Office Establishment" data-fr="Établissement de Bureau">Office Establishment</h3>
+            <p class="t" data-en="Application for physical facilities for VIP3+ agents." data-fr="Demande de locaux physiques pour les agents VIP3+.">Application for physical facilities for VIP3+ agents.</p>
+        </div>
+        <div class="card" onclick="showForm('form-event')">
+            <h3 class="t" data-en="Networking Subsidy" data-fr="Subvention de Réseautage">Networking Subsidy</h3>
+            <p class="t" data-en="Funding for offline gatherings and team events." data-fr="Financement pour les réunions et événements d'équipe.">Funding for offline gatherings and team events.</p>
+        </div>
+        <div class="card" onclick="showForm('form-supplies')">
+            <h3 class="t" data-en="Branding Supplies" data-fr="Fournitures de Marque">Branding Supplies</h3>
+            <p class="t" data-en="Request for official marketing and logistics materials." data-fr="Demande de matériel marketing et logistique officiel.">Request for official marketing and logistics materials.</p>
+        </div>
+    </div>
+</div>
+
+<div id="form-container">
+    <div class="top-bar">
+        <button class="btn-back t" onclick="location.reload()" data-en="← BACK TO HUB" data-fr="← RETOUR AU PÔLE">← BACK TO HUB</button>
+    </div>
+
+    <div class="viewport">
+        <!-- 1. OFFICE FORM (RESTORED ALL FIELDS) -->
+        <div id="form-office" class="form-sheet" style="display:none">
+            <div class="paper" id="pdf-office">
+                <div class="header">
+                    <h1 class="t" data-en="Office Establishment Application" data-fr="Demande d'Établissement de Bureau">Office Establishment Application</h1>
+                    <p class="t" data-en="GLOBAL MARKET EXPANSION DIVISION" data-fr="DIVISION DE L'EXPANSION DU MARCHÉ MONDIAL">GLOBAL MARKET EXPANSION DIVISION</p>
+                </div>
+                
+                <div class="section-title t" data-en="I. Profile & Property Information" data-fr="I. Informations sur le Profil et la Propriété">I. Profile & Property Information</div>
+                <table>
+                    <tr>
+                        <td class="label t" data-en="Applicant Name" data-fr="Nom du Demandeur">Applicant Name</td><td><input type="text"></td>
+                        <td class="label t" data-en="Affiliated Team" data-fr="Équipe Affiliée">Affiliated Team</td><td><input type="text"></td>
+                    </tr>
+                    <tr><td class="label t" data-en="Physical Address" data-fr="Adresse Physique">Physical Address</td><td colspan="3"><input type="text"></td></tr>
+                    <tr>
+                        <td class="label t" data-en="Property Nature" data-fr="Nature du Bien">Property Nature</td><td><input type="text" class="t-ph" data-en-ph="e.g. Commercial" data-fr-ph="ex: Commercial"></td>
+                        <td class="label t" data-en="Total Area" data-fr="Surface Totale">Total Area</td><td><input type="text" placeholder="sqm"></td>
+                    </tr>
+                    <tr>
+                        <td class="label t" data-en="Monthly Rent" data-fr="Loyer Mensuel">Monthly Rent</td><td><input type="number" placeholder="USDT"></td>
+                        <td class="label t" data-en="Lease Term" data-fr="Durée du Bail">Lease Term</td><td><input type="text"></td>
+                    </tr>
+                    <tr>
+                        <td class="label t" data-en="Property Owner" data-fr="Propriétaire">Property Owner</td><td><input type="text"></td>
+                        <td class="label t" data-en="Owner Contact" data-fr="Contact Propriétaire">Owner Contact</td><td><input type="text"></td>
+                    </tr>
+                </table>
+
+                <div class="section-title t" data-en="II. Strategic Category & Goals" data-fr="II. Catégorie Stratégique et Objectifs">II. Strategic Category & Goals</div>
+                <table>
+                    <tr>
+                        <td class="label t" data-en="Office Category" data-fr="Catégorie de Bureau">Office Category</td>
+                        <td colspan="3">
+                            <label><input type="checkbox"> <span class="t" data-en="Communication" data-fr="Communication">Communication</span></label> &nbsp; 
+                            <label><input type="checkbox"> <span class="t" data-en="Recruitment" data-fr="Recrutement">Recruitment</span></label> &nbsp; 
+                            <label><input type="checkbox"> <span class="t" data-en="Market Hub" data-fr="Centre de Marché">Market Hub</span></label>
+                        </td>
+                    </tr>
+                    <tr><td class="label t" data-en="6-Month Strategic Goals" data-fr="Objectifs sur 6 mois">6-Month Strategic Goals</td><td colspan="3"><textarea rows="5" class="t-ph" data-en-ph="Detailed expansion plan..." data-fr-ph="Plan d'expansion détaillé..."></textarea></td></tr>
+                </table>
+
+                <div class="section-title t" data-en="III. Application Terms & Guidelines" data-fr="III. Conditions et Directives">III. Application Terms & Guidelines</div>
+                <div class="rules-grid" id="rules-box">
+                    <!-- English Rules (will be swapped by JS) -->
+                    <div class="rule-item"><b>1. Eligibility</b>Reserved for VIP3+ agents. Proper documentation required.</div>
+                    <!-- ... simplified for space in code, will be fully translated in JS below ... -->
+                </div>
+
+                <div class="footer-grid">
+                    <div class="sig-box"><input type="text"><span class="t" data-en="Applicant Signature & Date" data-fr="Signature et Date du Demandeur">Applicant Signature & Date</span></div>
+                    <div class="info-box"><p class="t" data-en="Ensure all fields are accurate. Submit to Matt Gall for approval." data-fr="Assurez l'exactitude des données. Soumettez à Matt Gall pour approbation.">Ensure all fields are accurate. Submit to Matt Gall for approval.</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. EVENT FORM (RESTORED ALL FIELDS) -->
+        <div id="form-event" class="form-sheet" style="display:none">
+            <div class="paper" id="pdf-event">
+                <div class="header">
+                    <h1 class="t" data-en="Event & Networking Subsidy" data-fr="Subvention de Réseautage">Event & Networking Subsidy</h1>
+                    <p>STAR TEAM STRATEGIC EXPANSION FUND</p>
+                </div>
+                <div class="section-title t" data-en="I. Event Information" data-fr="I. Informations sur l'Événement">I. Event Information</div>
+                <table>
+                    <tr><td class="label t" data-en="Organizer Name" data-fr="Nom de l'Organisateur">Organizer Name</td><td><input type="text"></td><td class="label t" data-en="Event Title" data-fr="Titre de l'Événement">Event Title</td><td><input type="text"></td></tr>
+                    <tr><td class="label t" data-en="Venue & Date" data-fr="Lieu et Date">Venue & Date</td><td colspan="3"><input type="text"></td></tr>
+                </table>
+                <div class="section-title t" data-en="II. Financial Requisition (USDT)" data-fr="II. Réquisition Financière (USDT)">II. Financial Requisition (USDT)</div>
+                <table>
+                    <tr><td class="label t" data-en="Guest Count" data-fr="Nombre d'Invités">Guest Count</td><td><input type="number" id="e_qty" oninput="calcE()"></td><td class="label t" data-en="Cost per Guest" data-fr="Coût par Invité">Cost per Guest</td><td><input type="number" id="e_price" oninput="calcE()"></td></tr>
+                    <tr><td class="label t" data-en="Miscellaneous" data-fr="Frais Divers">Miscellaneous</td><td><input type="number" id="e_misc" oninput="calcE()"></td><td class="label" style="background:#fffcf0; color:var(--star-gold); font-weight:800" data-en="ESTIMATED TOTAL" data-fr="TOTAL ESTIMÉ">ESTIMATED TOTAL</td><td id="e_total" style="font-weight:800">0.00 USDT</td></tr>
+                    <tr><td class="label t" data-en="Misc. Details" data-fr="Détails Divers">Misc. Details</td><td colspan="3"><input type="text"></td></tr>
+                </table>
+                <div class="footer-grid">
+                    <div class="sig-box"><input type="text"><span class="t" data-en="Signature & Date" data-fr="Signature et Date">Signature & Date</span></div>
+                    <div class="info-box"><p class="t" data-en="Event records and photos must be submitted post-event." data-fr="Les photos de l'événement doivent être soumises après.">Event records and photos must be submitted post-event.</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. SUPPLIES FORM (RESTORED 8 FULL ROWS) -->
+        <div id="form-supplies" class="form-sheet" style="display:none">
+            <div class="paper" id="pdf-supplies">
+                <div class="header">
+                    <h1 class="t" data-en="Branding Supplies Request" data-fr="Demande de Fournitures">Branding Supplies Request</h1>
+                    <p>GLOBAL LOGISTICS DIVISION</p>
+                </div>
+                <div class="section-title t" data-en="I. Shipping Information" data-fr="I. Informations de Livraison">I. Shipping Information</div>
+                <table>
+                    <tr><td class="label t" data-en="Receiver Name" data-fr="Nom du Destinataire">Receiver Name</td><td><input type="text"></td><td class="label t" data-en="Phone Number" data-fr="Téléphone">Phone Number</td><td><input type="text"></td></tr>
+                    <tr><td class="label t" data-en="Full Address" data-fr="Adresse Complète">Full Address</td><td colspan="3"><input type="text"></td></tr>
+                </table>
+                <div class="section-title t" data-en="II. Requisition List (8 Items)" data-fr="II. Liste de Réquisition (8 Articles)">II. Requisition List (8 Items)</div>
+                <table id="sup_table">
+                    <tr style="background:#f1f5f9; font-weight:700; text-align:center; font-size:8px">
+                        <td style="width:30px">NO.</td>
+                        <td class="t" data-en="ITEM NAME" data-fr="NOM DE L'ARTICLE">ITEM NAME</td>
+                        <td class="t" data-en="SPECS" data-fr="SPÉCIFICATIONS">SPECS</td>
+                        <td style="width:50px" class="t" data-en="QTY" data-fr="QTÉ">QTY</td>
+                        <td style="width:70px" class="t" data-en="UNIT" data-fr="P.U.">UNIT</td>
+                        <td style="width:80px" class="t" data-en="TOTAL" data-fr="TOTAL">TOTAL</td>
+                    </tr>
+                    <!-- 8 ROWS FIXED -->
+                    <script>
+                        for(let i=1; i<=8; i++) {
+                            document.write(`<tr><td align="center">${i}</td><td><input type="text"></td><td><input type="text"></td><td><input type="number" class="sq" oninput="calcS()"></td><td><input type="number" class="sp" oninput="calcS()"></td><td class="ss" align="right">0.00</td></tr>`);
+                        }
+                    </script>
+                    <tr style="background:#fffcf0; font-weight:800"><td colspan="5" align="right" class="t" data-en="GRAND TOTAL VALUE (USDT)" data-fr="VALEUR TOTALE (USDT)">GRAND TOTAL VALUE (USDT)</td><td id="sup_grand" align="right">0.00</td></tr>
+                </table>
+                <div class="footer-grid">
+                    <div class="sig-box"><input type="text"><span class="t" data-en="Signature & Date" data-fr="Signature et Date">Signature & Date</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <button class="btn-download t" onclick="download()" data-en="GENERATE & DOWNLOAD PDF" data-fr="GÉNÉRER ET TÉLÉCHARGER LE PDF">GENERATE & DOWNLOAD PDF</button>
+    </div>
+</div>
+
+<script>
+    let currentLang = 'en';
+    let activeFormId = '';
+
+    const rules = {
+        en: [
+            "<b>1. Eligibility</b>Reserved for VIP3+ agents. Proper documentation required.",
+            "<b>2. Office Types</b>Select stage: Communication, Training, or Regional Hub.",
+            "<b>3. Core Purpose</b>Facility used for member training and market expansion.",
+            "<b>4. Targets</b>Submit 6-month growth targets (registrations/VIPs).",
+            "<b>5. Declarations</b>Commit to authentic use for STAR TEAM projects only.",
+            "<b>6. Funds</b>Eligible for Rent, Venue, and Member service subsidies.",
+            "<b>7. Assessment</b>Audit Center monitors operations; funds may be suspended if inactive.",
+            "<b>8. Commitment</b>Submission confirms acceptance of STAR TEAM processing terms."
+        ],
+        fr: [
+            "<b>1. Éligibilité</b>Réservé aux VIP3+. Documentation officielle requise.",
+            "<b>2. Types de Bureau</b>Choisir: Communication, Formation ou Hub Régional.",
+            "<b>3. Objectif Central</b>Dédié à la formation et à l'expansion du marché.",
+            "<b>4. Objectifs</b>Soumettre les cibles de croissance sur 6 mois.",
+            "<b>5. Déclarations</b>Engagement d'utilisation exclusive pour STAR TEAM.",
+            "<b>6. Fonds</b>Subventions pour Loyer, Maintenance et Services membres.",
+            "<b>7. Évaluation</b>Audit régulier; suspension si inactivité constatée.",
+            "<b>8. Engagement</b>La soumission vaut acceptation des conditions STAR."
+        ]
+    };
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('btn-' + lang).classList.add('active');
+        
+        // Update Text
+        document.querySelectorAll('.t').forEach(el => el.innerText = el.getAttribute('data-' + lang));
+        
+        // Update Placeholders
+        document.querySelectorAll('.t-ph').forEach(el => el.placeholder = el.getAttribute('data-' + lang + '-ph'));
+        
+        // Update Rules Box
+        const box = document.getElementById('rules-box');
+        if(box) {
+            box.innerHTML = rules[lang].map(r => `<div class="rule-item">${r}</div>`).join('');
+        }
+    }
+
+    function showForm(id) {
+        activeFormId = id;
+        document.getElementById('home-screen').style.display = 'none';
+        document.getElementById('form-container').style.display = 'block';
+        document.querySelectorAll('.form-sheet').forEach(s => s.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        setLang(currentLang); // Refresh text
+        window.scrollTo(0,0);
+    }
+
+    function calcE() {
+        const q = parseFloat(document.getElementById('e_qty').value) || 0;
+        const p = parseFloat(document.getElementById('e_price').value) || 0;
+        const m = parseFloat(document.getElementById('e_misc').value) || 0;
+        document.getElementById('e_total').innerText = ((q * p) + m).toFixed(2) + " USDT";
+    }
+
+    function calcS() {
+        let total = 0;
+        document.querySelectorAll('#sup_table tr:not(:first-child):not(:last-child)').forEach(row => {
+            const q = parseFloat(row.querySelector('.sq').value) || 0;
+            const p = parseFloat(row.querySelector('.sp').value) || 0;
+            const sub = q * p;
+            row.querySelector('.ss').innerText = sub.toFixed(2);
+            total += sub;
+        });
+        document.getElementById('sup_grand').innerText = total.toFixed(2);
+    }
+
+    function download() {
+        const sheet = document.getElementById(activeFormId);
+        sheet.querySelectorAll('input, textarea').forEach(el => {
+            el.setAttribute('value', el.value);
+            if(el.tagName === 'TEXTAREA') el.innerHTML = el.value;
+        });
+
+        const element = document.querySelector(`#${activeFormId} .paper`);
+        const opt = {
+            margin: 0,
+            filename: `STAR_${currentLang.toUpperCase()}_${new Date().getTime()}.pdf`,
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        const btn = document.querySelector('.btn-download');
+        btn.innerText = (currentLang === 'en') ? "GENERATING..." : "GÉNÉRATION...";
+        html2pdf().set(opt).from(element).save().then(() => {
+            btn.innerText = (currentLang === 'en') ? "GENERATE & DOWNLOAD PDF" : "GÉNÉRER ET TÉLÉCHARGER LE PDF";
+        });
+    }
+
+    // Initialize English Rules
+    setLang('en');
+</script>
+
+</body>
+</html>
