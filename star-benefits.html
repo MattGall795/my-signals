@@ -3,228 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STAR Team Official Specification</title>
-    <!-- Load PDF Library for Auto-Download -->
+    <title>STAR Team Official Specification - Multi-language</title>
+    
+    <!-- 1. PDF Generation Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- 2. MathJax for rendering $$ symbols correctly -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$$', '$$']], displayMath: [['$$', '$$']] }
+        };
+    </script>
+
     <style>
         :root {
-            --primary: #002e5d;
-            --accent: #c5a059;
-            --bg-page: #f4f7f6;
-            --text-dark: #2c3e50;
+            --star-navy: #002e5d;
+            --star-gold: #c5a059;
+            --body-bg: #e9ecef;
         }
 
-        /* Responsive UI Logic */
-        * { box-sizing: border-box; }
-        body { font-family: 'Georgia', serif; background-color: var(--bg-page); margin: 0; padding: 0; color: var(--text-dark); }
-
-        /* Control Panel - Sticky on Mobile */
-        .controls {
+        /* Responsive Layout */
+        body { font-family: 'Times New Roman', serif; margin: 0; padding: 0; background: var(--body-bg); color: #333; line-height: 1.5; }
+        
+        /* Floating Navbar for Controls */
+        .nav-controls {
             position: sticky; top: 0; background: white; padding: 15px;
-            display: flex; justify-content: center; gap: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000;
+            display: flex; justify-content: center; gap: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 9999;
         }
 
-        .btn-dl {
-            padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;
+        .dl-btn {
+            padding: 12px 24px; border: none; border-radius: 30px; cursor: pointer;
             font-weight: bold; font-family: sans-serif; transition: 0.3s;
-            text-transform: uppercase; font-size: 13px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        .btn-en { background: var(--primary); color: white; }
-        .btn-fr { background: var(--accent); color: var(--primary); }
+        .btn-en { background: var(--star-navy); color: white; }
+        .btn-fr { background: var(--star-gold); color: var(--star-navy); }
+        .dl-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
-        /* PDF Layout Container */
-        .document-wrapper {
-            max-width: 850px; margin: 20px auto; background: white;
-            padding: 40px; box-shadow: 0 0 30px rgba(0,0,0,0.05);
-        }
-
-        /* Mobile Adjustments */
-        @media (max-width: 600px) {
-            .document-wrapper { padding: 15px; margin: 10px; }
-            .header img { height: 40px !important; }
-            table { font-size: 12px !important; }
-            h1 { font-size: 20px !important; }
+        /* Main Document Container */
+        .document-page {
+            max-width: 900px; margin: 40px auto; background: white;
+            padding: 60px 80px; box-shadow: 0 0 40px rgba(0,0,0,0.1);
+            position: relative;
         }
 
-        /* Branding Header */
-        .header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 3px solid var(--primary); padding-bottom: 20px; margin-bottom: 30px;
+        /* Mobile Adaptations */
+        @media (max-width: 768px) {
+            .document-page { padding: 30px 20px; margin: 10px; }
+            .nav-controls { flex-direction: column; align-items: stretch; gap: 10px; }
+            .header-info { text-align: center !important; margin-top: 10px; }
+            table { font-size: 13px; }
         }
-        .logo-area { display: flex; align-items: center; }
-        .logo-area img { height: 60px; margin-right: 15px; }
-        .brand-name { font-size: 24px; font-weight: bold; color: var(--primary); letter-spacing: 1px; }
 
-        /* Typography */
-        h1 { text-align: center; color: var(--primary); margin-bottom: 5px; }
-        .ver-label { text-align: center; color: var(--accent); font-weight: bold; margin-bottom: 30px; text-transform: uppercase; }
-        h2 { border-left: 5px solid var(--accent); padding-left: 15px; color: var(--primary); margin-top: 35px; font-size: 18px; }
-        h3 { color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        /* Visual Elements */
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--star-navy); padding-bottom: 15px; margin-bottom: 30px; }
+        .header img { height: 60px; }
+        .brand-text { font-size: 28px; font-weight: bold; color: var(--star-navy); text-transform: uppercase; }
 
-        /* Table & Lists */
-        .table-scroll { overflow-x: auto; margin: 20px 0; }
-        table { width: 100%; border-collapse: collapse; min-width: 500px; }
-        th { background: var(--primary); color: white; padding: 12px; text-align: left; }
-        td { border: 1px solid #ddd; padding: 10px; }
-        tr:nth-child(even) { background: #f9f9f9; }
+        h1 { text-align: center; color: var(--star-navy); font-size: 26px; text-transform: uppercase; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: var(--star-gold); font-weight: bold; margin-bottom: 40px; }
+        h2 { border-left: 6px solid var(--star-gold); padding-left: 15px; color: var(--star-navy); margin-top: 40px; font-size: 20px; text-transform: uppercase; }
+        
+        /* Tables */
+        .table-wrapper { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: var(--star-navy); color: white; padding: 12px; text-align: left; }
+        td { border-bottom: 1px solid #eee; padding: 12px; }
+        tr:nth-child(even) { background: #f8f9fa; }
 
-        .dept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin: 20px 0; }
-        .dept-card { border: 1px solid #ddd; padding: 15px; background: #fffcf5; border-radius: 4px; }
-        .dept-card b { color: var(--primary); display: block; margin-bottom: 5px; }
+        .dept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 25px 0; }
+        @media (max-width: 600px) { .dept-grid { grid-template-columns: 1fr; } }
+        .dept-item { border: 1px solid #ddd; padding: 15px; background: #fffdf7; border-left: 4px solid var(--star-navy); }
+        .dept-item b { color: var(--star-navy); display: block; margin-bottom: 5px; }
 
-        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 20px; }
+        .footer { border-top: 1px solid #eee; padding-top: 20px; margin-top: 60px; text-align: center; font-size: 12px; color: #777; }
     </style>
 </head>
 <body>
 
-<div class="controls">
-    <button class="btn-dl btn-en" onclick="downloadPDF('en')">Download English PDF</button>
-    <button class="btn-dl btn-fr" onclick="downloadPDF('fr')">Télécharger PDF Français</button>
+<div class="nav-controls">
+    <button class="dl-btn btn-en" onclick="generatePDF('en')">DOWNLOAD ENGLISH PDF</button>
+    <button class="dl-btn btn-fr" onclick="generatePDF('fr')">TÉLÉCHARGER PDF FRANÇAIS</button>
 </div>
 
 <!-- ================= ENGLISH VERSION ================= -->
-<div id="content-en" class="document-wrapper">
+<div id="star-en" class="document-page">
     <div class="header">
-        <div class="logo-area">
+        <div style="display: flex; align-items: center;">
             <img src="https://raw.githubusercontent.com/MattGall795/my-signals/main/favicon.png" alt="Logo">
-            <span class="brand-name">STAR TEAM</span>
+            <span class="brand-text" style="margin-left: 15px;">STAR TEAM</span>
         </div>
-        <div style="text-align: right; font-size: 12px; color: #666;">Ref: STAR-REG-2026-EN</div>
+        <div class="header-info" style="text-align: right; font-size: 12px; color: #666;">
+            Ref: STAR-SEC-2026-EN<br>Matt Gall, Chief Strategist
+        </div>
     </div>
 
     <h1>Member Rights & Benefits Specification</h1>
-    <p class="ver-label">Official English Edition</p>
+    <p class="subtitle">Official Internal Regulation – Global Framework</p>
 
     <h2>I. General Provisions</h2>
-    <p>This document outlines the systematic framework of member incentives, VIP levels, and governance protocols. Our focus is on compliant development and long-term value creation.</p>
+    <p>The STAR Team rights system is designed for the sustainable development of our investment community. It integrates global macro analysis with a structured reward mechanism.</p>
 
     <h2>II. Communication Infrastructure</h2>
-    <p><b>1. STAR – Documentation Centre:</b> Repository for official policies and learning guides.</p>
-    <p><b>2. STAR - Stock Discussion Group:</b> Hub for daily signal codes and Thursday New Member Training.</p>
-    <p><b>3. STAR VIP Agent Training Group:</b> Management summits and Friday strategic training.</p>
+    <p><b>1. STAR – Documentation Centre:</b> The official library for compliance, logic, and operational protocols.</p>
+    <p><b>2. STAR - Stock Discussion Group:</b> The operational hub for daily signals and <b>Thursday Training</b>.</p>
+    <p><b>3. VIP Agent Training Group:</b> Strategic summits and management training held every Friday.</p>
 
-    <h2>III. Core Governance Pillars</h2>
+    <h2>III. Governance Departments</h2>
     <div class="dept-grid">
-        <div class="dept-card"><b>1. DCC (Compliance)</b>: Ethical monitoring and account termination authority.</div>
-        <div class="dept-card"><b>2. RPMC (Risk Control)</b>: Exposure limits and capital stability management.</div>
-        <div class="dept-card"><b>3. IROO (Research)</b>: Institutional strategy and operational rhythm.</div>
-        <div class="dept-card"><b>4. FGAC (Audit)</b>: Financial transparency and fund flow verification.</div>
+        <div class="dept-item"><b>1. DCC (Compliance)</b>: Monitors ethical standards and manages account terminations.</div>
+        <div class="dept-item"><b>2. RPMC (Risk Control)</b>: Sets exposure limits and ensures capital safety.</div>
+        <div class="dept-item"><b>3. IROO (Research)</b>: Formulates institutional strategies and operational rhythms.</div>
+        <div class="dept-item"><b>4. FGAC (Audit)</b>: Ensures fund transparency and audited reward distribution.</div>
     </div>
-
-    <h2>IV. Operating Principles</h2>
-    <p>Separation of research from execution. Compliance takes priority over short-term gains. Fully auditable financial cycles.</p>
-
-    <h2>V. Operational Disclaimer</h2>
-    <p>Announcements are research-based and do not constitute profit guarantees or individual investment advice.</p>
 
     <h2>VI. Referral Rewards</h2>
-    <div class="table-scroll">
+    <div class="table-wrapper">
         <table>
-            <tr><th>Investment</th><th>Inviter Reward</th><th>New Member Reward</th></tr>
-            <tr><td>$$500$$ USDT</td><td>$$50$$ USDT</td><td>$$50$$ USDT</td></tr>
-            <tr><td>$$1000$$ USDT</td><td>$$100$$ USDT</td><td>$$100$$ USDT</td></tr>
-            <tr><td>$$3000$$ USDT</td><td>$$300$$ USDT</td><td>$$300$$ USDT</td></tr>
-            <tr><td>$$10000$$ USDT</td><td>$$1000$$ USDT</td><td>$$1000$$ USDT</td></tr>
-        </table>
-    </div>
-
-    <h2>VII. VIP Level Standards</h2>
-    <div class="table-scroll">
-        <table>
-            <tr><th>Level</th><th>Team Size</th><th>Direct Partners</th><th>ACM Profit Share</th></tr>
-            <tr><td>VIP1</td><td>$$3-19$$</td><td>$$3$$</td><td>$$3\%$$</td></tr>
-            <tr><td>VIP2</td><td>$$20-60$$</td><td>$$6$$</td><td>$$3\%$$</td></tr>
-            <tr><td>VIP9</td><td>$$6000+$$</td><td>$$20 \times VIP2$$</td><td>$$3\%$$</td></tr>
+            <tr><th>Investment</th><th>Inviter (USDT)</th><th>New Member (USDT)</th></tr>
+            <tr><td>$$500$$</td><td>$$50$$</td><td>$$50$$</td></tr>
+            <tr><td>$$1000$$</td><td>$$100$$</td><td>$$100$$</td></tr>
+            <tr><td>$$5000$$</td><td>$$500$$</td><td>$$500$$</td></tr>
+            <tr><td>$$10000$$</td><td>$$1000$$</td><td>$$1000$$</td></tr>
         </table>
     </div>
 
     <h2>VIII. Fixed Bi-Weekly Rewards</h2>
-    <div class="table-scroll">
+    <div class="table-wrapper">
         <table>
-            <tr><th>Level</th><th>Reward (15 Days)</th><th>Annual Projection</th></tr>
+            <tr><th>Level</th><th>15-Day Reward</th><th>Annual Projection</th></tr>
             <tr><td>VIP1</td><td>$$15$$ USDT</td><td>$$360$$ USDT</td></tr>
             <tr><td>VIP2</td><td>$$60$$ USDT</td><td>$$1440$$ USDT</td></tr>
+            <tr><td>VIP6</td><td>$$1200$$ USDT</td><td>$$28800$$ USDT</td></tr>
             <tr><td>VIP9</td><td>$$10000$$ USDT</td><td>$$240000$$ USDT</td></tr>
         </table>
     </div>
 
-    <h2>IX. Agent Responsibilities</h2>
-    <p>Maintain order, disseminate official data accurately, and coordinate with DCC for audits.</p>
-
-    <h2>X. Signal Bonuses</h2>
-    <p><b>Permanent Code:</b> Achieved at VIP2 with a certified group.</p>
-    <p><b>Boost Signals:</b> referral deposit reaching $$30\%$$ of balance triggers extra signals.</p>
-
-    <h2>XI. Collective Signals</h2>
-    <p>Milestone-based unlocking for independent teams of $$20+$$ members.</p>
-
     <h2>XII. Copy-Trading Quota</h2>
-    <p>Quota increases by $$500$$ - $$800$$ USDT per valid referral based on account balance.</p>
-
-    <h2>XIII. VIP Growth Path</h2>
-    <p>From learning (VIP1) to regional management (VIP6) and global partnership (VIP9).</p>
-
-    <h2>XIV. Compliance Enforcement</h2>
-    <p>Strict prohibition of multi-accounting and malicious farming. One account per verified user.</p>
-
-    <h2>XV. Core Principle Summary</h2>
-    <p>Authenticity, compliance, and merit-based resource allocation.</p>
+    <p>Resources are allocated based on platform contribution. For each valid referral, the quota increases by $$500$$ - $$800$$ USDT.</p>
 
     <h2>XVI. Conclusion</h2>
-    <p>This framework is the foundation of the STAR ecosystem's sustainability. We invite all to grow professionally.</p>
+    <p>Compliance and research are our foundation. This document ensures all members move toward long-term wealth within a professional framework.</p>
 
     <div class="footer">
-        © 2026 STAR Team Official | Authorized by Dr. Matt Gall
+        © 2026 STAR Team Official. All rights reserved. Authorized by Dr. Matt Gall.
     </div>
 </div>
 
 <!-- ================= FRENCH VERSION ================= -->
-<div id="content-fr" class="document-wrapper">
+<div id="star-fr" class="document-page">
     <div class="header">
-        <div class="logo-area">
+        <div style="display: flex; align-items: center;">
             <img src="https://raw.githubusercontent.com/MattGall795/my-signals/main/favicon.png" alt="Logo">
-            <span class="brand-name">EQUIPE STAR</span>
+            <span class="brand-text" style="margin-left: 15px;">ÉQUIPE STAR</span>
         </div>
-        <div style="text-align: right; font-size: 12px; color: #666;">Réf: STAR-REG-2026-FR</div>
+        <div style="text-align: right; font-size: 12px; color: #666;">
+            Réf: STAR-SEC-2026-FR<br>Matt Gall, Stratège en Chef
+        </div>
     </div>
 
-    <h1>Spécification des Droits et Avantages des Membres</h1>
-    <p class="ver-label">Édition Officielle en Français</p>
+    <h1>Spécification des Droits et Avantages</h1>
+    <p class="subtitle">Règlement Officiel Interne – Cadre Global</p>
 
     <h2>I. Dispositions Générales</h2>
-    <p>Ce document définit le cadre systématique des incitations, des niveaux VIP et des protocoles de gouvernance.</p>
+    <p>Le système de l'équipe STAR est conçu pour le développement durable de notre communauté d'investissement via une analyse macroéconomique rigoureuse.</p>
 
     <h2>II. Infrastructure de Communication</h2>
-    <p><b>1. STAR – Centre de Documentation:</b> Dépôt des politiques officielles.</p>
-    <p><b>2. STAR - Groupe de Discussion:</b> Hub pour les signaux quotidiens et formation du jeudi.</p>
-    <p><b>3. STAR - Formation VIP:</b> Sommets de gestion et formation stratégique du vendredi.</p>
-
-    <h2>III. Piliers de Gouvernance</h2>
-    <div class="dept-grid">
-        <div class="dept-card"><b>1. DCC (Conformité)</b>: Surveillance éthique et autorité de clôture de compte.</div>
-        <div class="dept-card"><b>2. RPMC (Contrôle des Risques)</b>: Gestion des limites d'exposition et stabilité du capital.</div>
-        <div class="dept-card"><b>3. IROO (Recherche)</b>: Stratégie institutionnelle et rythme opérationnel.</div>
-        <div class="dept-card"><b>4. FGAC (Audit)</b>: Transparence financière et vérification des flux.</div>
-    </div>
-
-    <h2>IV. Principes Opérationnels</h2>
-    <p>Séparation de la recherche et de l'exécution. La conformité prime sur les gains à court terme.</p>
+    <p><b>1. STAR – Centre de Documentation:</b> La bibliothèque officielle pour la conformité et les protocoles.</p>
+    <p><b>2. STAR - Discussion Boursière:</b> Hub opérationnel pour les signaux et la <b>Formation du Jeudi</b>.</p>
+    <p><b>3. Groupe de Formation VIP:</b> Sommets stratégiques organisés chaque vendredi.</p>
 
     <h2>VI. Récompenses de Parrainage</h2>
-    <div class="table-scroll">
+    <div class="table-wrapper">
         <table>
-            <tr><th>Investissement</th><th>Parrain</th><th>Nouveau Membre</th></tr>
-            <tr><td>$$500$$ USDT</td><td>$$50$$ USDT</td><td>$$50$$ USDT</td></tr>
-            <tr><td>$$1000$$ USDT</td><td>$$100$$ USDT</td><td>$$100$$ USDT</td></tr>
-            <tr><td>$$10000$$ USDT</td><td>$$1000$$ USDT</td><td>$$1000$$ USDT</td></tr>
+            <tr><th>Investissement</th><th>Parrain (USDT)</th><th>Nouveau Membre (USDT)</th></tr>
+            <tr><td>$$500$$</td><td>$$50$$</td><td>$$50$$</td></tr>
+            <tr><td>$$1000$$</td><td>$$100$$</td><td>$$100$$</td></tr>
+            <tr><td>$$10000$$</td><td>$$1000$$</td><td>$$1000$$</td></tr>
         </table>
     </div>
 
-    <h2>VIII. Récompenses Fixes (Tous les 15 jours)</h2>
-    <div class="table-scroll">
+    <h2>VIII. Récompenses Fixes (Mensuelles)</h2>
+    <div class="table-wrapper">
         <table>
-            <tr><th>Niveau</th><th>Récompense (15J)</th><th>Projection Annuelle</th></tr>
+            <tr><th>Niveau</th><th>Récompense (15 Jours)</th><th>Projection Annuelle</th></tr>
             <tr><td>VIP1</td><td>$$15$$ USDT</td><td>$$360$$ USDT</td></tr>
             <tr><td>VIP2</td><td>$$60$$ USDT</td><td>$$1440$$ USDT</td></tr>
             <tr><td>VIP9</td><td>$$10000$$ USDT</td><td>$$240000$$ USDT</td></tr>
@@ -232,26 +196,34 @@
     </div>
 
     <h2>XVI. Conclusion</h2>
-    <p>Ce cadre est le fondement de la durabilité de l'écosystème STAR. Nous vous invitons tous à croître professionnellement.</p>
+    <p>La conformité et la recherche sont notre socle. Ce document garantit une croissance professionnelle pour tous les membres.</p>
 
     <div class="footer">
-        © 2026 STAR Team Officiel | Autorisé par Dr. Matt Gall
+        © 2026 STAR Team Officiel. Tous droits réservés. Autorisé par Dr. Matt Gall.
     </div>
 </div>
 
 <script>
-    function downloadPDF(lang) {
-        const element = document.getElementById('content-' + lang);
+    function generatePDF(lang) {
+        const element = document.getElementById('star-' + lang);
+        
+        // Configuration for html2pdf
         const opt = {
             margin:       10,
-            filename:     'STAR_Team_Rights_Benefits_' + lang.toUpperCase() + '.pdf',
+            filename:     'STAR_Team_Rules_' + lang.toUpperCase() + '.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
-        
-        // Use the library to save the file
-        html2pdf().set(opt).from(element).save();
+
+        // First, make sure MathJax finishes rendering
+        if (window.MathJax) {
+            window.MathJax.typesetPromise().then(() => {
+                html2pdf().set(opt).from(element).save();
+            });
+        } else {
+            html2pdf().set(opt).from(element).save();
+        }
     }
 </script>
 
