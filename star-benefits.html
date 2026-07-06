@@ -1,206 +1,770 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STAR Team Official Specification 2026</title>
-    <!-- 引入高清 PDF 引擎 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <style>
-        :root { --navy: #002e5d; --gold: #c5a059; --text: #333; }
-        
-        /* UI 适配逻辑 */
-        body { font-family: "Georgia", serif; background: #e0e0e0; margin: 0; padding: 0; color: var(--text); }
-        .controls { position: sticky; top: 0; background: white; padding: 15px; display: flex; justify-content: center; gap: 20px; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        
-        .btn { padding: 12px 25px; border: 2px solid var(--navy); background: transparent; color: var(--navy); font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
-        .btn:hover { background: var(--navy); color: white; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STAR Team Member Benefits Policy</title>
+  <meta name="description" content="Official STAR Team Member Benefits Policy, translated into English and formatted for website use." />
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/MattGall795/my-signals/main/favicon.png" />
+  <style>
+    :root{
+      --bg: #f7f9fc;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #0f4c81;
+      --primary-2: #1d6fa5;
+      --accent: #f59e0b;
+      --border: #e5e7eb;
+      --soft: #eef6fb;
+      --danger: #b91c1c;
+      --success: #15803d;
+    }
 
-        /* 文档纸张样式 */
-        .document { width: 210mm; min-height: 297mm; margin: 30px auto; background: white; padding: 25mm 20mm; box-sizing: border-box; box-shadow: 0 0 30px rgba(0,0,0,0.3); position: relative; }
-        
-        @media (max-width: 768px) { 
-            .document { width: 95%; padding: 20px 15px; margin: 10px auto; box-shadow: none; }
-            .controls { flex-direction: column; padding: 10px; }
-            .header-meta { text-align: center !important; }
-        }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      background: linear-gradient(180deg, #eef4f8 0%, #f7f9fc 100%);
+      color: var(--text);
+      line-height: 1.7;
+    }
 
-        /* 内部排版 */
-        .header { border-bottom: 3px solid var(--navy); padding-bottom: 15px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .logo-text { font-size: 28px; font-weight: bold; color: var(--navy); letter-spacing: 2px; }
-        
-        h1 { text-align: center; color: var(--navy); font-size: 24px; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 40px; text-transform: uppercase; }
-        
-        h2 { border-left: 5px solid var(--gold); padding-left: 15px; color: var(--navy); font-size: 18px; margin-top: 30px; text-transform: uppercase; }
-        h3 { color: var(--navy); font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-family: Arial, sans-serif; }
-        th { background: var(--navy); color: white; padding: 12px; font-size: 13px; border: 1px solid var(--navy); }
-        td { border: 1px solid #e0e0e0; padding: 10px; font-size: 14px; }
-        tr:nth-child(even) { background: #f9f9f9; }
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 18px 56px;
+    }
 
-        .footer { margin-top: 60px; border-top: 1px solid #ddd; padding-top: 20px; text-align: center; font-size: 11px; color: #999; }
-        
-        /* 强制清理符号的辅助样式 */
-        .clean-num { font-weight: bold; }
-    </style>
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+      color: #fff;
+      border-radius: 18px;
+      padding: 22px 24px;
+      box-shadow: 0 10px 25px rgba(15, 76, 129, 0.18);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .logo-wrap {
+      width: 64px;
+      height: 64px;
+      flex: 0 0 64px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .header-text h1 {
+      margin: 0 0 6px;
+      font-size: 1.6rem;
+      line-height: 1.25;
+    }
+
+    .header-text p {
+      margin: 0;
+      color: rgba(255,255,255,0.9);
+      font-size: 0.98rem;
+    }
+
+    .notice {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 18px 0 22px;
+      font-size: 0.95rem;
+    }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 16px rgba(17, 24, 39, 0.04);
+    }
+
+    .toc h2 {
+      margin: 0 0 10px;
+      font-size: 1.15rem;
+      color: var(--primary);
+    }
+
+    .toc ul {
+      margin: 0;
+      padding-left: 20px;
+      columns: 2;
+      column-gap: 32px;
+    }
+
+    .toc li {
+      margin: 6px 0;
+      break-inside: avoid;
+    }
+
+    .section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 22px 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(17, 24, 39, 0.04);
+    }
+
+    .section h2 {
+      margin: 0 0 14px;
+      color: var(--primary);
+      font-size: 1.25rem;
+      border-left: 5px solid var(--accent);
+      padding-left: 12px;
+    }
+
+    .section h3 {
+      margin: 18px 0 8px;
+      color: #0f172a;
+      font-size: 1.05rem;
+    }
+
+    .section p {
+      margin: 10px 0;
+      color: var(--text);
+    }
+
+    .muted { color: var(--muted); }
+
+    .info-box {
+      background: var(--soft);
+      border: 1px solid #dbeafe;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 14px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 10px;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 12px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f3f7fb;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) td {
+      background: #fbfdff;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #075985;
+      font-size: 0.85rem;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    .warning {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .success {
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .footer {
+      margin-top: 24px;
+      padding: 18px 0 8px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .toc ul {
+        columns: 1;
+      }
+
+      .header-text h1 {
+        font-size: 1.35rem;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+      .page {
+        max-width: 100%;
+        padding: 0;
+      }
+      .header, .section, .toc, .notice {
+        box-shadow: none !important;
+      }
+      .section, .toc, .notice {
+        page-break-inside: avoid;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="page">
+    <header class="header">
+      <div class="logo-wrap">
+        <img src="https://raw.githubusercontent.com/MattGall795/my-signals/main/favicon.png" alt="STAR Team Logo" />
+      </div>
+      <div class="header-text">
+        <h1>STAR Team Member Benefits Policy</h1>
+        <p>Official English version for website publication and PDF export</p>
+      </div>
+    </header>
 
-<div class="controls">
-    <button class="btn" onclick="downloadCleanPDF('en')">Download English Edition</button>
-    <button class="btn" onclick="downloadCleanPDF('fr')">Télécharger l'édition française</button>
-</div>
-
-<!-- ================= ENGLISH VERSION ================= -->
-<div id="content-en" class="document">
-    <div class="header">
-        <div class="logo-text">STAR TEAM</div>
-        <div class="header-meta" style="text-align: right; font-size: 11px;">OFFICIAL SPECIFICATION<br>REF: 2026-REG-EN</div>
+    <div class="notice">
+      <strong>Important Notice:</strong> This document is a policy and operational description for the STAR Team ecosystem. It does not constitute a profit guarantee, investment commitment, personalized investment advice, or a result guarantee.
     </div>
 
-    <h1>Member Rights & Benefits Specification</h1>
-    <div class="subtitle">Institutional Growth Framework</div>
+    <section class="toc">
+      <h2>Contents</h2>
+      <ul>
+        <li>1. General Policy Overview</li>
+        <li>2. STAR Bonchat Group Structure</li>
+        <li>3. STAR Official Account Service Overview</li>
+        <li>4. Team Operating Principles</li>
+        <li>5. Investment Operations Announcement Notes</li>
+        <li>6. STAR Referral Rewards</li>
+        <li>7. STAR-VIP Agent Tier Definitions</li>
+        <li>8. STAR Agent Fixed Rewards</li>
+        <li>9. STAR Agent Responsibilities</li>
+        <li>10. STAR Signal Rewards</li>
+        <li>11. STAR Team Group Signal Rewards</li>
+        <li>12. Copy-Trading Quota and Trading Channel Benefits</li>
+        <li>13. VIP Growth and Responsibility System</li>
+        <li>14. Unified Compliance and Risk Management Requirements</li>
+        <li>15. Core Principles Summary</li>
+        <li>16. Closing Statement</li>
+      </ul>
+    </section>
 
-    <h2>I. General Provisions</h2>
-    <p>This document governs the operational standards and reward structures for the STAR Team. All protocols are designed to ensure long-term community value.</p>
+    <section class="section">
+      <h2>1. General Policy Overview</h2>
+      <p>The STAR Team Member Benefits System is built around the following core dimensions:</p>
+      <ul>
+        <li>Referral rewards</li>
+        <li>VIP agent ACM profit-sharing income</li>
+        <li>Monthly fixed bonuses for VIP agents</li>
+        <li>STAR signal rewards</li>
+        <li>STAR team collective signal rewards</li>
+        <li>Copy-trading quota and trading channel benefits</li>
+        <li>VIP growth and responsibility structure</li>
+        <li>Official learning documents and meeting system</li>
+        <li>Four-department collaborative governance mechanism</li>
+      </ul>
+      <p>The purpose of this policy is to encourage long-term cooperation, real trading, and orderly development. All rewards and benefits are based on compliance, real accounts, continuous participation, and team contribution. The system does not pursue short-term excitement, but rather stability, structure, and long-term value.</p>
+    </section>
 
-    <h2>II. Communication Infrastructure</h2>
-    <p><b>1. Documentation Centre:</b> Official repository for compliance and logic.<br>
-    <b>2. Stock Discussion Group:</b> Signal hub and <b>Thursday Training</b>.<br>
-    <b>3. VIP Training Group:</b> Management summits held every <b>Friday</b>.</p>
+    <section class="section">
+      <h2>2. STAR Bonchat Group Structure</h2>
+      <p>STAR Team uses different Bonchat groups to provide learning, discussion, training, and management support for members.</p>
 
-    <h2>III. Core Governance Pillars</h2>
-    <p><b>DCC (Compliance):</b> Account audits and ethical oversight.<br>
-    <b>RPMC (Risk):</b> Position limits and capital security.<br>
-    <b>IROO (Research):</b> Strategy formulation and official signals.<br>
-    <b>FGAC (Audit):</b> Fund flow verification and reward granting.</p>
+      <h3>2.1 STAR – Official Documentation Center</h3>
+      <div class="info-box">
+        <p><strong>Main function:</strong> Official support document publishing group</p>
+        <p>This group is used to publish official support and learning materials, including:</p>
+        <ul>
+          <li>STAR Team policy explanations</li>
+          <li>Member benefits details</li>
+          <li>Rule updates and announcements</li>
+          <li>Beginner learning materials</li>
+          <li>Team operation guides</li>
+          <li>Compliance and discipline guidance</li>
+          <li>Official support material collections</li>
+        </ul>
+        <p><strong>Positioning:</strong> The unified entry point for official STAR learning materials, suitable for all members.</p>
+      </div>
 
-    <h2>VI. Referral Rewards</h2>
-    <table>
-        <thead><tr><th>Investment Amount</th><th>Inviter Reward</th><th>New Member Reward</th></tr></thead>
+      <h3>2.2 STAR - Stock Discussion Group</h3>
+      <div class="info-box">
+        <p><strong>Main function:</strong> Signal codes, daily key learning, and benefit announcements</p>
+        <p>This group is used to publish:</p>
+        <ul>
+          <li>Signal codes</li>
+          <li>Official daily key learning content</li>
+          <li>Major decision notices</li>
+          <li>Member benefit announcements</li>
+          <li>Thursday newcomer training meeting notices and entry links</li>
+        </ul>
+        <p><strong>Positioning:</strong> The core discussion group for stock-related information, team learning, benefit notices, and newcomer training.</p>
+      </div>
+
+      <h3>2.3 STAR VIP Agent Training Group</h3>
+      <div class="info-box">
+        <p><strong>Main function:</strong> VIP agent training group</p>
+        <p>This group is used for:</p>
+        <ul>
+          <li>VIP agent training</li>
+          <li>Management experience sharing</li>
+          <li>Agent responsibility explanations</li>
+          <li>VIP operating mechanism instruction</li>
+          <li>Team collaboration and execution standard training</li>
+          <li>Weekly Friday VIP agent meeting</li>
+        </ul>
+        <p><strong>Positioning:</strong> Open only to VIP agents and used as an important operating group for management and promotion.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>3. STAR Official Account Service Overview</h2>
+      <p>The STAR Official Account centrally distributes service information from the four major departments. It is the important window for official policies, notices, audits, risk control, and research information.</p>
+
+      <h3>3.1 STAR Discipline & Compliance Committee (DCC)</h3>
+      <p><strong>Positioning:</strong> The highest rule-making and discipline supervision body in the STAR system.</p>
+      <p><strong>Core responsibilities:</strong></p>
+      <ul>
+        <li>Formulate, interpret, and continuously update STAR stock trading discipline and behavioral standards</li>
+        <li>Supervise and handle rule violations, abnormal operations, and bypass behaviors</li>
+        <li>Hold final decision power over violating accounts, teams, and individuals, including removal decisions</li>
+        <li>Have compliance review and veto authority over all departments and operations</li>
+      </ul>
+
+      <h3>3.2 STAR Risk Control & Position Management Center (RPMC)</h3>
+      <p><strong>Positioning:</strong> The central risk boundary management hub of the system.</p>
+      <p><strong>Core responsibilities:</strong></p>
+      <ul>
+        <li>Monitor account positions, risk exposure, and capital usage in real time</li>
+        <li>Manage maximum drawdown, concentration, and potential systemic risks</li>
+        <li>Intervene in abnormal positions, overtrading, and risk imbalance situations</li>
+        <li>Provide clear risk constraints for research and execution systems</li>
+      </ul>
+
+      <h3>3.3 STAR Investment Research & Operations Office (IROO)</h3>
+      <p><strong>Positioning:</strong> The research center and official information release window.</p>
+      <p><strong>Core responsibilities:</strong></p>
+      <ul>
+        <li>Conduct long-term stock market research and strategy framework building</li>
+        <li>Produce logically complete, executable, and reviewable research conclusions</li>
+        <li>Unified release of official operation notices and research explanations</li>
+        <li>Manage information pacing and professional communication</li>
+      </ul>
+
+      <h3>3.4 STAR Financial Governance & Audit Center (FGAC)</h3>
+      <p><strong>Positioning:</strong> The capital flow and audit management hub.</p>
+      <p><strong>Core responsibilities:</strong></p>
+      <ul>
+        <li>Review compliance of fund applications, disbursements, and usage</li>
+        <li>Supervise the completeness and reasonableness of fund flows and records</li>
+        <li>Support disciplinary and compliance audit work</li>
+        <li>Ensure the fund system is transparent, traceable, and auditable</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>4. Team Operating Principles</h2>
+      <p>STAR Team operates with an institutional structure where research, risk control, compliance, and finance balance one another. Responsibilities are clearly separated, and the system does not rely on individual judgment. Instead, it is driven by rules, process, and long-term research.</p>
+      <p>Operating principles include:</p>
+      <ul>
+        <li>Separation of research and execution</li>
+        <li>Risk control and expansion in balance</li>
+        <li>Compliance comes before profit expression</li>
+        <li>Financial processes must be traceable and auditable</li>
+        <li>Unified interpretation and unified enforcement of rules</li>
+        <li>Important decisions are announced through official mechanisms</li>
+        <li>All members must comply with discipline and cooperation standards</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>5. Notes on STAR Investment Operations Announcements</h2>
+      <p>The operation announcements issued by the STAR Investment Research & Operations Office are based on long-term stock research and risk assessment mechanisms. They are phased operational and research explanations.</p>
+      <p>The purpose is to help members understand market conditions and system rhythm. They do not constitute any form of:</p>
+      <ul>
+        <li>Profit guarantee</li>
+        <li>Investment commitment</li>
+        <li>Individual stock buy/sell recommendation</li>
+        <li>Outcome guarantee</li>
+      </ul>
+      <p>Members should consider their own situation and interpret all official explanations rationally.</p>
+    </section>
+
+    <section class="section">
+      <h2>6. STAR Referral Rewards</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Investment Amount</th>
+            <th>Referrer Reward</th>
+            <th>New Member Reward</th>
+          </tr>
+        </thead>
         <tbody>
-            <tr><td>$$500$$ USDT</td><td>$$50$$ USDT</td><td>$$50$$ USDT</td></tr>
-            <tr><td>$$1000$$ USDT</td><td>$$100$$ USDT</td><td>$$100$$ USDT</td></tr>
-            <tr><td>$$5000$$ USDT</td><td>$$500$$ USDT</td><td>$$500$$ USDT</td></tr>
-            <tr><td>$$10000$$ USDT</td><td>$$1000$$ USDT</td><td>$$1000$$ USDT</td></tr>
+          <tr><td>500 USDT</td><td>50 USDT</td><td>50 USDT</td></tr>
+          <tr><td>800 USDT</td><td>80 USDT</td><td>80 USDT</td></tr>
+          <tr><td>1000 USDT</td><td>100 USDT</td><td>100 USDT</td></tr>
+          <tr><td>2000 USDT</td><td>200 USDT</td><td>200 USDT</td></tr>
+          <tr><td>3000 USDT</td><td>300 USDT</td><td>300 USDT</td></tr>
+          <tr><td>5000 USDT</td><td>500 USDT</td><td>500 USDT</td></tr>
+          <tr><td>10000 USDT</td><td>1000 USDT</td><td>1000 USDT</td></tr>
         </tbody>
-    </table>
+      </table>
 
-    <h2>VII. VIP Level Standards</h2>
-    <table>
-        <thead><tr><th>Level</th><th>Team Size</th><th>Direct Partners</th><th>Profit Share</th></tr></thead>
+      <div class="info-box">
+        <h3>Important Notes</h3>
+        <ul>
+          <li>Any deposit above 3000 USDT requires approval from Dr. Matt Gall.</li>
+          <li>The minimum subscription period is one month. If the subscription period is less than one month, all referral rewards and extra signal income will be cancelled.</li>
+          <li>Multiple accounts and money laundering are strictly prohibited. Violators will lose rewards and the cooperation relationship will end.</li>
+          <li>If the account balance falls below the initial deposit amount, it will be automatically removed from the signal tracking plan.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>7. STAR-VIP Agent Tier Definitions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Tier</th>
+            <th>Team Size</th>
+            <th>Direct Partners</th>
+          </tr>
+        </thead>
         <tbody>
-            <tr><td>VIP1</td><td>$$3 - 19$$</td><td>$$3$$</td><td>$$3\%$$</td></tr>
-            <tr><td>VIP2</td><td>$$20 - 60$$</td><td>$$6$$</td><td>$$3\%$$</td></tr>
-            <tr><td>VIP9</td><td>$$6000+$$</td><td>$$20 \times VIP2$$</td><td>$$3\%$$</td></tr>
+          <tr><td>VIP1</td><td>3–19 people</td><td>3 people</td></tr>
+          <tr><td>VIP2</td><td>20–60 people</td><td>6 people</td></tr>
+          <tr><td>VIP3</td><td>61–200 people</td><td>9 people</td></tr>
+          <tr><td>VIP4</td><td>201–400 people</td><td>12 people</td></tr>
+          <tr><td>VIP5</td><td>401–800 people</td><td>15 people</td></tr>
+          <tr><td>VIP6</td><td>801–1600 people</td><td>18 people</td></tr>
+          <tr><td>VIP7</td><td>1601–3000 people</td><td>21 people</td></tr>
+          <tr><td>VIP8</td><td>3001–6000 people</td><td>12 VIP2s</td></tr>
+          <tr><td>VIP9</td><td>More than 6000 people</td><td>20 VIP2s</td></tr>
         </tbody>
-    </table>
+      </table>
 
-    <h2>VIII. Fixed Bi-Weekly Rewards</h2>
-    <table>
-        <thead><tr><th>Level</th><th>15-Day Reward</th><th>Annual Projection</th></tr></thead>
+      <p><strong>ACM platform profit-sharing for team members:</strong></p>
+      <ul>
+        <li>First level ACM platform profit-sharing: 3%</li>
+        <li>Second level ACM platform profit-sharing: 2%</li>
+        <li>Third level ACM platform profit-sharing: 1%</li>
+      </ul>
+
+      <div class="info-box">
+        <h3>Activity Rules</h3>
+        <ul>
+          <li>Team member deposits must exceed 500 USDT, and the account balance must not be lower than the deposit amount.</li>
+          <li>If the number of people directly invited by a subordinate is greater than the number invited by the agent, the agent will not receive the corresponding team benefits.</li>
+          <li>Multiple accounts and money laundering are prohibited. Any violation will result in recovery of rewards and cancellation of cooperation eligibility.</li>
+          <li>Fixed US dollar bonuses are distributed to agents on the 1st and 16th of each month.</li>
+          <li>VIP3 agents may receive support related to the STAR support office.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>8. STAR Agent Fixed Rewards</h2>
+      <h3>8.1 VIP Agent Fixed Reward Standards</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Tier</th>
+            <th>Every 15 Days</th>
+            <th>Per Year</th>
+          </tr>
+        </thead>
         <tbody>
-            <tr><td>VIP1</td><td>$$15$$ USDT</td><td>$$360$$ USDT</td></tr>
-            <tr><td>VIP2</td><td>$$60$$ USDT</td><td>$$1440$$ USDT</td></tr>
-            <tr><td>VIP9</td><td>$$10000$$ USDT</td><td>$$240000$$ USDT</td></tr>
+          <tr><td>VIP1</td><td>15 USDT</td><td>360 USDT</td></tr>
+          <tr><td>VIP2</td><td>60 USDT</td><td>1440 USDT</td></tr>
+          <tr><td>VIP3</td><td>150 USDT</td><td>3600 USDT</td></tr>
+          <tr><td>VIP4</td><td>300 USDT</td><td>7200 USDT</td></tr>
+          <tr><td>VIP5</td><td>600 USDT</td><td>14400 USDT</td></tr>
+          <tr><td>VIP6</td><td>1200 USDT</td><td>28800 USDT</td></tr>
+          <tr><td>VIP7</td><td>2400 USDT</td><td>57600 USDT</td></tr>
+          <tr><td>VIP8</td><td>4800 USDT</td><td>115200 USDT</td></tr>
+          <tr><td>VIP9</td><td>10000 USDT</td><td>240000 USDT</td></tr>
         </tbody>
-    </table>
+      </table>
 
-    <h2>XII. Copy-Trading Quota</h2>
-    <p>Individual bandwidth is increased by $$500$$ - $$800$$ USDT per valid referral to ensure server stability.</p>
+      <h3>8.2 Eligibility Notes</h3>
+      <ul>
+        <li>VIP agent fixed rewards are only valid based on official STAR agent identity.</li>
+        <li>The agent must remain active, compliant, and continuously involved.</li>
+        <li>These benefits are institutional team benefits, not investment returns or financial yield.</li>
+        <li>If the agent responsibilities are not fulfilled or the agent status becomes invalid, the related benefits will stop.</li>
+      </ul>
+    </section>
 
-    <h2>XVI. Conclusion</h2>
-    <p>Compliance and discipline are the foundations of our success. This framework is final and binding for the 2026 fiscal cycle.</p>
+    <section class="section">
+      <h2>9. STAR Agent Responsibilities</h2>
+      <p>STAR agents should actively participate in team building, support member communication, coordination, and daily assistance, and help maintain normal team order.</p>
+      <p>Agents must comply with STAR discipline, compliance, and behavior standards. They may not engage in anything that harms the team’s reputation, breaks rules, or disrupts the stability of the system.</p>
+      <p>Agents must transmit information accurately and maintain order, ensuring that team members correctly understand official STAR announcements, rules, and policy descriptions. They must not distort or expand official statements without authorization.</p>
+      <p>Agents should maintain activity and stability, help new members become familiar with the system, and promote long-term cooperation and structured development.</p>
+      <p>Agents must cooperate with compliance, risk control, and operations requirements and accept necessary reviews and assessments. If they do not continue to fulfill their duties, their agent identity and related benefits may be adjusted or terminated according to the rules.</p>
+    </section>
 
-    <div class="footer">© 2026 STAR Team Official. Authorized by Dr. Matt Gall, Chief Strategist.</div>
-</div>
+    <section class="section">
+      <h2>10. STAR Signal Rewards</h2>
 
-<!-- ================= FRENCH VERSION ================= -->
-<div id="content-fr" class="document" style="display:none;">
-    <div class="header">
-        <div class="logo-text">EQUIPE STAR</div>
-        <div class="header-meta" style="text-align: right; font-size: 11px;">SPÉCIFICATION OFFICIELLE<br>REF: 2026-REG-FR</div>
+      <h3>10.1 Permanent Signal Code Reward</h3>
+      <p>After reaching VIP2 agent status, you will receive the third permanent stock signal code.</p>
+
+      <h3>10.2 Conditions for Permanent Signal Rewards</h3>
+      <ul>
+        <li>Create and effectively manage a STAR-certified agent team</li>
+        <li>Provide daily support to team members through group messages</li>
+        <li>Create a collaboration workspace and provide daily team support</li>
+        <li>Organize one face-to-face team meeting every week</li>
+      </ul>
+
+      <h3>10.3 Additional Signal Rewards</h3>
+      <div class="info-box">
+        <p><strong>Rule summary:</strong></p>
+        <ul>
+          <li>If you invite a friend to deposit 500–999 USDT and the deposit reaches 30% of your account balance, both you and your friend receive 6 extra signals.</li>
+          <li>If you invite a friend to deposit less than 1000 USDT, both you and your friend receive 12 extra signals.</li>
+        </ul>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Account Balance</th>
+            <th>Invitation Amount</th>
+            <th>Signal Reward</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>500–999 USDT</td><td>500–999 USDT</td><td>6</td></tr>
+          <tr><td>1000 USDT</td><td>500 USDT or above</td><td>6</td></tr>
+          <tr><td>3000 USDT</td><td>1000 USDT or above</td><td>12</td></tr>
+          <tr><td>5000 USDT</td><td>1500 USDT or above</td><td>12</td></tr>
+          <tr><td>10000 USDT</td><td>3000 USDT or above</td><td>12</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>Important:</strong> One additional trading signal per day is counted cumulatively. Signal rewards are triggered only when the invited user’s total balance reaches 30% of the required threshold. Multiple deposits may be accumulated without limit.</p>
+    </section>
+
+    <section class="section">
+      <h2>11. STAR Team Collective Signal Rewards</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Small Group Size</th>
+            <th>Cumulative Invitations</th>
+            <th>Team Signal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>20 people</td><td>4 people</td><td>1 time</td></tr>
+          <tr><td>25 people</td><td>5 people</td><td>1 time</td></tr>
+          <tr><td>30 people</td><td>6 people</td><td>1 time</td></tr>
+          <tr><td>35 people</td><td>7 people</td><td>1 time</td></tr>
+        </tbody>
+      </table>
+
+      <div class="info-box">
+        <p><strong>Trading Position:</strong> 500–2000 USDT</p>
+        <p><strong>Expected return:</strong> 3–12 USDT</p>
+        <p><strong>Activity rules:</strong></p>
+        <ul>
+          <li>Independent agent teams must start from 20 people.</li>
+          <li>Once the target is reached, all members in the Bonchat group can unlock extra team signal rewards.</li>
+          <li>Every additional 5 members in the group requires 1 new member to deposit 500 USDT.</li>
+          <li>VIP2 agents may apply to create a STAR-certified agent team.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>12. Copy-Trading Quota and Trading Channel Benefit Adjustments</h2>
+      <p>As STAR Team continues promoting ACM platform development in the African market, copy-trading channels, trading bandwidth, API resources, and strategy synchronization seats are limited resources.</p>
+      <p>To ensure fair distribution, the team dynamically adjusts copy-trading quotas and related benefits according to whether members stay aligned with STAR, participate in ACM co-building, and contribute real value to the platform.</p>
+
+      <h3>Copy-Trading Quota Increase Rules</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Account Balance</th>
+            <th>Each Successful Invitation of 1 Valid New Member</th>
+            <th>Quota Increase</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Within 2000 USDT</td><td>1 member</td><td>+500</td></tr>
+          <tr><td>2000–4000 USDT</td><td>1 member</td><td>+800</td></tr>
+        </tbody>
+      </table>
+
+      <div class="info-box">
+        <ul>
+          <li>Copy-trading quota and trading channel benefits are not fixed.</li>
+          <li>Not every account automatically receives the same standard.</li>
+          <li>For accounts that do not cooperate in promoting ACM, do not participate in team co-building, or do not generate valid promotional contributions, the system may adjust copy-trading limits and some benefit permissions under unified rules.</li>
+          <li>This is not a punishment and does not deny the account itself. It is a fair resource allocation mechanism.</li>
+          <li>Future restoration or improvement of quotas can be requested again through collaboration, team building, and valid new contributions.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>13. VIP Growth and Responsibility System</h2>
+      <p><span class="tag">VIP0</span> Trainee Agent | Learning and Following Stage</p>
+      <ul>
+        <li>Follow VIP1 to learn the basic rules</li>
+        <li>Understand benefits and operating processes</li>
+        <li>Clarify the conditions for promotion to VIP1</li>
+      </ul>
+
+      <p><span class="tag">VIP1</span> Basic Agent Stage</p>
+      <ul>
+        <li>Learn management and communication methods</li>
+        <li>Help members transition to VIP1</li>
+        <li>Organize rule explanations and communication</li>
+        <li>Track team execution</li>
+      </ul>
+
+      <p><span class="tag">VIP2</span> Independent Team Leader Stage</p>
+      <ul>
+        <li>Manage your own team group</li>
+        <li>Lead the team toward stable growth</li>
+        <li>Develop core direct subordinates</li>
+        <li>Build an offline office</li>
+      </ul>
+
+      <p><span class="tag">VIP3</span> Multi-Team Management Stage</p>
+      <ul>
+        <li>Manage multiple teams</li>
+        <li>Develop more agents</li>
+        <li>Assist superiors in stable operations</li>
+        <li>Provide unified explanations and timely corrections</li>
+      </ul>
+
+      <p><span class="tag">VIP4</span> Execution Management Stage</p>
+      <ul>
+        <li>Unify execution standards</li>
+        <li>Establish data management mechanisms</li>
+        <li>Promote recruitment, training, promotion, and retention rhythms</li>
+        <li>Improve expansion efficiency and stability</li>
+      </ul>
+
+      <p><span class="tag">VIP5</span> Regional Coordination Stage</p>
+      <ul>
+        <li>Coordinate communication among multiple teams</li>
+        <li>Promote unified training and activities</li>
+        <li>Build regional growth channels</li>
+        <li>Increase regional cohesion</li>
+      </ul>
+
+      <p><span class="tag">VIP6</span> Mechanized Multi-Team Management Stage</p>
+      <ul>
+        <li>Manage multiple team leaders</li>
+        <li>Build management meeting mechanisms</li>
+        <li>Provide compliance reminders and risk warnings</li>
+        <li>Produce replicable mechanisms</li>
+      </ul>
+
+      <p><span class="tag">VIP7</span> System Operations Stage</p>
+      <ul>
+        <li>Set annual and quarterly plans</li>
+        <li>Build policy promotion and inspection mechanisms</li>
+        <li>Handle cross-team issues</li>
+        <li>Develop talent pipelines and promotion structures</li>
+      </ul>
+
+      <p><span class="tag">VIP8</span> Strategic Regional Stage</p>
+      <ul>
+        <li>Promote core regional layouts</li>
+        <li>Develop regional management leaders</li>
+        <li>Promote certified office development</li>
+        <li>Enhance brand influence</li>
+      </ul>
+
+      <p><span class="tag">VIP9</span> System Partner Stage</p>
+      <ul>
+        <li>Participate in major policy and direction suggestions</li>
+        <li>Protect brand and compliance boundaries</li>
+        <li>Coordinate key regional leaders</li>
+        <li>Promote the long-term health of the system</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>14. Unified Compliance and Risk Management Requirements</h2>
+      <p>All members and agents must comply with the following requirements:</p>
+      <ul>
+        <li>All accounts must be real accounts.</li>
+        <li>Multiple accounts by one person are prohibited.</li>
+        <li>Money laundering and abnormal fund behavior are prohibited.</li>
+        <li>False invitations, false deposits, false trades, or malicious reward farming are prohibited.</li>
+        <li>All rewards must be based on compliant accounts, qualified balances, and real participation.</li>
+        <li>Members must cooperate with STAR compliance review, risk review, and operations management requirements.</li>
+        <li>Violators may lose rewards, have earnings recovered, have cooperation terminated, or lose agent status.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>15. Core Principles Summary</h2>
+      <p>The STAR Team Member Benefits System follows these principles:</p>
+      <ul>
+        <li>Long-term cooperation first</li>
+        <li>Real trading first</li>
+        <li>Compliant accounts first</li>
+        <li>Continuous participation first</li>
+        <li>Team contribution first</li>
+        <li>Fair resource allocation</li>
+        <li>Short-term stimulation is not encouraged</li>
+        <li>Stability, structure, and long-term value are emphasized</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>16. Closing Statement</h2>
+      <p>The STAR Team Member Benefits System is a comprehensive structure built around referral rewards, agent fixed rewards, basic benefits, signal rewards, team signals, copy-trading quotas, and the VIP growth system.</p>
+      <p>With Bonchat groups, the Official Account service channel, and the collaborative governance of the four departments, STAR Team has formed a complete system for learning, research, risk control, compliance, finance, and operational publishing.</p>
+      <p>This policy aims to promote long-term, stable, compliant, and sustainable development through clear tier standards, reward mechanisms, and agent responsibilities.</p>
+    </section>
+
+    <div class="footer">
+      <p><strong>STAR Team</strong> — Official Policy Document</p>
+      <p class="muted">Prepared for website publication and PDF export</p>
     </div>
-
-    <h1>Droits et Avantages des Membres</h1>
-    <div class="subtitle">Cadre de Développement Institutionnel</div>
-
-    <h2>I. Dispositions Générales</h2>
-    <p>Ce document régit les normes opérationnelles et les structures de récompense pour l'équipe STAR.</p>
-
-    <h2>VI. Système de Parrainage</h2>
-    <table>
-        <thead><tr><th>Montant du Dépôt</th><th>Bonus Parrain</th><th>Bonus Nouveau Membre</th></tr></thead>
-        <tbody>
-            <tr><td>$$500$$ USDT</td><td>$$50$$ USDT</td><td>$$50$$ USDT</td></tr>
-            <tr><td>$$1000$$ USDT</td><td>$$100$$ USDT</td><td>$$100$$ USDT</td></tr>
-        </tbody>
-    </table>
-
-    <h2>VIII. Récompenses Fixes (Bimensuelles)</h2>
-    <table>
-        <thead><tr><th>Niveau</th><th>Prime (15 Jours)</th><th>Projection Annuelle</th></tr></thead>
-        <tbody>
-            <tr><td>VIP1</td><td>$$15$$ USDT</td><td>$$360$$ USDT</td></tr>
-            <tr><td>VIP9</td><td>$$10000$$ USDT</td><td>$$240000$$ USDT</td></tr>
-        </tbody>
-    </table>
-
-    <h2>XVI. Conclusion</h2>
-    <p>La conformité et la discipline sont les fondements de notre succès.</p>
-
-    <div class="footer">© 2026 Équipe STAR. Autorisé par le Dr Matt Gall.</div>
-</div>
-
-<script>
-    async function downloadCleanPDF(lang) {
-        // 1. 获取目标元素
-        const original = document.getElementById('content-' + lang);
-        original.style.display = 'block';
-
-        // 2. 创建一个深拷贝用于清理
-        const clone = original.cloneNode(true);
-        clone.id = "pdf-temp-clone";
-        
-        // 3. 核心清理逻辑：使用正则表达式移除所有 $$ 和多余的符号
-        const cleanupText = (element) => {
-            const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
-            let node;
-            while (node = walker.nextNode()) {
-                // 移除 $$ 符号，移除可能出现的 \ 符号
-                node.nodeValue = node.nodeValue.replace(/\$\$/g, '').replace(/\\/g, '');
-            }
-        };
-        cleanupText(clone);
-
-        // 4. 将清理后的克隆件暂时放入不可见的容器
-        const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        container.style.top = '0';
-        document.body.appendChild(container);
-        container.appendChild(clone);
-
-        // 5. 设置 PDF 选项 (高清 300 DPI 效果)
-        const opt = {
-            margin:       0,
-            filename:     'STAR_Team_Official_' + lang.toUpperCase() + '.pdf',
-            image:        { type: 'jpeg', quality: 1 },
-            html2canvas:  { scale: 3, useCORS: true, letterRendering: true },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        // 6. 执行生成并清理
-        try {
-            await html2pdf().set(opt).from(clone).save();
-        } finally {
-            document.body.removeChild(container);
-            if (lang === 'fr') original.style.display = 'none';
-        }
-    }
-</script>
-
+  </div>
 </body>
 </html>
