@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAR Team Membership Rights & Benefits</title>
+    
+    <!-- Link to your GitHub Favicon -->
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/MattGall795/my-signals/main/favicon.png">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --navy: #0A192F;
+            --navy-light: #112240;
+            --gold: #D4AF37;
+            --gold-light: #F4D03F;
+            --white: #FFFFFF;
+            --gray: #A0AEC0;
+            --border: rgba(212, 175, 55, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--navy);
+            color: var(--white);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header & Logo */
+        header {
+            background-color: var(--navy);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--gold);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            height: 60px;
+            margin-bottom: 10px;
+        }
+
+        .header-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            color: var(--gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(rgba(10, 25, 47, 0.8), rgba(10, 25, 47, 0.8)), 
+                        url('https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--gold);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        section {
+            background-color: var(--navy-light);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--gold);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--gold);
+            padding-left: 15px;
+            font-size: 1.5rem;
+        }
+
+        h3 {
+            color: var(--gold-light);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: var(--gray);
+        }
+
+        ul {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+
+        th {
+            background-color: var(--gold);
+            color: var(--navy);
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--white);
+        }
+
+        /* Highlight Box (The 3-Month Rule) */
+        .warning-box {
+            background-color: rgba(212, 175, 55, 0.1);
+            border: 1px dashed var(--gold);
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        /* Action Buttons */
+        .btn-group {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .btn {
+            background-color: var(--gold);
+            color: var(--navy);
+            padding: 15px 40px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin: 10px;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn:hover {
+            background-color: var(--gold-light);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border);
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            section { padding: 20px; }
+            .header-title { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <!-- GitHub Logo Call -->
+        <img src="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/favicon.png" alt="STAR Logo" class="logo">
+        <div class="header-title">STAR TEAM GLOBAL</div>
+    </header>
+
+    <div class="hero">
+        <h1>Membership Rights & Benefits</h1>
+        <p>Bâtir la plateforme d'investissement financier en ligne de référence pour toute l'Afrique.</p>
+    </div>
+
+    <div class="container">
+        
+        <!-- I. General Provisions -->
+        <section>
+            <h2>I. General Provisions</h2>
+            <p>The STAR Team system is designed to provide learning support, tool access, and resource allocation based on member engagement levels.</p>
+            <ul>
+                <li><strong>Compliance:</strong> Operating within the framework of platform rules.</li>
+                <li><strong>Authenticity:</strong> Real accounts and transparent trading.</li>
+                <li><strong>Long-termism:</strong> Prioritizing structural growth.</li>
+            </ul>
+        </section>
+
+        <!-- II. Membership Levels -->
+        <section>
+            <h2>II. Membership Levels</h2>
+            <h3>1. Standard Member</h3>
+            <p>Access to basic learning materials, newcomer guidance, and basic signal references.</p>
+            <h3>2. Advanced Member</h3>
+            <p>Includes high-frequency strategy updates, internal team study materials, and full signal logs.</p>
+            <h3>3. VIP Member</h3>
+            <p>Premium-grade signal services, exclusive communication channels, and priority project participation.</p>
+        </section>
+
+        <!-- III. Referral & Collaboration -->
+        <section>
+            <h2>III. Referral & Collaboration Incentives</h2>
+            <p>Resources are allocated dynamically based on your contribution to the ACM ecosystem:</p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Account Balance (USDT)</th>
+                            <th>Action</th>
+                            <th>Quota Expansion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Under $$2000$$</td>
+                            <td>Invite 1 Active Member</td>
+                            <td>+ $$500$$ USDT</td>
+                        </tr>
+                        <tr>
+                            <td>$$2000$$ to $$4000$$</td>
+                            <td>Invite 1 Active Member</td>
+                            <td>+ $$800$$ USDT</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p><small>*Figures are references and subject to dynamic system adjustments.</small></p>
+        </section>
+
+        <!-- IX. The 3-Month Rule -->
+        <section class="warning-box">
+            <h2>IX. Dynamic Adjustment Mechanism</h2>
+            <h3>The 3-Month Efficiency Rule</h3>
+            <p>To ensure system vitality, if an account fails to engage in effective collaboration (no ACM promotion, no team-building, or no collaborative action) for a period exceeding <strong>3 months</strong>:</p>
+            <ul>
+                <li>The account will be identified as "Non-Collaborative".</li>
+                <li>It will be moved out of the current "Follower Quota Pool".</li>
+                <li>Premium benefits and signal access will be suspended.</li>
+            </ul>
+            <p><em>Re-activation is possible upon resume of active collaboration and review.</em></p>
+        </section>
+
+        <!-- X. Final Statement -->
+        <section>
+            <h2>X. Final Statement</h2>
+            <p>STAR Team does not promise fixed returns or guaranteed profits. All benefits are predicated on active participation, sustained collaboration, and a compliant account status.</p>
+            <p><strong>Any deposit over $$3000$$ USDT requires approval from Matt Gall, PhD.</strong></p>
+        </section>
+
+        <!-- PDF Button -->
+        <div class="btn-group">
+            <button class="btn" onclick="window.print()">Download PDF Version</button>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>© 2026 STAR Team Global. All Rights Reserved.</p>
+        <p>Authorized by Matt Gall, PhD – Chief Strategist.</p>
+    </footer>
+
+</body>
+</html>
