@@ -3,231 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STAR Team Official Rules 2026</title>
-    <!-- PDF Engine -->
+    <title>STAR Team Official Specification 2026</title>
+    <!-- 引入高清 PDF 引擎 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root {
-            --star-navy: #002e5d;
-            --star-gold: #b38f00;
-            --text-main: #222222;
-            --gray-bg: #f4f4f4;
-        }
-
-        /* Responsive Layout */
-        body { font-family: 'Times New Roman', Times, serif; background: #999; margin: 0; padding: 0; }
+        :root { --navy: #002e5d; --gold: #c5a059; --text: #333; }
         
-        .nav-bar {
-            position: sticky; top: 0; background: white; padding: 15px;
-            display: flex; justify-content: center; gap: 20px; z-index: 9999;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+        /* UI 适配逻辑 */
+        body { font-family: "Georgia", serif; background: #e0e0e0; margin: 0; padding: 0; color: var(--text); }
+        .controls { position: sticky; top: 0; background: white; padding: 15px; display: flex; justify-content: center; gap: 20px; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        
+        .btn { padding: 12px 25px; border: 2px solid var(--navy); background: transparent; color: var(--navy); font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+        .btn:hover { background: var(--navy); color: white; }
+
+        /* 文档纸张样式 */
+        .document { width: 210mm; min-height: 297mm; margin: 30px auto; background: white; padding: 25mm 20mm; box-sizing: border-box; box-shadow: 0 0 30px rgba(0,0,0,0.3); position: relative; }
+        
+        @media (max-width: 768px) { 
+            .document { width: 95%; padding: 20px 15px; margin: 10px auto; box-shadow: none; }
+            .controls { flex-direction: column; padding: 10px; }
+            .header-meta { text-align: center !important; }
         }
 
-        .dl-btn {
-            padding: 12px 30px; border: 2px solid var(--star-navy); background: white;
-            color: var(--star-navy); font-weight: bold; cursor: pointer; border-radius: 2px;
-            transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .dl-btn:hover { background: var(--star-navy); color: white; }
+        /* 内部排版 */
+        .header { border-bottom: 3px solid var(--navy); padding-bottom: 15px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .logo-text { font-size: 28px; font-weight: bold; color: var(--navy); letter-spacing: 2px; }
+        
+        h1 { text-align: center; color: var(--navy); font-size: 24px; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 40px; text-transform: uppercase; }
+        
+        h2 { border-left: 5px solid var(--gold); padding-left: 15px; color: var(--navy); font-size: 18px; margin-top: 30px; text-transform: uppercase; }
+        h3 { color: var(--navy); font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-family: Arial, sans-serif; }
+        th { background: var(--navy); color: white; padding: 12px; font-size: 13px; border: 1px solid var(--navy); }
+        td { border: 1px solid #e0e0e0; padding: 10px; font-size: 14px; }
+        tr:nth-child(even) { background: #f9f9f9; }
 
-        /* Document Container */
-        .pdf-page {
-            width: 210mm; min-height: 297mm; margin: 30px auto; background: white;
-            padding: 25mm 20mm; box-sizing: border-box; box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-
-        @media (max-width: 768px) {
-            .pdf-page { width: 95%; padding: 15px; margin: 10px auto; box-shadow: none; }
-            .nav-bar { flex-direction: column; }
-        }
-
-        /* Header Styling */
-        .header { border-bottom: 3px solid var(--star-navy); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .logo-area { display: flex; align-items: center; }
-        .logo-area img { height: 75px; margin-right: 20px; }
-        .brand-title { font-size: 32px; font-weight: bold; color: var(--star-navy); letter-spacing: 2px; }
-
-        /* Typography */
-        h1 { text-align: center; color: var(--star-navy); text-transform: uppercase; font-size: 24px; margin: 40px 0 10px 0; }
-        .subtitle { text-align: center; color: var(--star-gold); font-style: italic; font-weight: bold; margin-bottom: 50px; }
-        h2 { border-left: 5px solid var(--star-gold); padding-left: 15px; color: var(--star-navy); font-size: 18px; text-transform: uppercase; margin-top: 35px; }
-        h3 { color: var(--star-navy); border-bottom: 1px solid #ddd; padding-bottom: 5px; font-size: 16px; }
-        p, li { font-size: 14px; line-height: 1.6; text-align: justify; color: var(--text-main); }
-
-        /* Tables - Professional Styling */
-        .table-res { overflow-x: auto; margin: 20px 0; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-        th { background: var(--star-navy); color: white; padding: 12px; font-size: 13px; text-transform: uppercase; border: 1px solid var(--star-navy); }
-        td { border: 1px solid #ddd; padding: 10px; font-size: 14px; color: var(--text-main); }
-        tr:nth-child(even) { background: #fbfbfb; }
-
-        /* Hidden raw markers */
-        .raw-val { font-weight: bold; font-family: sans-serif; }
-
-        .footer { margin-top: 60px; border-top: 1px solid #ddd; padding-top: 20px; text-align: center; font-size: 11px; color: #777; font-style: italic; }
+        .footer { margin-top: 60px; border-top: 1px solid #ddd; padding-top: 20px; text-align: center; font-size: 11px; color: #999; }
+        
+        /* 强制清理符号的辅助样式 */
+        .clean-num { font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="nav-bar">
-    <button class="dl-btn" onclick="buildPDF('en')">Download English Specification</button>
-    <button class="dl-btn" onclick="buildPDF('fr')">Télécharger le Règlement Français</button>
+<div class="controls">
+    <button class="btn" onclick="downloadCleanPDF('en')">Download English Edition</button>
+    <button class="btn" onclick="downloadCleanPDF('fr')">Télécharger l'édition française</button>
 </div>
 
-<!-- ================= ENGLISH FULL VERSION ================= -->
-<div id="doc-en" class="pdf-page">
+<!-- ================= ENGLISH VERSION ================= -->
+<div id="content-en" class="document">
     <div class="header">
-        <div class="logo-area">
-            <img src="https://raw.githubusercontent.com/MattGall795/my-signals/main/favicon.png" alt="STAR">
-            <span class="brand-text"><span class="brand-title">STAR TEAM</span></span>
-        </div>
-        <div style="text-align: right; color: var(--star-navy); font-weight: bold;">OFFICIAL DOCUMENT 2026<br>V.1.0-EN</div>
+        <div class="logo-text">STAR TEAM</div>
+        <div class="header-meta" style="text-align: right; font-size: 11px;">OFFICIAL SPECIFICATION<br>REF: 2026-REG-EN</div>
     </div>
 
     <h1>Member Rights & Benefits Specification</h1>
-    <div class="subtitle">Structured Global Development Framework</div>
+    <div class="subtitle">Institutional Growth Framework</div>
 
     <h2>I. General Provisions</h2>
-    <p>This charter defines the rights and obligations of the STAR Team members. Our mission is to integrate institutional research with retail participation, ensuring sustainable growth under the leadership of Dr. Matt Gall.</p>
+    <p>This document governs the operational standards and reward structures for the STAR Team. All protocols are designed to ensure long-term community value.</p>
 
     <h2>II. Communication Infrastructure</h2>
-    <p><b>1. STAR Official Documentation Centre:</b> The single source of truth for compliance and learning.</p>
-    <p><b>2. STAR Stock Discussion Group:</b> Operational hub. Mandatory <b>Thursday Training</b> for new members.</p>
-    <p><b>3. STAR VIP Training Group:</b> Strategic summit for agents. <b>Friday Leadership Summits</b>.</p>
+    <p><b>1. Documentation Centre:</b> Official repository for compliance and logic.<br>
+    <b>2. Stock Discussion Group:</b> Signal hub and <b>Thursday Training</b>.<br>
+    <b>3. VIP Training Group:</b> Management summits held every <b>Friday</b>.</p>
 
-    <h2>III. Four Governance Departments</h2>
-    <p><b>DCC:</b> Compliance monitoring and termination authority. | <b>RPMC:</b> Risk & Position Management. | <b>IROO:</b> Institutional Research Operations. | <b>FGAC:</b> Financial Audit & Grant Control.</p>
+    <h2>III. Core Governance Pillars</h2>
+    <p><b>DCC (Compliance):</b> Account audits and ethical oversight.<br>
+    <b>RPMC (Risk):</b> Position limits and capital security.<br>
+    <b>IROO (Research):</b> Strategy formulation and official signals.<br>
+    <b>FGAC (Audit):</b> Fund flow verification and reward granting.</p>
 
-    <h2>VI. Referral Rewards System</h2>
-    <div class="table-res">
-        <table>
-            <thead><tr><th>Deposit Level</th><th>Inviter Bonus</th><th>New Member Bonus</th></tr></thead>
-            <tbody>
-                <tr><td>$$500$$ USDT</td><td>$$50$$ USDT</td><td>$$50$$ USDT</td></tr>
-                <tr><td>$$1000$$ USDT</td><td>$$100$$ USDT</td><td>$$100$$ USDT</td></tr>
-                <tr><td>$$5000$$ USDT</td><td>$$500$$ USDT</td><td>$$500$$ USDT</td></tr>
-                <tr><td>$$10000$$ USDT</td><td>$$1000$$ USDT</td><td>$$1000$$ USDT</td></tr>
-            </tbody>
-        </table>
-    </div>
+    <h2>VI. Referral Rewards</h2>
+    <table>
+        <thead><tr><th>Investment Amount</th><th>Inviter Reward</th><th>New Member Reward</th></tr></thead>
+        <tbody>
+            <tr><td>$$500$$ USDT</td><td>$$50$$ USDT</td><td>$$50$$ USDT</td></tr>
+            <tr><td>$$1000$$ USDT</td><td>$$100$$ USDT</td><td>$$100$$ USDT</td></tr>
+            <tr><td>$$5000$$ USDT</td><td>$$500$$ USDT</td><td>$$500$$ USDT</td></tr>
+            <tr><td>$$10000$$ USDT</td><td>$$1000$$ USDT</td><td>$$1000$$ USDT</td></tr>
+        </tbody>
+    </table>
 
     <h2>VII. VIP Level Standards</h2>
-    <div class="table-res">
-        <table>
-            <thead><tr><th>Level</th><th>Team Size</th><th>Partners</th><th>ACM Share</th></tr></thead>
-            <tbody>
-                <tr><td>VIP1</td><td>$$3 - 19$$</td><td>$$3$$</td><td>$$3\%$$</td></tr>
-                <tr><td>VIP2</td><td>$$20 - 60$$</td><td>$$6$$</td><td>$$3\%$$</td></tr>
-                <tr><td>VIP9</td><td>$$6000+$$</td><td>$$20 \times VIP2$$</td><td>$$3\%$$</td></tr>
-            </tbody>
-        </table>
-    </div>
+    <table>
+        <thead><tr><th>Level</th><th>Team Size</th><th>Direct Partners</th><th>Profit Share</th></tr></thead>
+        <tbody>
+            <tr><td>VIP1</td><td>$$3 - 19$$</td><td>$$3$$</td><td>$$3\%$$</td></tr>
+            <tr><td>VIP2</td><td>$$20 - 60$$</td><td>$$6$$</td><td>$$3\%$$</td></tr>
+            <tr><td>VIP9</td><td>$$6000+$$</td><td>$$20 \times VIP2$$</td><td>$$3\%$$</td></tr>
+        </tbody>
+    </table>
 
     <h2>VIII. Fixed Bi-Weekly Rewards</h2>
-    <div class="table-res">
-        <table>
-            <thead><tr><th>Level</th><th>15-Day Reward</th><th>Annual Total</th></tr></thead>
-            <tbody>
-                <tr><td>VIP1</td><td>$$15$$ USDT</td><td>$$360$$ USDT</td></tr>
-                <tr><td>VIP2</td><td>$$60$$ USDT</td><td>$$1440$$ USDT</td></tr>
-                <tr><td>VIP9</td><td>$$10000$$ USDT</td><td>$$240000$$ USDT</td></tr>
-            </tbody>
-        </table>
-    </div>
+    <table>
+        <thead><tr><th>Level</th><th>15-Day Reward</th><th>Annual Projection</th></tr></thead>
+        <tbody>
+            <tr><td>VIP1</td><td>$$15$$ USDT</td><td>$$360$$ USDT</td></tr>
+            <tr><td>VIP2</td><td>$$60$$ USDT</td><td>$$1440$$ USDT</td></tr>
+            <tr><td>VIP9</td><td>$$10000$$ USDT</td><td>$$240000$$ USDT</td></tr>
+        </tbody>
+    </table>
 
     <h2>XII. Copy-Trading Quota</h2>
-    <p>Based on contribution, each valid referral increases bandwidth by $$500$$ to $$800$$ USDT.</p>
+    <p>Individual bandwidth is increased by $$500$$ - $$800$$ USDT per valid referral to ensure server stability.</p>
 
     <h2>XVI. Conclusion</h2>
-    <p>Strict adherence to this framework ensures the STAR Team's long-term dominance in market analysis. All members must follow these standards to secure their growth.</p>
+    <p>Compliance and discipline are the foundations of our success. This framework is final and binding for the 2026 fiscal cycle.</p>
 
-    <div class="footer">
-        Confidential Document © 2026 STAR Team. Authorized by Dr. Matt Gall, Chief Strategist.
-    </div>
+    <div class="footer">© 2026 STAR Team Official. Authorized by Dr. Matt Gall, Chief Strategist.</div>
 </div>
 
-<!-- ================= FRENCH FULL VERSION ================= -->
-<div id="doc-fr" class="pdf-page" style="display:none;">
+<!-- ================= FRENCH VERSION ================= -->
+<div id="content-fr" class="document" style="display:none;">
     <div class="header">
-        <div class="logo-area">
-            <img src="https://raw.githubusercontent.com/MattGall795/my-signals/main/favicon.png" alt="STAR">
-            <span class="brand-title">ÉQUIPE STAR</span>
-        </div>
-        <div style="text-align: right; color: var(--star-navy); font-weight: bold;">DOCUMENT OFFICIEL 2026<br>V.1.0-FR</div>
+        <div class="logo-text">EQUIPE STAR</div>
+        <div class="header-meta" style="text-align: right; font-size: 11px;">SPÉCIFICATION OFFICIELLE<br>REF: 2026-REG-FR</div>
     </div>
 
-    <h1>Spécification des Droits et Avantages</h1>
-    <div class="subtitle">Cadre de Développement Global Structuré</div>
+    <h1>Droits et Avantages des Membres</h1>
+    <div class="subtitle">Cadre de Développement Institutionnel</div>
 
     <h2>I. Dispositions Générales</h2>
-    <p>Cette charte définit les droits et obligations des membres. Notre mission est d'intégrer la recherche institutionnelle pour assurer une croissance durable sous la direction du Dr Matt Gall.</p>
+    <p>Ce document régit les normes opérationnelles et les structures de récompense pour l'équipe STAR.</p>
 
-    <h2>VI. Système de Récompenses</h2>
-    <div class="table-res">
-        <table>
-            <thead><tr><th>Niveau de Dépôt</th><th>Bonus Parrain</th><th>Bonus Nouveau Membre</th></tr></thead>
-            <tbody>
-                <tr><td>$$500$$ USDT</td><td>$$50$$ USDT</td><td>$$50$$ USDT</td></tr>
-                <tr><td>$$1000$$ USDT</td><td>$$100$$ USDT</td><td>$$100$$ USDT</td></tr>
-            </tbody>
-        </table>
-    </div>
+    <h2>VI. Système de Parrainage</h2>
+    <table>
+        <thead><tr><th>Montant du Dépôt</th><th>Bonus Parrain</th><th>Bonus Nouveau Membre</th></tr></thead>
+        <tbody>
+            <tr><td>$$500$$ USDT</td><td>$$50$$ USDT</td><td>$$50$$ USDT</td></tr>
+            <tr><td>$$1000$$ USDT</td><td>$$100$$ USDT</td><td>$$100$$ USDT</td></tr>
+        </tbody>
+    </table>
 
     <h2>VIII. Récompenses Fixes (Bimensuelles)</h2>
-    <div class="table-res">
-        <table>
-            <thead><tr><th>Niveau</th><th>Prime (15 Jours)</th><th>Total Annuel</th></tr></thead>
-            <tbody>
-                <tr><td>VIP1</td><td>$$15$$ USDT</td><td>$$360$$ USDT</td></tr>
-                <tr><td>VIP9</td><td>$$10000$$ USDT</td><td>$$240000$$ USDT</td></tr>
-            </tbody>
-        </table>
-    </div>
+    <table>
+        <thead><tr><th>Niveau</th><th>Prime (15 Jours)</th><th>Projection Annuelle</th></tr></thead>
+        <tbody>
+            <tr><td>VIP1</td><td>$$15$$ USDT</td><td>$$360$$ USDT</td></tr>
+            <tr><td>VIP9</td><td>$$10000$$ USDT</td><td>$$240000$$ USDT</td></tr>
+        </tbody>
+    </table>
 
     <h2>XVI. Conclusion</h2>
-    <p>Le respect strict de ce cadre assure la pérennité de l'équipe STAR. La discipline est la clé de la réussite.</p>
+    <p>La conformité et la discipline sont les fondements de notre succès.</p>
 
-    <div class="footer">
-        Document Confidentiel © 2026 Équipe STAR. Autorisé par Dr. Matt Gall.
-    </div>
+    <div class="footer">© 2026 Équipe STAR. Autorisé par le Dr Matt Gall.</div>
 </div>
 
 <script>
-    function buildPDF(lang) {
-        const element = document.getElementById('doc-' + lang);
-        element.style.display = 'block';
+    async function downloadCleanPDF(lang) {
+        // 1. 获取目标元素
+        const original = document.getElementById('content-' + lang);
+        original.style.display = 'block';
 
-        // --- PRE-PROCESSING: REMOVE $$ SYMBOLS FOR PDF ---
-        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
-        let node;
-        const nodesToReplace = [];
-        while(node = walker.nextNode()) {
-            if (node.nodeValue.includes('$$')) {
-                nodesToReplace.push(node);
+        // 2. 创建一个深拷贝用于清理
+        const clone = original.cloneNode(true);
+        clone.id = "pdf-temp-clone";
+        
+        // 3. 核心清理逻辑：使用正则表达式移除所有 $$ 和多余的符号
+        const cleanupText = (element) => {
+            const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            while (node = walker.nextNode()) {
+                // 移除 $$ 符号，移除可能出现的 \ 符号
+                node.nodeValue = node.nodeValue.replace(/\$\$/g, '').replace(/\\/g, '');
             }
-        }
-        nodesToReplace.forEach(n => {
-            n.nodeValue = n.nodeValue.replace(/\$\$/g, '');
-        });
+        };
+        cleanupText(clone);
 
-        // --- PDF OPTIONS ---
+        // 4. 将清理后的克隆件暂时放入不可见的容器
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        container.style.top = '0';
+        document.body.appendChild(container);
+        container.appendChild(clone);
+
+        // 5. 设置 PDF 选项 (高清 300 DPI 效果)
         const opt = {
             margin:       0,
-            filename:     'STAR_Official_Specification_2026_' + lang.toUpperCase() + '.pdf',
+            filename:     'STAR_Team_Official_' + lang.toUpperCase() + '.pdf',
             image:        { type: 'jpeg', quality: 1 },
-            html2canvas:  { 
-                scale: 3, 
-                useCORS: true, 
-                letterRendering: true,
-                windowWidth: 1000
-            },
+            html2canvas:  { scale: 3, useCORS: true, letterRendering: true },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(element).save().then(() => {
-            if(lang === 'fr') element.style.display = 'none';
-            // Note: In a real app, you might want to refresh to restore the $$ markers
-        });
+        // 6. 执行生成并清理
+        try {
+            await html2pdf().set(opt).from(clone).save();
+        } finally {
+            document.body.removeChild(container);
+            if (lang === 'fr') original.style.display = 'none';
+        }
     }
 </script>
 
