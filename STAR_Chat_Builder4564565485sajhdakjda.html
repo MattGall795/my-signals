@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>STAR 团队 - 话术构建系统 (Matt Gall专用)</title>
+    <style>
+        :root {
+            --primary-color: #0f2027;
+            --secondary-color: #203a43;
+            --accent-color: #2c5364;
+            --success-color: #27ae60;
+            --text-color: #333;
+            --bg-color: #f4f7f6;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1100px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            overflow: hidden;
+            min-height: 80vh;
+        }
+        /* 左侧快捷栏 */
+        .sidebar {
+            width: 260px;
+            background: var(--primary-color);
+            color: white;
+            padding: 25px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar h3 {
+            margin: 20px 0 10px 0;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+        .sidebar h3:first-child { margin-top: 0; }
+
+        .btn-quick {
+            background: var(--secondary-color);
+            color: #bdc3c7;
+            border: 1px solid #34495e;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        .btn-quick:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        /* 自定义诉求区域 */
+        .custom-add-box {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .custom-input {
+            flex: 1;
+            padding: 5px;
+            border-radius: 4px;
+            border: none;
+            font-size: 12px;
+        }
+        .btn-add-tag {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #custom-tags-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .tag-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+        }
+        .tag-item .btn-quick { flex: 1; margin-bottom: 0; border: none; background: transparent; }
+        .btn-del-tag {
+            padding: 0 10px;
+            color: #e74c3c;
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.5;
+        }
+        .btn-del-tag:hover { opacity: 1; }
+
+        /* 右侧主工作区 */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-container {
+            flex: 1;
+            margin-bottom: 20px;
+            overflow-y: auto;
+        }
+        .chat-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .role-select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 120px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            resize: vertical;
+            min-height: 50px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .btn-remove {
+            background: #eee;
+            color: #999;
+            border: none;
+            padding: 0 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-remove:hover { background: #e74c3c; color: white; }
+        
+        .footer-controls {
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+        }
+        .reply-style-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #eef2f3;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .reply-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        #reply-style {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+        .btn-action {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-copy { background: var(--success-color); color: white; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); }
+        .btn-reset { background: #95a5a6; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="sidebar">
+        <h3>➕ 添加对话</h3>
+        <button class="btn-quick" onclick="addChatRow('Matt Gall', '')">Matt Gall 发言</button>
+        <button class="btn-quick" onclick="addChatRow('会员', '')">会员 发言</button>
+        
+        <h3>📂 常用对话模版</h3>
+        <button class="btn-quick" onclick="addChatRow('会员', 'D\'accord')">↳ 会员: D'accord</button>
+        <button class="btn-quick" onclick="addChatRow('会员', 'J\'ai pris bonne note Dr')">↳ 会员: 已记下</button>
+
+        <h3>🎯 我的最终诉求</h3>
+        <div class="custom-add-box">
+            <input type="text" id="new-tag-input" class="custom-input" placeholder="输入常用诉求...">
+            <button class="btn-add-tag" onclick="saveNewTag()">+</button>
+        </div>
+        <div id="custom-tags-container">
+            <!-- 自定义诉求标签将显示在这里 -->
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 style="margin:0; color: var(--primary-color);">STAR 团队对话构建系统</h2>
+            <span style="font-size:12px; color:#999;">首席策略师 Matt Gall 专用版</span>
+        </div>
+        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+        
+        <div class="chat-container" id="chat-container"></div>
+
+        <div class="footer-controls">
+            <div class="reply-style-box">
+                <div style="font-size:14px; color:#666; font-weight:bold;">当前指令诉求：</div>
+                <div class="reply-input-group">
+                    <span style="white-space:nowrap;">Matt Gall用中文怎么回复，</span>
+                    <input type="text" id="reply-style" placeholder="请选择左侧诉求或在此输入...">
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-action btn-reset" onclick="resetForm()">全部重置</button>
+                <button class="btn-action btn-copy" onclick="copyToClipboard()">一键生成并复制</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const chatContainer = document.getElementById('chat-container');
+    const tagsContainer = document.getElementById('custom-tags-container');
+    const newTagInput = document.getElementById('new-tag-input');
+    const replyStyleInput = document.getElementById('reply-style');
+
+    // 初始化加载
+    window.onload = function() {
+        loadTags();
+        resetForm();
+    };
+
+    // --- 对话行管理 ---
+    function addChatRow(roleStr, textStr) {
+        const row = document.createElement('div');
+        row.className = 'chat-row';
+        row.innerHTML = `
+            <select class="role-select">
+                <option value="Matt Gall" ${roleStr==='Matt Gall'?'selected':''}>Matt Gall</option>
+                <option value="会员" ${roleStr==='会员'?'selected':''}>会员</option>
+            </select>
+            <textarea class="chat-input" placeholder="输入对话内容...">${textStr}</textarea>
+            <button class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+        `;
+        chatContainer.appendChild(row);
+        row.querySelector('textarea').focus();
+    }
+
+    function resetForm() {
+        chatContainer.innerHTML = '';
+        addChatRow('Matt Gall', '');
+        addChatRow('会员', '');
+        replyStyleInput.value = '简单关心和鼓励。';
+    }
+
+    // --- 自定义诉求标签管理 (localStorage) ---
+    function saveNewTag() {
+        const val = newTagInput.value.trim();
+        if(!val) return;
+        let tags = JSON.parse(localStorage.getItem('star_tags') || '[]');
+        if(!tags.includes(val)) {
+            tags.push(val);
+            localStorage.setItem('star_tags', JSON.stringify(tags));
+            renderTags();
+        }
+        newTagInput.value = '';
+    }
+
+    function loadTags() {
+        // 初始预设
+        if(!localStorage.getItem('star_tags')) {
+            const defaultTags = ["简单关心和鼓励。", "鼓励行动获得收益比含口号实在。", "展现专业金融策略视角。", "语气温和但目标明确。"];
+            localStorage.setItem('star_tags', JSON.stringify(defaultTags));
+        }
+        renderTags();
+    }
+
+    function renderTags() {
+        const tags = JSON.parse(localStorage.getItem('star_tags') || '[]');
+        tagsContainer.innerHTML = '';
+        tags.forEach((tag, index) => {
+            const div = document.createElement('div');
+            div.className = 'tag-item';
+            div.innerHTML = `
+                <button class="btn-quick" onclick="setReplyStyle('${tag}')">${tag}</button>
+                <span class="btn-del-tag" onclick="deleteTag(${index})">×</span>
+            `;
+            tagsContainer.appendChild(div);
+        });
+    }
+
+    function deleteTag(index) {
+        let tags = JSON.parse(localStorage.getItem('star_tags') || '[]');
+        tags.splice(index, 1);
+        localStorage.setItem('star_tags', JSON.stringify(tags));
+        renderTags();
+    }
+
+    function setReplyStyle(text) {
+        replyStyleInput.value = text;
+        replyStyleInput.style.backgroundColor = "#fff9c4";
+        setTimeout(() => replyStyleInput.style.backgroundColor = "#fff", 500);
+    }
+
+    // --- 最终复制功能 ---
+    function copyToClipboard() {
+        let finalOutput = "";
+        const rows = document.querySelectorAll('.chat-row');
+        
+        rows.forEach(row => {
+            const role = row.querySelector('.role-select').value;
+            const text = row.querySelector('.chat-input').value.trim();
+            if(text) {
+                finalOutput += `${role}：\t${text}\n`;
+            }
+        });
+
+        const style = replyStyleInput.value.trim();
+        finalOutput += `\nMatt Gall用中文怎么回复，${style}`;
+
+        navigator.clipboard.writeText(finalOutput).then(() => {
+            alert("✅ 已生成 Matt Gall 格式文本并复制！\n请直接粘贴到 AI 窗口。");
+        });
+    }
+</script>
+
+</body>
+</html>
