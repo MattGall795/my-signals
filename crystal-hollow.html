@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- STEALTH: Prevent search engines from indexing this page -->
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- STEALTH: A generic title that doesn't reveal content -->
+  <title>System Dashboard</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
+  <style>
+    :root {
+      --glass-alpha: 0.5;
+      --glass-base: 255, 255, 255;
+      --text-main: #000000;
+      --accent-gold: #f39c12;
+      --header-cyan: #4ecdc4;
+      --border-alpha: rgba(0, 0, 0, 0.15);
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px 40px 120px 40px;
+      background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.3)), 
+                  url('https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Tabs Bar */
+    .tabs-container {
+      margin-top: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      gap: 12px;
+      padding: 8px 15px;
+      background: rgba(var(--glass-base), 0.2);
+      backdrop-filter: blur(15px);
+      border-radius: 50px;
+      border: 1px solid rgba(var(--glass-base), 0.3);
+      z-index: 900;
+    }
+
+    .tab-btn {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 40px;
+      background: transparent;
+      color: var(--text-main);
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-gold);
+      color: white;
+      box-shadow: 0 4px 15px rgba(243, 156, 18, 0.5);
+    }
+
+    /* Floating Opacity Control */
+    .control-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 10px 18px;
+      border-radius: 12px;
+      color: white;
+      font-size: 12px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    input[type=range] { cursor: pointer; accent-color: var(--accent-gold); }
+
+    /* The Report Card */
+    .slide-card {
+      display: none;
+      background: rgba(var(--glass-base), var(--glass-alpha));
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(var(--glass-base), 0.4);
+      border-radius: 24px;
+      padding: 50px;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.4);
+      min-width: max-content;
+      color: var(--text-main);
+    }
+
+    .slide-card.active { display: inline-block; animation: fadeIn 0.4s ease-out; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+    .header-group { display: flex; align-items: center; margin-bottom: 35px; gap: 30px; }
+    .header-logo { height: 90px; width: auto; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2)); }
+    .title-box h1 { margin: 0; font-size: 34px; font-weight: 900; color: inherit; text-transform: uppercase; }
+    .title-box h3 { margin: 5px 0 0 0; font-size: 16px; color: inherit; opacity: 0.8; }
+
+    table { border-collapse: collapse; font-size: 14px; text-align: center; width: 100%; background: rgba(var(--glass-base), 0.05); color: inherit; }
+    th, td { border: 1px solid var(--border-alpha); padding: 12px 18px; white-space: nowrap; font-weight: 600; }
+    tr:first-child td { background: var(--header-cyan) !important; color: #000 !important; font-weight: 800; padding: 18px 10px; }
+    tr:nth-child(even) td { background: rgba(var(--glass-base), 0.1); }
+    
+    .footer-note { text-align: right; margin-top: 30px; font-size: 14px; font-weight: 700; }
+
+    /* Download Button at Bottom-Right (Fixed) */
+    .btn-download {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      padding: 18px 35px;
+      background: var(--accent-gold);
+      color: white;
+      border: none;
+      border-radius: 60px;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.2s ease;
+    }
+    .btn-download:hover { transform: translateY(-5px); background: #e67e22; }
+
+    #loading { color: white; font-size: 24px; font-weight: 900; margin-top: 100px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+  </style>
+</head>
+<body>
+
+  <div class="control-panel">
+    <span>View Style</span>
+    <input type="range" id="opacityRange" min="0.1" max="0.95" step="0.01" value="0.5">
+  </div>
+
+  <div class="tabs-container" id="tabs-nav"></div>
+
+  <div id="app">
+    <div id="loading">CONNECTING TO SECURE SERVER...</div>
+  </div>
+
+  <button class="btn-download" onclick="exportToPNG()">
+    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+    DOWNLOAD DATA PNG
+  </button>
+
+  <script>
+    // Replace with your Google Web App URL
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyllHRURU7J248ZNPeG4UnYHyEn8hamu5QDh98CC3yWht0qhXc62DYTRE-JnnMu951L/exec';
+
+    const headerMap = {
+      "Team No.": "Team ID", "Captain Name": "Captain", "Captain ID": "ID", "Level": "LV",
+      "New Members (Today)": "New (Today)", "Total Members": "Total", "Current Headcount": "Active",
+      "Direct Members": "Direct", "Secondary Team": "2nd Team", "New Members (7 Days)": "New (7D)",
+      "Growth %": "Growth %", "Departures (7 Days)": "Dep (7D)", "Departures %": "Dep %",
+      "Dropouts": "Drop", "Current Base": "Base", "Task Objective": "Target",
+      "Achieved": "Done", "Progress %": "Prog %", "Historical Achievements": "History"
+    };
+
+    // Adaptive Dark/Light Text Toggle
+    document.getElementById('opacityRange').addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      const root = document.documentElement;
+      root.style.setProperty('--glass-alpha', val);
+      if (val < 0.45) {
+        root.style.setProperty('--glass-base', '25, 25, 25'); 
+        root.style.setProperty('--text-main', '#ffffff');
+        root.style.setProperty('--border-alpha', 'rgba(255, 255, 255, 0.2)');
+      } else {
+        root.style.setProperty('--glass-base', '255, 255, 255');
+        root.style.setProperty('--text-main', '#000000');
+        root.style.setProperty('--border-alpha', 'rgba(0, 0, 0, 0.15)');
+      }
+    });
+
+    async function fetchData() {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        render(data);
+      } catch (err) {
+        document.getElementById('loading').innerText = "ACCESS DENIED.";
+      }
+    }
+
+    function switchTab(index) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-btn')[index].classList.add('active');
+      document.querySelectorAll('.slide-card').forEach(card => card.classList.remove('active'));
+      document.getElementById(`card-${index}`).classList.add('active');
+    }
+
+    function render(slidesData) {
+      const container = document.getElementById('app');
+      const tabsNav = document.getElementById('tabs-nav');
+      container.innerHTML = ''; tabsNav.innerHTML = '';
+
+      slidesData.forEach((slide, index) => {
+        const btn = document.createElement('button');
+        btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
+        btn.innerText = slide.sheetName; 
+        btn.onclick = () => switchTab(index);
+        tabsNav.appendChild(btn);
+
+        const card = document.createElement('div');
+        card.className = `slide-card ${index === 0 ? 'active' : ''}`;
+        card.id = `card-${index}`;
+
+        let tableHtml = `<div class="table-container"><table>`;
+        slide.tableData.forEach((row, r) => {
+          tableHtml += `<tr>`;
+          row.forEach((cell, c) => {
+            const actualRowIdx = r + 5;
+            const key = `${actualRowIdx},${c}`;
+            const mergeInfo = slide.mergeMap[key];
+            if (mergeInfo === "HIDDEN") return;
+            const rs = mergeInfo ? `rowspan="${mergeInfo.rs}"` : "";
+            const cs = mergeInfo ? `colspan="${mergeInfo.cs}"` : "";
+            const content = (r === 0) ? (headerMap[cell] || cell) : cell;
+            tableHtml += `<td ${rs} ${cs}>${content}</td>`;
+          });
+          tableHtml += `</tr>`;
+        });
+        tableHtml += `</table></div>`;
+
+        card.innerHTML = `
+          <div class="header-group">
+            <img src="${slide.logoUrl || 'https://raw.githubusercontent.com/MattGall795/my-signals/main/favicon.png'}" class="header-logo">
+            <div class="title-box">
+              <h1>${slide.title}</h1>
+              <h3>${slide.subtitle}</h3>
+            </div>
+          </div>
+          ${tableHtml}
+          <div class="footer-note">${slide.footer}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function exportToPNG() {
+      const activeCard = document.querySelector('.slide-card.active');
+      if(!activeCard) return;
+      html2canvas(activeCard, { 
+        useCORS: true, 
+        backgroundColor: null, 
+        scale: 3,
+        logging: false 
+      }).then(canvas => {
+        const link = document.createElement('a');
+        const activeBtn = document.querySelector('.tab-btn.active');
+        link.download = `${activeBtn.innerText}_Snapshot.png`;
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+      });
+    }
+
+    fetchData();
+  </script>
+</body>
+</html>
