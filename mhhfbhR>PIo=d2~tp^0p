@@ -1,16 +1,15 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>拼图海报智能生成器</title>
-  <!-- 调用根目录下的 favicon.png -->
+  <title>Smart Poster Generator</title>
   <link rel="icon" type="image/png" href="./favicon.png">
   
   <style>
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
-      background: #f0f2f5; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      background: #f4f6f8; 
       margin: 0; 
       padding: 20px; 
       display: flex; 
@@ -26,9 +25,9 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
       display: flex; 
       flex-direction: column; 
-      gap: 18px; 
-      min-width: 300px;
-      max-width: 380px; 
+      gap: 16px; 
+      min-width: 320px;
+      max-width: 400px; 
       overflow-y: auto; 
     }
     .preview-panel { 
@@ -43,35 +42,50 @@
       padding: 20px; 
       box-shadow: inset 0 4px 12px rgba(0,0,0,0.05); 
     }
-    h2 { margin-top: 0; font-size: 22px; color: #1a1a1a; display: flex; align-items: center; gap: 8px;}
-    label { font-weight: 600; font-size: 14px; color: #444; display: flex; justify-content: space-between;}
+    h2 { margin-top: 0; margin-bottom: 5px; font-size: 22px; color: #1a1a1a; display: flex; align-items: center; justify-content: space-between;}
+    
+    .reset-btn {
+      font-size: 13px; padding: 6px 12px; background: #f1f3f5; color: #495057; 
+      border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 600;
+    }
+    .reset-btn:hover { background: #e2e6ea; color: #d32f2f; }
+
+    label { font-weight: 600; font-size: 13px; color: #444; display: flex; justify-content: space-between; align-items: center;}
+    
     textarea { 
-      width: 100%; height: 120px; padding: 12px; border: 1px solid #d1d5db; 
-      border-radius: 8px; resize: vertical; box-sizing: border-box; font-family: inherit;
+      width: 100%; height: 100px; padding: 12px; border: 1px solid #d1d5db; 
+      border-radius: 8px; resize: vertical; box-sizing: border-box; font-family: inherit; font-size: 14px;
     }
     textarea:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
-    input[type="color"] { border: none; width: 100%; height: 44px; border-radius: 8px; cursor: pointer; padding: 0; }
+    
+    .color-group { display: flex; gap: 10px; }
+    input[type="color"] { border: none; width: 100%; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; }
     input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
     input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
-    input[type="range"] { width: 100%; cursor: pointer; margin-top: 8px;}
+    
+    select, input[type="range"] { 
+      width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; 
+      font-family: inherit; font-size: 14px; cursor: pointer;
+    }
+    input[type="range"] { padding: 0; border: none; margin-top: 8px;}
     
     .paste-area { 
-      border: 2px dashed #007bff; border-radius: 8px; padding: 30px 20px; 
+      border: 2px dashed #007bff; border-radius: 8px; padding: 25px 20px; 
       text-align: center; color: #007bff; background: #f8fbff; cursor: pointer; 
-      transition: all 0.3s ease; font-size: 15px; line-height: 1.5;
+      transition: all 0.3s ease; font-size: 14px; line-height: 1.5;
     }
     .paste-area:hover { background: #e6f2ff; border-color: #0056b3; }
-    .paste-area b { color: #0056b3; font-size: 18px;}
+    .paste-area b { color: #0056b3; font-size: 16px;}
     
     .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-    button { 
+    button.action-btn { 
       flex: 1; border: none; padding: 14px; font-size: 15px; border-radius: 8px; 
-      cursor: pointer; transition: 0.2s; font-weight: bold; color: white;
+      cursor: pointer; transition: 0.2s; font-weight: bold; color: white; display: flex; justify-content: center; align-items: center; gap: 6px;
     }
-    button:active { transform: scale(0.98); }
-    button.copy-btn { background: #10b981; } /* 绿色 */
+    button.action-btn:active { transform: scale(0.98); }
+    button.copy-btn { background: #10b981; } 
     button.copy-btn:hover { background: #059669; }
-    button.download-btn { background: #3b82f6; } /* 蓝色 */
+    button.download-btn { background: #3b82f6; } 
     button.download-btn:hover { background: #2563eb; }
     
     canvas { 
@@ -79,7 +93,6 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: 0.3s; 
     }
     
-    /* 响应式：手机端变成上下布局 */
     @media (max-width: 768px) {
       body { flex-direction: column; height: auto; }
       .control-panel { max-width: 100%; }
@@ -89,44 +102,58 @@
 </head>
 <body>
 
-  <!-- 左侧控制面板 -->
+  <!-- Control Panel -->
   <div class="control-panel">
-    <h2>✨ 海报排版控制台</h2>
+    <h2>
+      Poster Studio
+      <button class="reset-btn" id="resetBtn">🔄 Reset</button>
+    </h2>
     
     <div class="paste-area" id="pasteArea">
-      点击此处后，直接按 <b>Ctrl + V</b><br>粘贴截图或网页图片<br>
-      <span style="font-size: 12px; color: #666;">(也可点击选择本地图片)</span>
+      Click here & press <b>Ctrl + V</b><br>to paste an image<br>
+      <span style="font-size: 12px; color: #666;">(or click to upload from device)</span>
       <input type="file" id="fileInput" accept="image/*" style="display:none">
     </div>
 
     <div>
-      <label>输入文案 (实时渲染)：</label>
-      <textarea id="textInput" placeholder="在此粘贴文案..."></textarea>
+      <label>Text Content (Live Preview):</label>
+      <textarea id="textInput" placeholder="Paste your text here..."></textarea>
     </div>
 
     <div>
-      <label>背景底色：</label>
-      <!-- 默认您的金黄色 -->
-      <input type="color" id="bgColor" value="#FFD700">
+      <label>Background Gradient Colors:</label>
+      <div class="color-group">
+        <input type="color" id="color1" value="#FFD700" title="Top Color">
+        <input type="color" id="color2" value="#FFA500" title="Bottom Color">
+      </div>
     </div>
 
     <div>
-      <label>文字大小：<span id="fontSizeVal">32px</span></label>
+      <label>Text Alignment:</label>
+      <select id="textAlign">
+        <option value="left">Left Align</option>
+        <option value="center" selected>Center Align</option>
+        <option value="right">Right Align</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Font Size: <span id="fontSizeVal" style="color:#007bff;">32px</span></label>
       <input type="range" id="fontSize" min="12" max="100" value="32">
     </div>
 
     <div>
-      <label>画布留白 (Padding)：<span id="paddingVal">40px</span></label>
+      <label>Canvas Padding: <span id="paddingVal" style="color:#007bff;">40px</span></label>
       <input type="range" id="padding" min="0" max="150" value="40">
     </div>
 
     <div class="btn-group">
-      <button class="copy-btn" id="copyBtn">📋 一键复制</button>
-      <button class="download-btn" id="downloadBtn">📥 保存图片</button>
+      <button class="action-btn copy-btn" id="copyBtn">📋 Copy Image</button>
+      <button class="action-btn download-btn" id="downloadBtn">📥 Download</button>
     </div>
   </div>
 
-  <!-- 右侧预览面板 -->
+  <!-- Preview Panel -->
   <div class="preview-panel">
     <canvas id="posterCanvas"></canvas>
   </div>
@@ -136,19 +163,23 @@
     const ctx = canvas.getContext('2d');
     let currentImage = null;
 
+    // DOM Elements
     const textInput = document.getElementById('textInput');
-    const bgColorInput = document.getElementById('bgColor');
+    const color1Input = document.getElementById('color1');
+    const color2Input = document.getElementById('color2');
+    const alignInput = document.getElementById('textAlign');
     const fontSizeInput = document.getElementById('fontSize');
     const paddingInput = document.getElementById('padding');
     const pasteArea = document.getElementById('pasteArea');
     const fileInput = document.getElementById('fileInput');
+    const resetBtn = document.getElementById('resetBtn');
 
-    // 绑定实时更新事件
-    [textInput, bgColorInput, fontSizeInput, paddingInput].forEach(el => {
+    // Bind real-time update events
+    [textInput, color1Input, color2Input, alignInput, fontSizeInput, paddingInput].forEach(el => {
       el.addEventListener('input', drawPoster);
     });
 
-    // 监听全避局 Ctrl+V 粘贴事件
+    // Paste Image Event (Ctrl+V)
     document.addEventListener('paste', function(e) {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       for (let i = 0; i < items.length; i++) {
@@ -161,10 +192,23 @@
       }
     });
 
-    // 点击上传文件
+    // Click to upload
     pasteArea.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', (e) => {
       if (e.target.files && e.target.files[0]) loadImageBlob(e.target.files[0]);
+    });
+
+    // Reset Application
+    resetBtn.addEventListener('click', () => {
+      currentImage = null;
+      textInput.value = "";
+      color1Input.value = "#FFD700";
+      color2Input.value = "#FFA500";
+      alignInput.value = "center";
+      fontSizeInput.value = 32;
+      paddingInput.value = 40;
+      fileInput.value = "";
+      drawPoster();
     });
 
     function loadImageBlob(blob) {
@@ -180,23 +224,25 @@
       reader.readAsDataURL(blob);
     }
 
-    // 绘制海报核心算法
+    // Core Drawing Algorithm
     function drawPoster() {
-      if (!currentImage) {
-        // 如果没有图片，画一个初始提示画面
-        canvas.width = 600; canvas.height = 400;
-        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 600, 400);
-        ctx.fillStyle = "#cccccc"; ctx.font = "24px sans-serif"; ctx.textAlign = "center";
-        ctx.fillText("等待载入图片...", 300, 200);
-        return;
-      }
-
-      // 更新滑块数值显示
+      // Update UI Slider Values
       document.getElementById('fontSizeVal').innerText = fontSizeInput.value + 'px';
       document.getElementById('paddingVal').innerText = paddingInput.value + 'px';
 
+      if (!currentImage) {
+        // Draw Empty State
+        canvas.width = 600; canvas.height = 400;
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 600, 400);
+        ctx.fillStyle = "#a0aab5"; ctx.font = "20px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText("Please paste or select an image to preview", 300, 200);
+        return;
+      }
+
       const text = textInput.value;
-      const bgColor = bgColorInput.value;
+      const color1 = color1Input.value;
+      const color2 = color2Input.value;
+      const align = alignInput.value;
       const fontSize = parseInt(fontSizeInput.value);
       const padding = parseInt(paddingInput.value);
       
@@ -204,38 +250,52 @@
       const imgH = currentImage.height;
       const imgRatio = imgW / imgH;
 
-      ctx.font = `${fontSize}px -apple-system, 'Segoe UI', Arial, sans-serif`;
-      const lineHeight = fontSize * 1.6;
+      ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
+      const lineHeight = fontSize * 1.5;
       
       let canvasW, canvasH, textMaxWidth;
 
-      // 智能判断排版：宽图采用“上图下文”，高图采用“左图右文”
-      if (imgRatio >= 0.9) { 
-        // 【模式一：上图下文】
+      // Layout Logic: Top-Bottom for Wide/Square images, Left-Right for Tall images
+      const isHorizontal = imgRatio >= 0.9; 
+
+      if (isHorizontal) { 
+        // --- MODE 1: Top Image, Bottom Text ---
         canvasW = imgW + padding * 2;
         textMaxWidth = imgW; 
         const textLines = wrapText(ctx, text, textMaxWidth);
         const textHeight = textLines.length > 0 ? (textLines.length * lineHeight) : 0;
         
         canvasH = imgH + textHeight + padding * (textLines.length > 0 ? 3 : 2);
-        
         canvas.width = canvasW; canvas.height = canvasH;
-        ctx.fillStyle = bgColor; ctx.fillRect(0, 0, canvasW, canvasH);
         
+        // Draw Gradient Background
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvasH);
+        gradient.addColorStop(0, color1);
+        gradient.addColorStop(1, color2);
+        ctx.fillStyle = gradient; 
+        ctx.fillRect(0, 0, canvasW, canvasH);
+        
+        // Draw Image
         ctx.drawImage(currentImage, padding, padding, imgW, imgH);
         
+        // Draw Text
         ctx.fillStyle = "#000000";
-        ctx.font = `${fontSize}px -apple-system, 'Segoe UI', Arial, sans-serif`;
-        ctx.textAlign = "center";
+        ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
+        ctx.textAlign = align;
         ctx.textBaseline = "top";
         
+        let textX;
+        if(align === "left") textX = padding;
+        else if(align === "right") textX = canvasW - padding;
+        else textX = canvasW / 2; // center
+
         textLines.forEach((line, index) => {
-          ctx.fillText(line, canvasW / 2, padding * 2 + imgH + index * lineHeight);
+          ctx.fillText(line, textX, padding * 2 + imgH + index * lineHeight);
         });
 
       } else {
-        // 【模式二：左图右文】
-        textMaxWidth = Math.max(imgW * 0.6, fontSize * 10); // 根据图片宽度动态给文字区空间
+        // --- MODE 2: Left Image, Right Text ---
+        textMaxWidth = Math.max(imgW * 0.6, fontSize * 10);
         const textLines = wrapText(ctx, text, textMaxWidth);
         const totalTextHeight = textLines.length * lineHeight;
         
@@ -243,25 +303,39 @@
         canvasH = Math.max(imgH + padding * 2, totalTextHeight + padding * 2);
 
         canvas.width = canvasW; canvas.height = canvasH;
-        ctx.fillStyle = bgColor; ctx.fillRect(0, 0, canvasW, canvasH);
 
+        // Draw Gradient Background
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvasH);
+        gradient.addColorStop(0, color1);
+        gradient.addColorStop(1, color2);
+        ctx.fillStyle = gradient; 
+        ctx.fillRect(0, 0, canvasW, canvasH);
+
+        // Draw Image
         const finalImgY = (canvasH - imgH) / 2;
         ctx.drawImage(currentImage, padding, finalImgY, imgW, imgH);
 
+        // Draw Text
         ctx.fillStyle = "#000000";
-        ctx.font = `${fontSize}px -apple-system, 'Segoe UI', Arial, sans-serif`;
-        ctx.textAlign = "left";
+        ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
+        ctx.textAlign = align;
         ctx.textBaseline = "top";
         
         const startTextY = (canvasH - totalTextHeight) / 2;
         
+        let textStartX = padding * 2 + imgW;
+        let textX;
+        if(align === "left") textX = textStartX;
+        else if(align === "right") textX = textStartX + textMaxWidth;
+        else textX = textStartX + textMaxWidth / 2; // center
+        
         textLines.forEach((line, index) => {
-          ctx.fillText(line, padding * 2 + imgW, startTextY + index * lineHeight);
+          ctx.fillText(line, textX, startTextY + index * lineHeight);
         });
       }
     }
 
-    // 中英文混合智能换行
+    // Text Wrapping Function
     function wrapText(context, text, maxWidth) {
       if (!text.trim()) return [];
       const lines = [];
@@ -289,31 +363,31 @@
       return lines;
     }
 
-    // 初始化画板
+    // Init
     drawPoster();
 
-    // 复制到剪贴板功能
+    // Copy Button Logic
     document.getElementById('copyBtn').addEventListener('click', () => {
-      if (!currentImage) return alert("请先粘贴或选择一张图片！");
+      if (!currentImage) return alert("Please paste or upload an image first!");
       try {
         canvas.toBlob(async (blob) => {
           const item = new ClipboardItem({ "image/png": blob });
           await navigator.clipboard.write([item]);
           
           const btn = document.getElementById('copyBtn');
-          btn.innerText = "✅ 已复制到剪贴板";
-          setTimeout(() => btn.innerText = "📋 一键复制", 2000);
+          btn.innerHTML = "✅ Copied!";
+          setTimeout(() => btn.innerHTML = "📋 Copy Image", 2000);
         });
       } catch (err) {
-        alert("浏览器不支持一键复制，请点击右侧'保存图片'。");
+        alert("Your browser doesn't support direct copy. Please use the Download button.");
       }
     });
 
-    // 下载图片功能
+    // Download Button Logic
     document.getElementById('downloadBtn').addEventListener('click', () => {
-      if (!currentImage) return alert("请先粘贴或选择一张图片！");
+      if (!currentImage) return alert("Please paste or upload an image first!");
       const link = document.createElement('a');
-      link.download = '黄金海报_' + new Date().getTime() + '.png';
+      link.download = 'Poster_' + new Date().getTime() + '.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
     });
