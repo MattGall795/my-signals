@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Poster Generator</title>
+  <title>Smart Poster Generator - HD Edition</title>
   <link rel="icon" type="image/png" href="./favicon.png">
   
   <style>
@@ -53,7 +53,7 @@
     label { font-weight: 600; font-size: 13px; color: #444; display: flex; justify-content: space-between; align-items: center;}
     
     textarea { 
-      width: 100%; height: 100px; padding: 12px; border: 1px solid #d1d5db; 
+      width: 100%; height: 90px; padding: 12px; border: 1px solid #d1d5db; 
       border-radius: 8px; resize: vertical; box-sizing: border-box; font-family: inherit; font-size: 14px;
     }
     textarea:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
@@ -65,7 +65,7 @@
     
     select, input[type="range"] { 
       width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; 
-      font-family: inherit; font-size: 14px; cursor: pointer;
+      font-family: inherit; font-size: 14px; cursor: pointer; background: white;
     }
     input[type="range"] { padding: 0; border: none; margin-top: 8px;}
     
@@ -116,7 +116,16 @@
     </div>
 
     <div>
-      <label>Text Content (Live Preview):</label>
+      <label>Export Quality (Clarity):</label>
+      <select id="exportScale" style="border-color: #007bff; color: #007bff; font-weight: bold;">
+        <option value="1">1x (Standard)</option>
+        <option value="2" selected>2x (HD - Recommended)</option>
+        <option value="3">3x (Ultra HD)</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Text Content:</label>
       <textarea id="textInput" placeholder="Paste your text here..."></textarea>
     </div>
 
@@ -170,16 +179,17 @@
     const alignInput = document.getElementById('textAlign');
     const fontSizeInput = document.getElementById('fontSize');
     const paddingInput = document.getElementById('padding');
+    const scaleInput = document.getElementById('exportScale');
     const pasteArea = document.getElementById('pasteArea');
     const fileInput = document.getElementById('fileInput');
     const resetBtn = document.getElementById('resetBtn');
 
     // Bind real-time update events
-    [textInput, color1Input, color2Input, alignInput, fontSizeInput, paddingInput].forEach(el => {
+    [textInput, color1Input, color2Input, alignInput, fontSizeInput, paddingInput, scaleInput].forEach(el => {
       el.addEventListener('input', drawPoster);
     });
 
-    // Paste Image Event (Ctrl+V)
+    // Paste Image Event
     document.addEventListener('paste', function(e) {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       for (let i = 0; i < items.length; i++) {
@@ -198,7 +208,7 @@
       if (e.target.files && e.target.files[0]) loadImageBlob(e.target.files[0]);
     });
 
-    // Reset Application
+    // Reset
     resetBtn.addEventListener('click', () => {
       currentImage = null;
       textInput.value = "";
@@ -207,6 +217,7 @@
       alignInput.value = "center";
       fontSizeInput.value = 32;
       paddingInput.value = 40;
+      scaleInput.value = "2";
       fileInput.value = "";
       drawPoster();
     });
@@ -224,14 +235,12 @@
       reader.readAsDataURL(blob);
     }
 
-    // Core Drawing Algorithm
+    // Core Drawing Algorithm (HD Render Engine)
     function drawPoster() {
-      // Update UI Slider Values
       document.getElementById('fontSizeVal').innerText = fontSizeInput.value + 'px';
       document.getElementById('paddingVal').innerText = paddingInput.value + 'px';
 
       if (!currentImage) {
-        // Draw Empty State
         canvas.width = 600; canvas.height = 400;
         ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 600, 400);
         ctx.fillStyle = "#a0aab5"; ctx.font = "20px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
@@ -239,27 +248,28 @@
         return;
       }
 
+      // 获取当前用户设置的值
       const text = textInput.value;
       const color1 = color1Input.value;
       const color2 = color2Input.value;
       const align = alignInput.value;
-      const fontSize = parseInt(fontSizeInput.value);
-      const padding = parseInt(paddingInput.value);
       
-      const imgW = currentImage.width;
-      const imgH = currentImage.height;
-      const imgRatio = imgW / imgH;
-
-      ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
+      // 【高清渲染核心】：获取倍率，把所有尺寸都乘以倍率
+      const scale = parseFloat(scaleInput.value);
+      const fontSize = parseInt(fontSizeInput.value) * scale;
+      const padding = parseInt(paddingInput.value) * scale;
+      const imgW = currentImage.width * scale;
+      const imgH = currentImage.height * scale;
+      
+      const imgRatio = currentImage.width / currentImage.height;
+      ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
       const lineHeight = fontSize * 1.5;
       
       let canvasW, canvasH, textMaxWidth;
-
-      // Layout Logic: Top-Bottom for Wide/Square images, Left-Right for Tall images
       const isHorizontal = imgRatio >= 0.9; 
 
       if (isHorizontal) { 
-        // --- MODE 1: Top Image, Bottom Text ---
+        // MODE 1: Top Image, Bottom Text
         canvasW = imgW + padding * 2;
         textMaxWidth = imgW; 
         const textLines = wrapText(ctx, text, textMaxWidth);
@@ -268,33 +278,34 @@
         canvasH = imgH + textHeight + padding * (textLines.length > 0 ? 3 : 2);
         canvas.width = canvasW; canvas.height = canvasH;
         
-        // Draw Gradient Background
+        // 开启高级抗锯齿和平滑算法
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+
         const gradient = ctx.createLinearGradient(0, 0, 0, canvasH);
         gradient.addColorStop(0, color1);
         gradient.addColorStop(1, color2);
         ctx.fillStyle = gradient; 
         ctx.fillRect(0, 0, canvasW, canvasH);
         
-        // Draw Image
         ctx.drawImage(currentImage, padding, padding, imgW, imgH);
         
-        // Draw Text
         ctx.fillStyle = "#000000";
-        ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
+        ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
         ctx.textAlign = align;
         ctx.textBaseline = "top";
         
         let textX;
         if(align === "left") textX = padding;
         else if(align === "right") textX = canvasW - padding;
-        else textX = canvasW / 2; // center
+        else textX = canvasW / 2;
 
         textLines.forEach((line, index) => {
           ctx.fillText(line, textX, padding * 2 + imgH + index * lineHeight);
         });
 
       } else {
-        // --- MODE 2: Left Image, Right Text ---
+        // MODE 2: Left Image, Right Text
         textMaxWidth = Math.max(imgW * 0.6, fontSize * 10);
         const textLines = wrapText(ctx, text, textMaxWidth);
         const totalTextHeight = textLines.length * lineHeight;
@@ -304,20 +315,21 @@
 
         canvas.width = canvasW; canvas.height = canvasH;
 
-        // Draw Gradient Background
+        // 开启高级抗锯齿和平滑算法
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+
         const gradient = ctx.createLinearGradient(0, 0, 0, canvasH);
         gradient.addColorStop(0, color1);
         gradient.addColorStop(1, color2);
         ctx.fillStyle = gradient; 
         ctx.fillRect(0, 0, canvasW, canvasH);
 
-        // Draw Image
         const finalImgY = (canvasH - imgH) / 2;
         ctx.drawImage(currentImage, padding, finalImgY, imgW, imgH);
 
-        // Draw Text
         ctx.fillStyle = "#000000";
-        ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
+        ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
         ctx.textAlign = align;
         ctx.textBaseline = "top";
         
@@ -327,7 +339,7 @@
         let textX;
         if(align === "left") textX = textStartX;
         else if(align === "right") textX = textStartX + textMaxWidth;
-        else textX = textStartX + textMaxWidth / 2; // center
+        else textX = textStartX + textMaxWidth / 2; 
         
         textLines.forEach((line, index) => {
           ctx.fillText(line, textX, startTextY + index * lineHeight);
@@ -335,7 +347,6 @@
       }
     }
 
-    // Text Wrapping Function
     function wrapText(context, text, maxWidth) {
       if (!text.trim()) return [];
       const lines = [];
@@ -363,10 +374,8 @@
       return lines;
     }
 
-    // Init
     drawPoster();
 
-    // Copy Button Logic
     document.getElementById('copyBtn').addEventListener('click', () => {
       if (!currentImage) return alert("Please paste or upload an image first!");
       try {
@@ -379,15 +388,14 @@
           setTimeout(() => btn.innerHTML = "📋 Copy Image", 2000);
         });
       } catch (err) {
-        alert("Your browser doesn't support direct copy. Please use the Download button.");
+        alert("Copy failed. Please use Download button.");
       }
     });
 
-    // Download Button Logic
     document.getElementById('downloadBtn').addEventListener('click', () => {
       if (!currentImage) return alert("Please paste or upload an image first!");
       const link = document.createElement('a');
-      link.download = 'Poster_' + new Date().getTime() + '.png';
+      link.download = 'HD_Poster_' + new Date().getTime() + '.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
     });
