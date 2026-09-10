@@ -7,74 +7,33 @@
   <link rel="icon" type="image/png" href="./favicon.png">
   
   <style>
-    body { 
-      font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-      background: #f4f6f8; margin: 0; padding: 20px; display: flex; gap: 20px; 
-      height: 100vh; box-sizing: border-box; 
-    }
-    .control-panel { 
-      flex: 1; background: white; padding: 25px; border-radius: 12px; 
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column; 
-      gap: 16px; min-width: 320px; max-width: 400px; overflow-y: auto; 
-    }
-    .preview-panel { 
-      flex: 2; display: flex; flex-direction: column; align-items: center; 
-      justify-content: center; background: #e9ecef; border-radius: 12px; 
-      overflow: auto; padding: 20px; box-shadow: inset 0 4px 12px rgba(0,0,0,0.05); 
-    }
+    body { font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; display: flex; gap: 20px; height: 100vh; box-sizing: border-box; }
+    .control-panel { flex: 1; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 16px; min-width: 320px; max-width: 400px; overflow-y: auto; }
+    .preview-panel { flex: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #e9ecef; border-radius: 12px; overflow: auto; padding: 20px; box-shadow: inset 0 4px 12px rgba(0,0,0,0.05); }
     h2 { margin-top: 0; margin-bottom: 5px; font-size: 22px; color: #1a1a1a; display: flex; align-items: center; justify-content: space-between;}
-    
-    .reset-btn {
-      font-size: 13px; padding: 6px 12px; background: #f1f3f5; color: #495057; 
-      border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 600;
-    }
+    .reset-btn { font-size: 13px; padding: 6px 12px; background: #f1f3f5; color: #495057; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 600; }
     .reset-btn:hover { background: #e2e6ea; color: #d32f2f; }
-
     label { font-weight: 600; font-size: 13px; color: #444; display: flex; justify-content: space-between; align-items: center;}
-    
-    textarea { 
-      width: 100%; height: 100px; padding: 12px; border: 1px solid #d1d5db; 
-      border-radius: 8px; resize: vertical; box-sizing: border-box; font-family: inherit; font-size: 14px;
-    }
+    textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; resize: vertical; box-sizing: border-box; font-family: inherit; font-size: 14px; }
     textarea:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
-    
     .color-group { display: flex; gap: 10px; }
     input[type="color"] { border: none; width: 100%; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; }
     input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
     input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
-    
-    select, input[type="range"] { 
-      width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; 
-      font-family: inherit; font-size: 14px; cursor: pointer; background: white;
-    }
+    select, input[type="range"] { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-family: inherit; font-size: 14px; cursor: pointer; background: white; }
     input[type="range"] { padding: 0; border: none; margin-top: 8px;}
-    
-    .paste-area { 
-      border: 2px dashed #007bff; border-radius: 8px; padding: 25px 20px; 
-      text-align: center; color: #007bff; background: #f8fbff; cursor: pointer; 
-      transition: all 0.3s ease; font-size: 14px; line-height: 1.5;
-    }
+    .paste-area { border: 2px dashed #007bff; border-radius: 8px; padding: 25px 20px; text-align: center; color: #007bff; background: #f8fbff; cursor: pointer; transition: all 0.3s ease; font-size: 14px; line-height: 1.5; }
     .paste-area:hover { background: #e6f2ff; border-color: #0056b3; }
     .paste-area b { color: #0056b3; font-size: 16px;}
-    
     .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-    button.action-btn { 
-      flex: 1; border: none; padding: 14px; font-size: 15px; border-radius: 8px; 
-      cursor: pointer; transition: 0.2s; font-weight: bold; color: white; display: flex; justify-content: center; align-items: center; gap: 6px;
-    }
+    button.action-btn { flex: 1; border: none; padding: 14px; font-size: 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: bold; color: white; display: flex; justify-content: center; align-items: center; gap: 6px; }
     button.action-btn:active { transform: scale(0.98); }
     button.copy-btn { background: #10b981; } 
     button.copy-btn:hover { background: #059669; }
     button.download-btn { background: #3b82f6; } 
     button.download-btn:hover { background: #2563eb; }
-    
     canvas { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: 0.3s; }
-    
-    @media (max-width: 768px) {
-      body { flex-direction: column; height: auto; }
-      .control-panel { max-width: 100%; }
-      .preview-panel { min-height: 500px; }
-    }
+    @media (max-width: 768px) { body { flex-direction: column; height: auto; } .control-panel { max-width: 100%; } .preview-panel { min-height: 500px; } }
   </style>
 </head>
 <body>
@@ -158,10 +117,10 @@
     const fileInput = document.getElementById('fileInput');
     const resetBtn = document.getElementById('resetBtn');
 
-    // 绑定实时更新
+    // 绑定实时更新事件，使用 requestAnimationFrame 优化性能
     [textInput, color1Input, color2Input, alignInput, fontSizeInput, paddingInput, scaleInput].forEach(el => {
       el.addEventListener('input', () => {
-        requestAnimationFrame(drawPoster); // 优化渲染性能防止卡顿
+        requestAnimationFrame(drawPoster); 
       });
     });
 
@@ -208,16 +167,16 @@
       reader.readAsDataURL(blob);
     }
 
-    // 全新、绝对安全的换行算法（完美处理多行回车）
+    // 安全的换行算法，完美处理多段落回车
     function wrapTextSafe(context, text, maxWidth) {
       if (!text) return [];
       const lines = [];
-      const paragraphs = text.split('\n'); // 先按真实回车拆分段落
+      const paragraphs = text.split('\n'); 
       
       for (let p = 0; p < paragraphs.length; p++) {
         let paragraph = paragraphs[p];
         if (paragraph === '') {
-          lines.push(''); // 保留空行
+          lines.push(''); 
           continue;
         }
         
@@ -241,7 +200,7 @@
       return lines;
     }
 
-    // 核心绘制逻辑（加入防卡死捕获）
+    // 核心绘制逻辑
     function drawPoster() {
       try {
         document.getElementById('fontSizeVal').innerText = fontSizeInput.value + 'px';
@@ -256,11 +215,10 @@
         const fontSize = parseInt(fontSizeInput.value) * scale;
         const padding = parseInt(paddingInput.value) * scale;
         
-        // 更安全的字体声明
         ctx.font = `bold ${fontSize}px "Segoe UI", Arial, sans-serif`;
         const lineHeight = fontSize * 1.5;
 
-        // 如果没有图片
+        // 【模式 1：纯文字排版（无图片）】
         if (!currentImage) {
           if (!text.trim()) {
             canvas.width = 600; canvas.height = 400;
@@ -269,9 +227,8 @@
             ctx.fillText("Paste image OR type text to begin", 300, 200);
             return;
           } else {
-            // 纯文本海报模式
             const baseW = 800 * scale; 
-            const textMaxWidth = Math.max(baseW - padding * 2, 100); // 防止宽度负数报错
+            const textMaxWidth = Math.max(baseW - padding * 2, 100); 
             const textLines = wrapTextSafe(ctx, text, textMaxWidth);
             const totalTextHeight = textLines.length * lineHeight;
             
@@ -299,7 +256,7 @@
           }
         }
 
-        // 有图片+文字 模式
+        // 【模式 2：图文混合排版】
         const imgW = currentImage.width * scale;
         const imgH = currentImage.height * scale;
         const imgRatio = currentImage.width / currentImage.height;
@@ -307,6 +264,7 @@
         const isHorizontal = imgRatio >= 0.9; 
 
         if (isHorizontal) { 
+          // 宽图：上图下文
           canvasW = imgW + padding * 2;
           const textMaxWidth = Math.max(imgW, 100); 
           const textLines = wrapTextSafe(ctx, text, textMaxWidth);
@@ -334,6 +292,7 @@
           });
 
         } else {
+          // 长图：左图右文
           const textMaxWidth = Math.max(imgW * 0.6, fontSize * 10);
           const textLines = wrapTextSafe(ctx, text, textMaxWidth);
           const totalTextHeight = textLines.length * lineHeight;
@@ -365,14 +324,13 @@
         }
       } catch (err) {
         console.error("Render Error:", err);
-        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "red"; ctx.font = "16px sans-serif"; ctx.textAlign = "center";
-        ctx.fillText("Error rendering poster. Try resetting.", canvas.width/2, canvas.height/2);
       }
     }
 
+    // 初始化运行
     drawPoster();
 
+    // 复制功能
     document.getElementById('copyBtn').addEventListener('click', () => {
       if (!currentImage && !textInput.value.trim()) return alert("Please paste an image or type text first!");
       try {
@@ -382,3 +340,21 @@
           
           const btn = document.getElementById('copyBtn');
           btn.innerHTML = "✅ Copied!";
+          setTimeout(() => btn.innerHTML = "📋 Copy Image", 2000);
+        });
+      } catch (err) {
+        alert("Copy failed. Please use Download button. Error: " + err.message);
+      }
+    });
+
+    // 下载功能
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      if (!currentImage && !textInput.value.trim()) return alert("Please paste an image or type text first!");
+      const link = document.createElement('a');
+      link.download = 'Poster_' + new Date().getTime() + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  </script>
+</body>
+</html>
