@@ -110,8 +110,8 @@
     </h2>
     
     <div class="paste-area" id="pasteArea">
-      Click here & press <b>Ctrl + V</b><br>to paste an image<br>
-      <span style="font-size: 12px; color: #666;">(or click to upload from device)</span>
+      Click here & press <b>Ctrl + V</b> to paste image<br>
+      <span style="font-size: 12px; color: #666;">(Or just type text below for Text-Only poster)</span>
       <input type="file" id="fileInput" accept="image/*" style="display:none">
     </div>
 
@@ -126,7 +126,7 @@
 
     <div>
       <label>Text Content:</label>
-      <textarea id="textInput" placeholder="Paste your text here..."></textarea>
+      <textarea id="textInput" placeholder="Type text here..."></textarea>
     </div>
 
     <div>
@@ -172,7 +172,6 @@
     const ctx = canvas.getContext('2d');
     let currentImage = null;
 
-    // DOM Elements
     const textInput = document.getElementById('textInput');
     const color1Input = document.getElementById('color1');
     const color2Input = document.getElementById('color2');
@@ -184,12 +183,10 @@
     const fileInput = document.getElementById('fileInput');
     const resetBtn = document.getElementById('resetBtn');
 
-    // Bind real-time update events
     [textInput, color1Input, color2Input, alignInput, fontSizeInput, paddingInput, scaleInput].forEach(el => {
       el.addEventListener('input', drawPoster);
     });
 
-    // Paste Image Event
     document.addEventListener('paste', function(e) {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       for (let i = 0; i < items.length; i++) {
@@ -202,13 +199,11 @@
       }
     });
 
-    // Click to upload
     pasteArea.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', (e) => {
       if (e.target.files && e.target.files[0]) loadImageBlob(e.target.files[0]);
     });
 
-    // Reset
     resetBtn.addEventListener('click', () => {
       currentImage = null;
       textInput.value = "";
@@ -235,170 +230,31 @@
       reader.readAsDataURL(blob);
     }
 
-    // Core Drawing Algorithm (HD Render Engine)
     function drawPoster() {
       document.getElementById('fontSizeVal').innerText = fontSizeInput.value + 'px';
       document.getElementById('paddingVal').innerText = paddingInput.value + 'px';
 
-      if (!currentImage) {
-        canvas.width = 600; canvas.height = 400;
-        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 600, 400);
-        ctx.fillStyle = "#a0aab5"; ctx.font = "20px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        ctx.fillText("Please paste or select an image to preview", 300, 200);
-        return;
-      }
-
-      // 获取当前用户设置的值
       const text = textInput.value;
       const color1 = color1Input.value;
       const color2 = color2Input.value;
       const align = alignInput.value;
       
-      // 【高清渲染核心】：获取倍率，把所有尺寸都乘以倍率
       const scale = parseFloat(scaleInput.value);
       const fontSize = parseInt(fontSizeInput.value) * scale;
       const padding = parseInt(paddingInput.value) * scale;
-      const imgW = currentImage.width * scale;
-      const imgH = currentImage.height * scale;
       
-      const imgRatio = currentImage.width / currentImage.height;
       ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
       const lineHeight = fontSize * 1.5;
-      
-      let canvasW, canvasH, textMaxWidth;
-      const isHorizontal = imgRatio >= 0.9; 
 
-      if (isHorizontal) { 
-        // MODE 1: Top Image, Bottom Text
-        canvasW = imgW + padding * 2;
-        textMaxWidth = imgW; 
-        const textLines = wrapText(ctx, text, textMaxWidth);
-        const textHeight = textLines.length > 0 ? (textLines.length * lineHeight) : 0;
-        
-        canvasH = imgH + textHeight + padding * (textLines.length > 0 ? 3 : 2);
-        canvas.width = canvasW; canvas.height = canvasH;
-        
-        // 开启高级抗锯齿和平滑算法
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
-
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvasH);
-        gradient.addColorStop(0, color1);
-        gradient.addColorStop(1, color2);
-        ctx.fillStyle = gradient; 
-        ctx.fillRect(0, 0, canvasW, canvasH);
-        
-        ctx.drawImage(currentImage, padding, padding, imgW, imgH);
-        
-        ctx.fillStyle = "#000000";
-        ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
-        ctx.textAlign = align;
-        ctx.textBaseline = "top";
-        
-        let textX;
-        if(align === "left") textX = padding;
-        else if(align === "right") textX = canvasW - padding;
-        else textX = canvasW / 2;
-
-        textLines.forEach((line, index) => {
-          ctx.fillText(line, textX, padding * 2 + imgH + index * lineHeight);
-        });
-
-      } else {
-        // MODE 2: Left Image, Right Text
-        textMaxWidth = Math.max(imgW * 0.6, fontSize * 10);
-        const textLines = wrapText(ctx, text, textMaxWidth);
-        const totalTextHeight = textLines.length * lineHeight;
-        
-        canvasW = imgW + textMaxWidth + padding * 3;
-        canvasH = Math.max(imgH + padding * 2, totalTextHeight + padding * 2);
-
-        canvas.width = canvasW; canvas.height = canvasH;
-
-        // 开启高级抗锯齿和平滑算法
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
-
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvasH);
-        gradient.addColorStop(0, color1);
-        gradient.addColorStop(1, color2);
-        ctx.fillStyle = gradient; 
-        ctx.fillRect(0, 0, canvasW, canvasH);
-
-        const finalImgY = (canvasH - imgH) / 2;
-        ctx.drawImage(currentImage, padding, finalImgY, imgW, imgH);
-
-        ctx.fillStyle = "#000000";
-        ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
-        ctx.textAlign = align;
-        ctx.textBaseline = "top";
-        
-        const startTextY = (canvasH - totalTextHeight) / 2;
-        
-        let textStartX = padding * 2 + imgW;
-        let textX;
-        if(align === "left") textX = textStartX;
-        else if(align === "right") textX = textStartX + textMaxWidth;
-        else textX = textStartX + textMaxWidth / 2; 
-        
-        textLines.forEach((line, index) => {
-          ctx.fillText(line, textX, startTextY + index * lineHeight);
-        });
-      }
-    }
-
-    function wrapText(context, text, maxWidth) {
-      if (!text.trim()) return [];
-      const lines = [];
-      const chars = text.split('');
-      let currentLine = '';
-
-      for (let i = 0; i < chars.length; i++) {
-        let testLine = currentLine + chars[i];
-        let metrics = context.measureText(testLine);
-        if (metrics.width > maxWidth && i > 0) {
-          if (chars[i] === '\n') {
-            lines.push(currentLine); currentLine = '';
-          } else {
-            lines.push(currentLine); currentLine = chars[i];
-          }
+      // 【核心新增逻辑】：如果没有图片，但有文字，直接进入“纯文本海报模式”
+      if (!currentImage) {
+        if (!text.trim()) {
+          // 既没图也没字，显示占位符
+          canvas.width = 600; canvas.height = 400;
+          ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 600, 400);
+          ctx.fillStyle = "#a0aab5"; ctx.font = "20px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.fillText("Paste image OR type text to begin", 300, 200);
+          return;
         } else {
-          if (chars[i] === '\n') {
-             lines.push(currentLine); currentLine = '';
-          } else {
-             currentLine = testLine;
-          }
-        }
-      }
-      if (currentLine) lines.push(currentLine);
-      return lines;
-    }
-
-    drawPoster();
-
-    document.getElementById('copyBtn').addEventListener('click', () => {
-      if (!currentImage) return alert("Please paste or upload an image first!");
-      try {
-        canvas.toBlob(async (blob) => {
-          const item = new ClipboardItem({ "image/png": blob });
-          await navigator.clipboard.write([item]);
-          
-          const btn = document.getElementById('copyBtn');
-          btn.innerHTML = "✅ Copied!";
-          setTimeout(() => btn.innerHTML = "📋 Copy Image", 2000);
-        });
-      } catch (err) {
-        alert("Copy failed. Please use Download button.");
-      }
-    });
-
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-      if (!currentImage) return alert("Please paste or upload an image first!");
-      const link = document.createElement('a');
-      link.download = 'HD_Poster_' + new Date().getTime() + '.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    });
-  </script>
-</body>
-</html>
+          // 纯文本排版模式（默认生成一张高质感的方形海报）
+          const baseW = 800 *
