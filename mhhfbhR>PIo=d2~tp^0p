@@ -3,44 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Poster Generator - HD Edition</title>
+  <title>Smart Poster Generator - Pro Edition</title>
   <link rel="icon" type="image/png" href="./favicon.png">
   
   <style>
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-      background: #f4f6f8; 
-      margin: 0; 
-      padding: 20px; 
-      display: flex; 
-      gap: 20px; 
-      height: 100vh; 
-      box-sizing: border-box; 
+      font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      background: #f4f6f8; margin: 0; padding: 20px; display: flex; gap: 20px; 
+      height: 100vh; box-sizing: border-box; 
     }
     .control-panel { 
-      flex: 1; 
-      background: white; 
-      padding: 25px; 
-      border-radius: 12px; 
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
-      display: flex; 
-      flex-direction: column; 
-      gap: 16px; 
-      min-width: 320px;
-      max-width: 400px; 
-      overflow-y: auto; 
+      flex: 1; background: white; padding: 25px; border-radius: 12px; 
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column; 
+      gap: 16px; min-width: 320px; max-width: 400px; overflow-y: auto; 
     }
     .preview-panel { 
-      flex: 2; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
-      background: #e9ecef; 
-      border-radius: 12px; 
-      overflow: auto; 
-      padding: 20px; 
-      box-shadow: inset 0 4px 12px rgba(0,0,0,0.05); 
+      flex: 2; display: flex; flex-direction: column; align-items: center; 
+      justify-content: center; background: #e9ecef; border-radius: 12px; 
+      overflow: auto; padding: 20px; box-shadow: inset 0 4px 12px rgba(0,0,0,0.05); 
     }
     h2 { margin-top: 0; margin-bottom: 5px; font-size: 22px; color: #1a1a1a; display: flex; align-items: center; justify-content: space-between;}
     
@@ -53,7 +33,7 @@
     label { font-weight: 600; font-size: 13px; color: #444; display: flex; justify-content: space-between; align-items: center;}
     
     textarea { 
-      width: 100%; height: 90px; padding: 12px; border: 1px solid #d1d5db; 
+      width: 100%; height: 100px; padding: 12px; border: 1px solid #d1d5db; 
       border-radius: 8px; resize: vertical; box-sizing: border-box; font-family: inherit; font-size: 14px;
     }
     textarea:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
@@ -88,10 +68,7 @@
     button.download-btn { background: #3b82f6; } 
     button.download-btn:hover { background: #2563eb; }
     
-    canvas { 
-      max-width: 100%; max-height: 100%; object-fit: contain;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: 0.3s; 
-    }
+    canvas { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: 0.3s; }
     
     @media (max-width: 768px) {
       body { flex-direction: column; height: auto; }
@@ -102,7 +79,6 @@
 </head>
 <body>
 
-  <!-- Control Panel -->
   <div class="control-panel">
     <h2>
       Poster Studio
@@ -130,7 +106,7 @@
     </div>
 
     <div>
-      <label>Background Gradient Colors:</label>
+      <label>Background Gradient:</label>
       <div class="color-group">
         <input type="color" id="color1" value="#FFD700" title="Top Color">
         <input type="color" id="color2" value="#FFA500" title="Bottom Color">
@@ -162,7 +138,6 @@
     </div>
   </div>
 
-  <!-- Preview Panel -->
   <div class="preview-panel">
     <canvas id="posterCanvas"></canvas>
   </div>
@@ -183,8 +158,11 @@
     const fileInput = document.getElementById('fileInput');
     const resetBtn = document.getElementById('resetBtn');
 
+    // 绑定实时更新
     [textInput, color1Input, color2Input, alignInput, fontSizeInput, paddingInput, scaleInput].forEach(el => {
-      el.addEventListener('input', drawPoster);
+      el.addEventListener('input', () => {
+        requestAnimationFrame(drawPoster); // 优化渲染性能防止卡顿
+      });
     });
 
     document.addEventListener('paste', function(e) {
@@ -230,31 +208,177 @@
       reader.readAsDataURL(blob);
     }
 
+    // 全新、绝对安全的换行算法（完美处理多行回车）
+    function wrapTextSafe(context, text, maxWidth) {
+      if (!text) return [];
+      const lines = [];
+      const paragraphs = text.split('\n'); // 先按真实回车拆分段落
+      
+      for (let p = 0; p < paragraphs.length; p++) {
+        let paragraph = paragraphs[p];
+        if (paragraph === '') {
+          lines.push(''); // 保留空行
+          continue;
+        }
+        
+        let currentLine = '';
+        for (let i = 0; i < paragraph.length; i++) {
+          let char = paragraph[i];
+          let testLine = currentLine + char;
+          let metrics = context.measureText(testLine);
+          
+          if (metrics.width > maxWidth && currentLine.length > 0) {
+            lines.push(currentLine);
+            currentLine = char;
+          } else {
+            currentLine = testLine;
+          }
+        }
+        if (currentLine.length > 0) {
+          lines.push(currentLine);
+        }
+      }
+      return lines;
+    }
+
+    // 核心绘制逻辑（加入防卡死捕获）
     function drawPoster() {
-      document.getElementById('fontSizeVal').innerText = fontSizeInput.value + 'px';
-      document.getElementById('paddingVal').innerText = paddingInput.value + 'px';
+      try {
+        document.getElementById('fontSizeVal').innerText = fontSizeInput.value + 'px';
+        document.getElementById('paddingVal').innerText = paddingInput.value + 'px';
 
-      const text = textInput.value;
-      const color1 = color1Input.value;
-      const color2 = color2Input.value;
-      const align = alignInput.value;
-      
-      const scale = parseFloat(scaleInput.value);
-      const fontSize = parseInt(fontSizeInput.value) * scale;
-      const padding = parseInt(paddingInput.value) * scale;
-      
-      ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
-      const lineHeight = fontSize * 1.5;
+        const text = textInput.value;
+        const color1 = color1Input.value;
+        const color2 = color2Input.value;
+        const align = alignInput.value;
+        
+        const scale = parseFloat(scaleInput.value) || 2;
+        const fontSize = parseInt(fontSizeInput.value) * scale;
+        const padding = parseInt(paddingInput.value) * scale;
+        
+        // 更安全的字体声明
+        ctx.font = `bold ${fontSize}px "Segoe UI", Arial, sans-serif`;
+        const lineHeight = fontSize * 1.5;
 
-      // 【核心新增逻辑】：如果没有图片，但有文字，直接进入“纯文本海报模式”
-      if (!currentImage) {
-        if (!text.trim()) {
-          // 既没图也没字，显示占位符
-          canvas.width = 600; canvas.height = 400;
-          ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 600, 400);
-          ctx.fillStyle = "#a0aab5"; ctx.font = "20px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          ctx.fillText("Paste image OR type text to begin", 300, 200);
-          return;
+        // 如果没有图片
+        if (!currentImage) {
+          if (!text.trim()) {
+            canvas.width = 600; canvas.height = 400;
+            ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 600, 400);
+            ctx.fillStyle = "#a0aab5"; ctx.font = "20px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.fillText("Paste image OR type text to begin", 300, 200);
+            return;
+          } else {
+            // 纯文本海报模式
+            const baseW = 800 * scale; 
+            const textMaxWidth = Math.max(baseW - padding * 2, 100); // 防止宽度负数报错
+            const textLines = wrapTextSafe(ctx, text, textMaxWidth);
+            const totalTextHeight = textLines.length * lineHeight;
+            
+            const canvasW = baseW;
+            const canvasH = Math.max(baseW, totalTextHeight + padding * 4); 
+            
+            canvas.width = canvasW; canvas.height = canvasH;
+            ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvasH);
+            gradient.addColorStop(0, color1); gradient.addColorStop(1, color2);
+            ctx.fillStyle = gradient; ctx.fillRect(0, 0, canvasW, canvasH);
+
+            ctx.fillStyle = "#000000";
+            ctx.font = `bold ${fontSize}px "Segoe UI", Arial, sans-serif`;
+            ctx.textAlign = align; ctx.textBaseline = "top";
+            
+            const startTextY = (canvasH - totalTextHeight) / 2;
+            let textX = (align === "left") ? padding : ((align === "right") ? canvasW - padding : canvasW / 2);
+
+            textLines.forEach((line, index) => {
+              ctx.fillText(line, textX, startTextY + index * lineHeight);
+            });
+            return;
+          }
+        }
+
+        // 有图片+文字 模式
+        const imgW = currentImage.width * scale;
+        const imgH = currentImage.height * scale;
+        const imgRatio = currentImage.width / currentImage.height;
+        let canvasW, canvasH;
+        const isHorizontal = imgRatio >= 0.9; 
+
+        if (isHorizontal) { 
+          canvasW = imgW + padding * 2;
+          const textMaxWidth = Math.max(imgW, 100); 
+          const textLines = wrapTextSafe(ctx, text, textMaxWidth);
+          const textHeight = textLines.length > 0 ? (textLines.length * lineHeight) : 0;
+          
+          canvasH = imgH + textHeight + padding * (textLines.length > 0 ? 3 : 2);
+          canvas.width = canvasW; canvas.height = canvasH;
+          
+          ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+
+          const gradient = ctx.createLinearGradient(0, 0, 0, canvasH);
+          gradient.addColorStop(0, color1); gradient.addColorStop(1, color2);
+          ctx.fillStyle = gradient; ctx.fillRect(0, 0, canvasW, canvasH);
+          
+          ctx.drawImage(currentImage, padding, padding, imgW, imgH);
+          
+          ctx.fillStyle = "#000000";
+          ctx.font = `bold ${fontSize}px "Segoe UI", Arial, sans-serif`;
+          ctx.textAlign = align; ctx.textBaseline = "top";
+          
+          let textX = (align === "left") ? padding : ((align === "right") ? canvasW - padding : canvasW / 2);
+
+          textLines.forEach((line, index) => {
+            ctx.fillText(line, textX, padding * 2 + imgH + index * lineHeight);
+          });
+
         } else {
-          // 纯文本排版模式（默认生成一张高质感的方形海报）
-          const baseW = 800 *
+          const textMaxWidth = Math.max(imgW * 0.6, fontSize * 10);
+          const textLines = wrapTextSafe(ctx, text, textMaxWidth);
+          const totalTextHeight = textLines.length * lineHeight;
+          
+          canvasW = imgW + textMaxWidth + padding * 3;
+          canvasH = Math.max(imgH + padding * 2, totalTextHeight + padding * 2);
+
+          canvas.width = canvasW; canvas.height = canvasH;
+          ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+
+          const gradient = ctx.createLinearGradient(0, 0, 0, canvasH);
+          gradient.addColorStop(0, color1); gradient.addColorStop(1, color2);
+          ctx.fillStyle = gradient; ctx.fillRect(0, 0, canvasW, canvasH);
+
+          const finalImgY = (canvasH - imgH) / 2;
+          ctx.drawImage(currentImage, padding, finalImgY, imgW, imgH);
+
+          ctx.fillStyle = "#000000";
+          ctx.font = `bold ${fontSize}px "Segoe UI", Arial, sans-serif`;
+          ctx.textAlign = align; ctx.textBaseline = "top";
+          
+          const startTextY = (canvasH - totalTextHeight) / 2;
+          let textStartX = padding * 2 + imgW;
+          let textX = (align === "left") ? textStartX : ((align === "right") ? textStartX + textMaxWidth : textStartX + textMaxWidth / 2);
+          
+          textLines.forEach((line, index) => {
+            ctx.fillText(line, textX, startTextY + index * lineHeight);
+          });
+        }
+      } catch (err) {
+        console.error("Render Error:", err);
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "red"; ctx.font = "16px sans-serif"; ctx.textAlign = "center";
+        ctx.fillText("Error rendering poster. Try resetting.", canvas.width/2, canvas.height/2);
+      }
+    }
+
+    drawPoster();
+
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      if (!currentImage && !textInput.value.trim()) return alert("Please paste an image or type text first!");
+      try {
+        canvas.toBlob(async (blob) => {
+          const item = new ClipboardItem({ "image/png": blob });
+          await navigator.clipboard.write([item]);
+          
+          const btn = document.getElementById('copyBtn');
+          btn.innerHTML = "✅ Copied!";
