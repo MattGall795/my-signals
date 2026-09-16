@@ -1,234 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STAR TEAM | Strategic Requisition Hub</title>
-    <!-- 引入 html2pdf 库 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <style>
-        /* 保持您最初满意的视觉样式，不作任何修改 */
-        :root { --star-blue: #0f172a; --star-gold: #b5935a; --text: #334155; --border: #cbd5e1; }
-        body { font-family: 'Inter', -apple-system, Arial, sans-serif; background: #f1f5f9; margin: 0; color: var(--text); }
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
+  <style>
+    :root {
+      --glass-alpha: 0.5;
+      --glass-base: 255, 255, 255;
+      --text-main: #000000;
+      --accent-gold: #f39c12;
+      --border-alpha: rgba(0, 0, 0, 0.15);
+    }
 
-        .lang-switch { position: fixed; top: 20px; right: 20px; z-index: 1000; background: white; border: 2px solid var(--star-blue); border-radius: 8px; overflow: hidden; display: flex; }
-        .lang-btn { padding: 8px 15px; font-size: 12px; font-weight: 800; cursor: pointer; border: none; }
-        .lang-btn.active { background: var(--star-blue); color: white; }
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), #333;
+      background-size: cover; background-attachment: fixed; background-position: center;
+      display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: white;
+    }
 
-        #home-screen { padding: 40px 15px; text-align: center; }
-        .hero { background: var(--star-blue); color: white; padding: 40px 20px; border-bottom: 5px solid var(--star-gold); margin-bottom: 30px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
-        .card { background: white; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; text-align: left; transition: 0.3s; }
-        .card:hover { border-color: var(--star-gold); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+    /* 登录界面样式 */
+    #login-screen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(15px);
+      display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease;
+    }
+    .login-box {
+      background: rgba(255, 255, 255, 0.1); padding: 40px; border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.2); width: 300px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .login-box h2 { margin-bottom: 25px; letter-spacing: 2px; font-weight: 900; }
+    .login-box input {
+      width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; outline: none; box-sizing: border-box;
+    }
+    .login-box button {
+      width: 100%; padding: 12px; background: var(--accent-gold); border: none;
+      border-radius: 10px; color: white; font-weight: 800; cursor: pointer; transition: 0.3s;
+    }
+    .login-box button:hover { transform: scale(1.03); background: #e67e22; }
+    #login-error { color: #ff6b6b; font-size: 13px; margin-top: 15px; display: none; font-weight: 700; }
 
-        /* 模态框样式 */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: none; align-items: center; justify-content: center; }
-        .modal-box { background: white; width: 90%; max-width: 600px; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
-        .modal-header { padding: 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: bold; }
-        .modal-body { padding: 25px; max-height: 60vh; overflow-y: auto; font-size: 14px; line-height: 1.6; }
-        .modal-footer { padding: 20px; text-align: center; border-top: 1px solid #e2e8f0; }
-        #confirm-btn { padding: 12px 40px; border-radius: 6px; border: none; background: var(--star-blue); color: white; cursor: pointer; }
-        #confirm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* 表单页面布局 - 保持 A4 比例 */
-        #form-container { display: none; padding: 20px 0; }
-        .paper { 
-            background: white; 
-            width: 210mm; 
-            min-height: 297mm; 
-            margin: 0 auto; 
-            padding: 20mm; 
-            box-sizing: border-box; 
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .header { text-align: center; border-bottom: 2px solid var(--star-blue); margin-bottom: 20px; }
-        .section-title { background: var(--star-blue); color: white; padding: 8px 12px; font-size: 12px; font-weight: bold; margin: 20px 0 10px; }
-        
-        /* 关键表格样式：不准改变 */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-        td { border: 1px solid var(--border); padding: 10px; font-size: 12px; }
-        .label { background: #f8fafc; width: 140px; font-weight: bold; color: var(--star-blue); }
-
-        input, textarea { width: 100%; border: none; border-bottom: 1px solid #eee; font-family: inherit; font-size: 12px; outline: none; }
-        
-        .rules-grid { font-size: 10px; color: #64748b; margin: 15px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        .footer-grid { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-        .sig-box { border-bottom: 1px solid #000; height: 40px; position: relative; }
-        .sig-box span { position: absolute; bottom: -20px; left: 0; font-size: 10px; font-weight: bold; }
-
-        .action-bar { text-align: center; padding: 40px 0; }
-        .btn-download { background: var(--star-gold); color: white; padding: 15px 40px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    </style>
+    /* 主界面框架样式 */
+    #main-wrapper { display: none; width: 100%; flex-direction: column; align-items: center; padding: 20px 40px 120px 40px; box-sizing: border-box; }
+    .control-panel { position: fixed; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.85); padding: 10px 18px; border-radius: 12px; color: white; font-size: 12px; z-index: 1000; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.1); }
+    input[type=range] { cursor: pointer; accent-color: var(--accent-gold); }
+    
+    .tabs-container { margin-top: 20px; margin-bottom: 30px; display: flex; gap: 12px; padding: 8px 15px; background: rgba(var(--glass-base), 0.2); backdrop-filter: blur(15px); border-radius: 50px; border: 1px solid rgba(var(--glass-base), 0.3); z-index: 900; flex-wrap: wrap; justify-content: center; }
+    .tab-btn { padding: 10px 22px; border: none; border-radius: 40px; background: transparent; color: var(--text-main); font-weight: 800; cursor: pointer; transition: all 0.3s ease; font-size: 13px; text-transform: uppercase; }
+    .tab-btn.active { background: var(--accent-gold); color: white; box-shadow: 0 4px 15px rgba(243, 156, 18, 0.5); }
+    
+    /* 卡片与内容样式 */
+    .slide-card { display: none; background: rgba(var(--glass-base), var(--glass-alpha)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(var(--glass-base), 0.4); border-radius: 24px; padding: 50px; box-shadow: 0 30px 70px rgba(0,0,0,0.4); width: 100%; max-width: 1200px; color: var(--text-main); box-sizing: border-box; }
+    .slide-card.active { display: inline-block; animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+    
+    .header-group { margin-bottom: 20px; text-align: center; }
+    .title-box h1 { margin: 0; font-size: 38px; font-weight: 900; color: inherit; text-transform: uppercase; letter-spacing: 2px;}
+    
+    .section-subtitle { margin: 40px 0 15px 0; font-size: 20px; font-weight: 800; color: inherit; text-align: left; border-left: 5px solid var(--accent-gold); padding-left: 15px; text-transform: uppercase; letter-spacing: 1px; }
+    .sheet-img { width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-alpha); box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: block; background: #fff; }
+    
+    /* 下载按钮 */
+    .btn-download { position: fixed; bottom: 40px; right: 40px; padding: 18px 35px; background: var(--accent-gold); color: white; border: none; border-radius: 60px; cursor: pointer; font-weight: 800; font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; gap: 10px; transition: transform 0.2s ease; }
+    .btn-download:hover { transform: translateY(-3px); }
+  </style>
 </head>
 <body>
 
-<!-- 规则确认模态框 -->
-<div class="modal-overlay" id="rules-modal">
-    <div class="modal-box">
-        <div class="modal-header" id="modal-title">Terms & Conditions</div>
-        <div class="modal-body" id="modal-content"></div>
-        <div class="modal-footer"><button id="confirm-btn" onclick="confirmRules()" disabled>Wait (60s)</button></div>
+  <!-- 登录层 -->
+  <div id="login-screen">
+    <div class="login-box">
+      <h2>SECURE LOGON</h2>
+      <input type="text" id="user-input" placeholder="USERNAME">
+      <input type="password" id="pass-input" placeholder="PASSWORD">
+      <button onclick="attemptLogin()">CONNECT</button>
+      <div id="login-error">INVALID CREDENTIALS</div>
     </div>
-</div>
+  </div>
 
-<div class="lang-switch">
-    <button class="lang-btn active" onclick="setLang('en')" id="btn-en">EN</button>
-    <button class="lang-btn" onclick="setLang('fr')" id="btn-fr">FR</button>
-</div>
-
-<div id="home-screen">
-    <div class="hero">
-        <h1 class="t" data-en="STAR TEAM | REQUISITION HUB" data-fr="STAR TEAM | PÔLE DE RÉQUISITION">STAR TEAM | REQUISITION HUB</h1>
-        <p>STRATEGIC RESOURCE MANAGEMENT SYSTEM</p>
+  <!-- 主界面 -->
+  <div id="main-wrapper">
+    <!-- 日间/夜间透明度调节 -->
+    <div class="control-panel">
+      <span>View Style</span>
+      <input type="range" id="opacityRange" min="0.1" max="0.95" step="0.01" value="0.5">
     </div>
-    <div class="grid">
-        <div class="card" onclick="requestForm('form-office')">
-            <h3 class="t" data-en="Office Establishment" data-fr="Établissement de Bureau">Office Establishment</h3>
-            <p>Application for physical facilities for VIP3+ agents.</p>
-        </div>
-        <!-- 更多卡片可在此添加 -->
-    </div>
-</div>
 
-<div id="form-container">
-    <div id="form-office" class="form-sheet">
-        <div class="paper" id="pdf-content">
-            <div class="header">
-                <h1 class="t" data-en="Office Establishment Application" data-fr="Demande d'Établissement de Bureau">Office Establishment Application</h1>
-                <p>GLOBAL MARKET EXPANSION DIVISION</p>
-            </div>
+    <!-- 标签页导航栏 -->
+    <div class="tabs-container" id="tabs-nav"></div>
+
+    <!-- 内容展示区 -->
+    <div id="app-content"></div>
+
+    <!-- 截图下载按钮 -->
+    <button class="btn-download" onclick="exportToPNG()">
+      <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      DOWNLOAD PNG SNAPSHOT
+    </button>
+  </div>
+
+  <script>
+    // 登录校验与数据拉取
+    function attemptLogin() {
+      const u = document.getElementById('user-input').value;
+      const p = document.getElementById('pass-input').value;
+      const errorEl = document.getElementById('login-error');
+      const btn = document.querySelector('.login-box button');
+
+      if (!u || !p) return;
+      errorEl.style.display = 'none';
+      btn.innerText = "LOADING DATA..."; // 提示用户正在截图中
+
+      // 调用后端 getSystemData 函数
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.status === "success") {
+            // 登录成功，设置背景图
+            document.body.style.background = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('${result.bgImage}')`;
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundAttachment = "fixed";
             
-            <div class="section-title">I. APPLICANT PROFILE</div>
-            <table>
-                <tr>
-                    <td class="label">Name</td><td><input type="text" id="field1"></td>
-                    <td class="label">Team</td><td><input type="text" id="field2"></td>
-                </tr>
-                <tr>
-                    <td class="label">Address</td><td colspan="3"><input type="text" id="field3"></td>
-                </tr>
-            </table>
+            // 隐藏登录界面，显示主界面
+            document.getElementById('login-screen').style.opacity = '0';
+            setTimeout(() => {
+              document.getElementById('login-screen').style.display = 'none';
+              document.getElementById('main-wrapper').style.display = 'flex';
+              render(result.data); // 开始渲染数据
+            }, 500);
+          } else {
+            errorEl.innerText = result.message;
+            errorEl.style.display = 'block';
+            btn.innerText = "CONNECT";
+          }
+        })
+        .withFailureHandler(function(error) {
+          errorEl.innerText = "CONNECTION FAILED";
+          errorEl.style.display = 'block';
+          btn.innerText = "CONNECT";
+        })
+        .getSystemData(u, p);
+    }
 
-            <div class="section-title">II. STRATEGIC GOALS</div>
-            <table>
-                <tr>
-                    <td class="label">6-Month Plan</td>
-                    <td colspan="3"><textarea rows="5" id="field4"></textarea></td>
-                </tr>
-            </table>
+    // 回车快捷登录
+    document.addEventListener('keypress', (e) => { if(e.key === 'Enter') attemptLogin(); });
 
-            <div class="section-title">III. DECLARATION</div>
-            <div class="rules-grid" id="rules-box">
-                <!-- 动态载入规则内容 -->
+    // 毛玻璃透明度控制
+    document.getElementById('opacityRange').addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      const root = document.documentElement;
+      root.style.setProperty('--glass-alpha', val);
+      if (val < 0.45) {
+        root.style.setProperty('--glass-base', '25, 25, 25'); 
+        root.style.setProperty('--text-main', '#ffffff');
+        root.style.setProperty('--border-alpha', 'rgba(255, 255, 255, 0.2)');
+      } else {
+        root.style.setProperty('--glass-base', '255, 255, 255');
+        root.style.setProperty('--text-main', '#000000');
+        root.style.setProperty('--border-alpha', 'rgba(0, 0, 0, 0.15)');
+      }
+    });
+
+    // 核心渲染逻辑
+    function render(slidesData) {
+      const container = document.getElementById('app-content');
+      const tabsNav = document.getElementById('tabs-nav');
+      container.innerHTML = ''; tabsNav.innerHTML = '';
+
+      slidesData.forEach((slide, index) => {
+        // 创建标签按钮
+        const btn = document.createElement('button');
+        btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
+        btn.innerText = slide.sheetName; 
+        btn.onclick = () => switchTab(index);
+        tabsNav.appendChild(btn);
+
+        // 创建数据卡片
+        const card = document.createElement('div');
+        card.className = `slide-card ${index === 0 ? 'active' : ''}`;
+        card.id = `card-${index}`;
+
+        // 主标题 HTML
+        let contentHtml = `
+          <div class="header-group">
+            <div class="title-box">
+              <h1>${slide.title}</h1>
             </div>
+          </div>
+        `;
 
-            <div class="footer-grid">
-                <div class="sig-box"><span>Applicant Signature & Date</span></div>
-                <div style="border: 1px dashed var(--star-gold); padding: 10px; font-size: 10px;">
-                    Approved by STAR Strategic Committee.
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="action-bar">
-        <button class="btn-download" onclick="downloadPDF()">GENERATE PDF DOCUMENT</button>
-    </div>
-</div>
-
-<script>
-    let currentLang = 'en';
-    let timerInterval;
-
-    const content = {
-        en: {
-            modal: "<h4>Rules</h4><p>1. Real office location required.<br>2. Exclusive use for STAR team.<br>3. Subject to audit.</p>",
-            rules: ["1. Real Office Location","2. Exclusive Usage","3. Regular Audit","4. Data Accuracy"]
-        },
-        fr: {
-            modal: "<h4>Règles</h4><p>1. Emplacement réel requis.<br>2. Usage exclusif équipe STAR.<br>3. Sujet à audit.</p>",
-            rules: ["1. Emplacement Réel","2. Usage Exclusif","3. Audit Régulier","4. Exactitude"]
-        }
-    };
-
-    function setLang(lang) {
-        currentLang = lang;
-        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-' + lang).classList.add('active');
-        document.querySelectorAll('.t').forEach(el => el.innerText = el.getAttribute('data-' + lang));
-        
-        // 更新规则展示
-        const box = document.getElementById('rules-box');
-        if(box) box.innerHTML = content[lang].rules.map(r => `<div>${r}</div>`).join('');
-    }
-
-    function requestForm(id) {
-        document.getElementById('rules-modal').style.display = 'flex';
-        document.getElementById('modal-content').innerHTML = content[currentLang].modal;
-        let count = 5; // 为了测试设为5秒，Matt您可以改为60
-        const btn = document.getElementById('confirm-btn');
-        btn.disabled = true;
-        
-        timerInterval = setInterval(() => {
-            count--;
-            btn.innerText = `Wait (${count}s)`;
-            if(count <= 0) {
-                clearInterval(timerInterval);
-                btn.disabled = false;
-                btn.innerText = "I AGREE & PROCEED";
-            }
-        }, 1000);
-    }
-
-    function confirmRules() {
-        document.getElementById('rules-modal').style.display = 'none';
-        document.getElementById('home-screen').style.display = 'none';
-        document.getElementById('form-container').style.display = 'block';
-    }
-
-    // 修复下载的核心逻辑
-    function downloadPDF() {
-        const element = document.getElementById('pdf-content');
-        const btn = document.querySelector('.btn-download');
-        btn.innerText = "PROCESSING...";
-
-        // 核心修复点 1: 强制同步 Input 值到 DOM 中
-        // html2canvas 默认抓不到动态输入的值，必须手动赋予 value 属性
-        const inputs = element.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.setAttribute('value', input.value);
-        });
-        const textareas = element.querySelectorAll('textarea');
-        textareas.forEach(tx => {
-            tx.innerHTML = tx.value;
+        // 循环插入该页面的：副标题 + 图片
+        slide.sections.forEach(sec => {
+          if (sec.subtitle) {
+            contentHtml += `<div class="section-subtitle">${sec.subtitle}</div>`;
+          }
+          contentHtml += `<img src="${sec.base64}" class="sheet-img" alt="Data Snapshot">`;
         });
 
-        // 核心修复点 2: 优化渲染配置
-        const opt = {
-            margin:       [10, 0, 10, 0], // 上下留白
-            filename:     'STAR_Strategic_Doc.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { 
-                scale: 2, 
-                useCORS: true, 
-                letterRendering: true,
-                scrollX: 0,
-                scrollY: 0
-            },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        // 执行生成
-        html2pdf().set(opt).from(element).save().then(() => {
-            btn.innerText = "GENERATE PDF DOCUMENT";
-        });
+        card.innerHTML = contentHtml;
+        container.appendChild(card);
+      });
     }
 
-    setLang('en');
-</script>
+    // 切换标签页逻辑
+    function switchTab(index) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-btn')[index].classList.add('active');
+      document.querySelectorAll('.slide-card').forEach(card => card.classList.remove('active'));
+      document.getElementById(`card-${index}`).classList.add('active');
+    }
 
+    // 一键下载网页截图逻辑
+    function exportToPNG() {
+      const activeCard = document.querySelector('.slide-card.active');
+      if(!activeCard) return;
+      
+      const btn = document.querySelector('.btn-download');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = "PROCESSING...";
+      
+      html2canvas(activeCard, { useCORS: true, backgroundColor: null, scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        const activeBtn = document.querySelector('.tab-btn.active');
+        link.download = `${activeBtn.innerText}_Snapshot.png`;
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+        btn.innerHTML = originalText;
+      });
+    }
+  </script>
 </body>
 </html>
