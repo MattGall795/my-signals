@@ -105,9 +105,12 @@
     </button>
   </div>
 
-  <script>
+    <script>
+    // ！！！请把下面引号里的链接，替换成你刚刚在第一步复制的 Google Apps Script 网址 ！！！
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec';
+
     // 登录校验与数据拉取
-    function attemptLogin() {
+    async function attemptLogin() {
       const u = document.getElementById('user-input').value;
       const p = document.getElementById('pass-input').value;
       const errorEl = document.getElementById('login-error');
@@ -117,35 +120,41 @@
       errorEl.style.display = 'none';
       btn.innerText = "LOADING DATA..."; // 提示用户正在截图中
 
-      // 调用后端 getSystemData 函数
-      google.script.run
-        .withSuccessHandler(function(result) {
-          if (result.status === "success") {
-            // 登录成功，设置背景图
-            document.body.style.background = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('${result.bgImage}')`;
-            document.body.style.backgroundSize = "cover";
-            document.body.style.backgroundAttachment = "fixed";
-            
-            // 隐藏登录界面，显示主界面
-            document.getElementById('login-screen').style.opacity = '0';
-            setTimeout(() => {
-              document.getElementById('login-screen').style.display = 'none';
-              document.getElementById('main-wrapper').style.display = 'flex';
-              render(result.data); // 开始渲染数据
-            }, 500);
-          } else {
-            errorEl.innerText = result.message;
-            errorEl.style.display = 'block';
-            btn.innerText = "CONNECT";
-          }
-        })
-        .withFailureHandler(function(error) {
-          errorEl.innerText = "CONNECTION FAILED";
+      try {
+        // 使用 fetch 替代原先的 google.script.run
+        const response = await fetch(`${API_URL}?u=${encodeURIComponent(u)}&p=${encodeURIComponent(p)}`);
+        const result = await response.json();
+
+        if (result.status === "success") {
+          // 登录成功，设置背景图
+          document.body.style.background = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('${result.bgImage}')`;
+          document.body.style.backgroundSize = "cover";
+          document.body.style.backgroundAttachment = "fixed";
+          
+          // 隐藏登录界面，显示主界面
+          document.getElementById('login-screen').style.opacity = '0';
+          setTimeout(() => {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-wrapper').style.display = 'flex';
+            render(result.data); // 开始渲染数据
+          }, 500);
+        } else {
+          errorEl.innerText = result.message;
           errorEl.style.display = 'block';
           btn.innerText = "CONNECT";
-        })
-        .getSystemData(u, p);
+        }
+      } catch (error) {
+        errorEl.innerText = "CONNECTION FAILED (Check Network or API URL)";
+        errorEl.style.display = 'block';
+        btn.innerText = "CONNECT";
+      }
     }
+
+    // 回车快捷登录
+    document.addEventListener('keypress', (e) => { if(e.key === 'Enter') attemptLogin(); });
+
+    // -------- 以下代码保持不变，照抄你之前的渲染逻辑 (opacityRange, render, switchTab, exportToPNG) --------
+
 
     // 回车快捷登录
     document.addEventListener('keypress', (e) => { if(e.key === 'Enter') attemptLogin(); });
