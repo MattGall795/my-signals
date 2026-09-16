@@ -2,192 +2,201 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Professional PPT Data Dashboard</title>
+  <title>Landscape PPT Dashboard</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     :root {
-      --primary-gold: #f39c12;
-      --table-blue: #2980b9;
-      --dark-bg: #0d0d0d;
+      --gold: #f39c12;
+      --blue: #2980b9;
+      --dark: #0a0a0a;
     }
-    body { margin: 0; background: var(--dark-bg); font-family: 'Segoe UI', Helvetica, Arial, sans-serif; color: white; }
+    body { margin: 0; background: var(--dark); font-family: 'Segoe UI', Arial, sans-serif; color: white; }
     
-    /* Login Area */
-    #login-module { display: flex; align-items: center; justify-content: center; height: 100vh; }
-    .login-card { background: #1a1a1a; padding: 40px; border-radius: 12px; width: 340px; text-align: center; border: 1px solid #333; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
-    .login-card h2 { margin-bottom: 30px; color: var(--primary-gold); font-weight: 300; letter-spacing: 2px; }
-    .login-card input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #333; background: #222; color: white; box-sizing: border-box; }
-    .login-card button { width: 100%; padding: 14px; background: var(--primary-gold); border: none; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 16px; }
+    /* Login - Clean English UI */
+    #login-zone { display: flex; align-items: center; justify-content: center; height: 100vh; }
+    .login-box { background: #151515; padding: 40px; border-radius: 8px; width: 340px; text-align: center; border: 1px solid #333; }
+    .login-box h2 { color: var(--gold); margin-bottom: 25px; font-weight: 300; letter-spacing: 2px; }
+    .login-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 4px; border: 1px solid #333; background: #222; color: white; box-sizing: border-box; }
+    .login-box button { width: 100%; padding: 14px; background: var(--gold); border: none; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; margin-top: 15px; }
 
-    /* Main Content */
-    #app-content { display: none; padding: 20px; text-align: center; }
-    .tabs-nav { display: flex; justify-content: center; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
-    .tab-item { background: #252525; color: #888; border: none; padding: 10px 24px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: 0.3s; }
-    .tab-item.active { background: var(--primary-gold); color: white; box-shadow: 0 4px 12px rgba(243,156,18,0.4); }
+    /* Main Dashboard */
+    #app-content { display: none; padding: 20px; }
+    .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    .tab { background: #222; color: #777; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+    .tab.active { background: var(--gold); color: white; }
 
-    /* PPT SLIDE (16:9 Landscape) */
-    .slide-wrapper { width: 100%; display: flex; justify-content: center; padding-bottom: 80px; }
+    /* THE PPT SLIDE - FIXED 16:9 ASPECT RATIO */
+    .canvas-container { 
+      width: 100%; display: flex; justify-content: center; align-items: flex-start; 
+      padding-bottom: 50px;
+    }
+    
     .ppt-slide {
-      width: 1280px; /* PPT Wide Width */
-      min-height: 720px; /* PPT Height */
-      background-size: cover !important;
+      width: 1280px;      /* Standard Slide Width */
+      height: 720px;     /* Standard Slide Height (16:9) */
+      background-size: 100% 100% !important; /* Force background to cover wide */
       background-position: center !important;
       position: relative;
+      overflow: hidden;   /* DO NOT allow vertical growth */
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 50px 0;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      border: 1px solid #444;
       box-sizing: border-box;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.8);
-      border: 1px solid #333;
     }
-    
-    .slide-header {
+
+    /* Top Title Area */
+    .title-area {
       width: 100%;
-      height: 140px;
+      height: 100px;
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-top: 20px;
     }
-    .slide-title {
-      font-size: 52px; font-weight: 900; color: #fff;
+    .ppt-title {
+      font-size: 46px; font-weight: 900; color: #fff;
       text-transform: uppercase; margin: 0;
-      text-shadow: 0 5px 15px rgba(0,0,0,0.9);
-      background: linear-gradient(to bottom, #ffffff, #c0c0c0);
+      text-shadow: 0 4px 10px rgba(0,0,0,0.9);
+      background: linear-gradient(to bottom, #ffffff, #bbbbbb);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .slide-data-box {
+    /* The Glass Container for Table */
+    .table-container {
       width: 94%;
+      height: 540px; /* Room for everything in one screen */
       background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(12px);
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-      margin-top: 10px;
+      backdrop-filter: blur(10px);
+      border-radius: 6px;
+      padding: 15px;
+      box-sizing: border-box;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      overflow: hidden; /* Important: Keep it inside the slide */
+      display: flex;
+      flex-direction: column;
     }
 
-    /* Professional Slide Table */
+    /* Fixed Layout Table - Auto shrinks font to fit rows */
     .ppt-table {
       width: 100%;
-      table-layout: fixed; /* Respects Manual Widths */
+      table-layout: fixed;
       border-collapse: collapse;
-      font-size: 13px;
       background: white;
+      font-size: 11px; /* Smaller font to fit 30+ rows in 16:9 */
     }
     .ppt-table th {
       background: linear-gradient(to bottom, #3498db, #2980b9);
       color: white; font-weight: bold;
-      padding: 15px 5px; border: 1px solid #21618c;
+      padding: 8px 2px; border: 1px solid #21618c;
+      text-transform: uppercase;
     }
     .ppt-table td {
-      padding: 10px 5px; border: 1px solid #d5d8dc;
-      color: #333; line-height: 1.4; text-align: center;
+      padding: 4px 2px; border: 1px solid #d5d8dc;
+      color: #333; line-height: 1.2; text-align: center;
       word-wrap: break-word; overflow-wrap: break-word;
-      white-space: normal; /* Auto Wrap */
+      white-space: normal;
     }
-    .ppt-table tr:nth-child(even) { background-color: #f7fbff; }
+    .ppt-table tr:nth-child(even) { background-color: #f6fbff; }
 
-    .btn-download {
+    /* Action Buttons */
+    .btn-save {
       position: fixed; bottom: 30px; right: 30px;
-      padding: 16px 36px; background: var(--primary-gold);
+      padding: 15px 35px; background: var(--gold);
       color: white; border: none; border-radius: 50px;
       font-size: 16px; font-weight: bold; cursor: pointer;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
     }
   </style>
 </head>
 <body>
 
-<div id="login-module">
-  <div class="login-card">
-    <h2>PPT DASHBOARD</h2>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="performLogin()">LOGIN</button>
+<div id="login-zone">
+  <div class="login-box">
+    <h2>DASHBOARD LOGIN</h2>
+    <input type="text" id="user" placeholder="Account ID" />
+    <input type="password" id="pass" placeholder="Secret Key" />
+    <button onclick="doLogin()">ACCESS SLIDES</button>
   </div>
 </div>
 
 <div id="app-content">
-  <div class="tabs-nav" id="tabs-nav"></div>
-  <div class="slide-wrapper">
-    <div id="capture-area" class="ppt-slide">
-      <div class="slide-header">
-        <h1 id="header-text" class="slide-title">TITLE</h1>
+  <div class="tabs" id="tabs"></div>
+  <div class="canvas-container">
+    <div id="capture-box" class="ppt-slide">
+      <div class="title-area">
+        <h1 id="slide-title" class="ppt-title">ANALYSIS TITLE</h1>
       </div>
-      <div id="body-content" class="slide-data-box"></div>
+      <div id="table-wrap" class="table-container">
+        <!-- Tables will fit here -->
+      </div>
     </div>
   </div>
-  <button class="btn-download" onclick="saveAsPNG()">DOWNLOAD PNG SLIDE</button>
+  <button class="btn-save" onclick="exportPNG()">SAVE AS HORIZONTAL PNG</button>
 </div>
 
 <script>
-
+// --- INTERNAL API URL ---
 const API_URL = "https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec";
 
-let remoteData = [];
-let bgBase64 = "";
+let appData = [];
+let slideBg = "";
 
-async function performLogin() {
-  const u = document.getElementById('username').value.trim();
-  const p = document.getElementById('password').value.trim();
-
-  if (!u || !p) return alert("Please enter credentials");
+async function doLogin() {
+  const u = document.getElementById('user').value.trim();
+  const p = document.getElementById('pass').value.trim();
+  if (!u || !p) return alert("Missing credentials");
 
   try {
-    const response = await fetch(`${API_URL}?u=${encodeURIComponent(u)}&p=${encodeURIComponent(p)}`);
-    const json = await response.json();
-
+    const res = await fetch(`${API_URL}?u=${encodeURIComponent(u)}&p=${encodeURIComponent(p)}`);
+    const json = await res.json();
     if (json.status === "success") {
-      remoteData = json.data;
-      bgBase64 = json.bgImage;
-      buildUI();
-      document.getElementById('login-module').style.display = 'none';
+      appData = json.data;
+      slideBg = json.bgImage;
+      initApp();
+      document.getElementById('login-zone').style.display = 'none';
       document.getElementById('app-content').style.display = 'block';
-    } else {
-      alert("Error: " + json.message);
-    }
-  } catch (e) {
-    alert("API Connection Error");
-  }
+    } else { alert("Error: " + json.message); }
+  } catch (e) { alert("Failed to connect to API server."); }
 }
 
-function buildUI() {
-  const nav = document.getElementById('tabs-nav');
-  nav.innerHTML = '';
-  remoteData.forEach((item, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'tab-item' + (i === 0 ? ' active' : '');
-    btn.innerText = item.sheetName.toUpperCase();
-    btn.onclick = () => render(i);
-    nav.appendChild(btn);
+function initApp() {
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = '';
+  appData.forEach((item, i) => {
+    const b = document.createElement('button');
+    b.className = 'tab' + (i === 0 ? ' active' : '');
+    b.innerText = item.sheetName.toUpperCase();
+    b.onclick = () => renderSlide(i);
+    tabs.appendChild(b);
   });
-  render(0);
+  renderSlide(0);
 }
 
-function render(idx) {
-  document.querySelectorAll('.tab-item').forEach((b, i) => b.classList.toggle('active', i === idx));
-  const item = remoteData[idx];
+function renderSlide(idx) {
+  document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('active', i === idx));
+  const item = appData[idx];
   
-  const slide = document.getElementById('capture-area');
-  slide.style.background = `url('${bgBase64}')`;
-  document.getElementById('header-text').innerText = item.title;
+  const slide = document.getElementById('capture-box');
+  slide.style.background = `url('${slideBg}')`;
+  document.getElementById('slide-title').innerText = item.title;
 
   let html = "";
   item.sections.forEach(sec => {
-    html += buildTableHtml(sec.tableData, sec.merges, sec.colWidths);
+    html += generateTable(sec.tableData, sec.merges, sec.colWidths);
   });
-  document.getElementById('body-content').innerHTML = html;
+  document.getElementById('table-wrap').innerHTML = html;
 }
 
-function buildTableHtml(data, merges, widths) {
-  let skipCells = {};
+function generateTable(data, merges, widths) {
+  let skip = {};
   merges.forEach(m => {
     for(let r=0; r<m.rowSpan; r++) {
       for(let c=0; c<m.colSpan; c++) {
         if(r===0 && c===0) continue;
-        skipCells[`${m.row+r},${m.col+c}`] = true;
+        skip[`${m.row+r},${m.col+c}`] = true;
       }
     }
   });
@@ -199,12 +208,12 @@ function buildTableHtml(data, merges, widths) {
   let html = `<table class="ppt-table">${cols}<thead>`;
   data.forEach((row, rIdx) => {
     html += '<tr>';
-    row.forEach((text, cIdx) => {
-      if(skipCells[`${rIdx},${cIdx}`]) return;
+    row.forEach((txt, cIdx) => {
+      if(skip[`${rIdx},${cIdx}`]) return;
       let m = merges.find(x => x.row === rIdx && x.col === cIdx);
       let span = m ? `${m.rowSpan > 1 ? ' rowspan="'+m.rowSpan+'"' : ''}${m.colSpan > 1 ? ' colspan="'+m.colSpan+'"' : ''}` : '';
-      let formatted = text.toString().replace(/\n/g, '<br>');
-      html += rIdx === 0 ? `<th ${span}>${formatted}</th>` : `<td ${span}>${formatted}</td>`;
+      let text = txt.toString().replace(/\n/g, '<br>');
+      html += rIdx === 0 ? `<th ${span}>${text}</th>` : `<td ${span}>${text}</td>`;
     });
     html += '</tr>';
     if(rIdx === 0) html += '</thead><tbody>';
@@ -212,18 +221,20 @@ function buildTableHtml(data, merges, widths) {
   return html + '</tbody></table>';
 }
 
-function saveAsPNG() {
-  const area = document.getElementById('capture-area');
+function exportPNG() {
+  const box = document.getElementById('capture-box');
   window.scrollTo(0,0);
-  html2canvas(area, { 
+  html2canvas(box, { 
     scale: 2, 
     useCORS: true, 
+    width: 1280, 
+    height: 720,
     backgroundColor: "#000" 
   }).then(canvas => {
-    const link = document.createElement('a');
-    link.download = `Slide_Export_${new Date().getTime()}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    const a = document.createElement('a');
+    a.download = `Horizontal_Slide_${new Date().getTime()}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
   });
 }
 </script>
