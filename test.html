@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>System Dashboard</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -13,67 +12,53 @@
       --glass-base: 255, 255, 255;
       --text-main: #000000;
       --accent-gold: #f39c12;
+      --header-cyan: #4ecdc4;
       --border-alpha: rgba(0, 0, 0, 0.15);
     }
 
     body {
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
+      font-family: 'Segoe UI', sans-serif; margin: 0;
       background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), #333;
       background-size: cover; background-attachment: fixed; background-position: center;
       display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: white;
     }
 
-    /* 登录界面样式 */
     #login-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7); backdrop-filter: blur(15px);
-      display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease;
+      display: flex; justify-content: center; align-items: center; z-index: 9999; transition: 0.5s ease;
     }
-    .login-box {
-      background: rgba(255, 255, 255, 0.1); padding: 40px; border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.2); width: 300px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    }
+    .login-box { background: rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.2); width: 300px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     .login-box h2 { margin-bottom: 25px; letter-spacing: 2px; font-weight: 900; }
-    .login-box input {
-      width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; outline: none; box-sizing: border-box;
-    }
-    .login-box button {
-      width: 100%; padding: 12px; background: var(--accent-gold); border: none;
-      border-radius: 10px; color: white; font-weight: 800; cursor: pointer; transition: 0.3s;
-    }
-    .login-box button:hover { transform: scale(1.03); background: #e67e22; }
+    .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; box-sizing: border-box; outline: none;}
+    .login-box button { width: 100%; padding: 12px; background: var(--accent-gold); border: none; border-radius: 10px; color: white; font-weight: 800; cursor: pointer; transition: 0.3s; }
+    .login-box button:hover { background: #e67e22; transform: scale(1.03); }
     #login-error { color: #ff6b6b; font-size: 13px; margin-top: 15px; display: none; font-weight: 700; }
 
-    /* 主界面框架样式 */
     #main-wrapper { display: none; width: 100%; flex-direction: column; align-items: center; padding: 20px 40px 120px 40px; box-sizing: border-box; }
-    .control-panel { position: fixed; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.85); padding: 10px 18px; border-radius: 12px; color: white; font-size: 12px; z-index: 1000; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.1); }
-    input[type=range] { cursor: pointer; accent-color: var(--accent-gold); }
-    
-    .tabs-container { margin-top: 20px; margin-bottom: 30px; display: flex; gap: 12px; padding: 8px 15px; background: rgba(var(--glass-base), 0.2); backdrop-filter: blur(15px); border-radius: 50px; border: 1px solid rgba(var(--glass-base), 0.3); z-index: 900; flex-wrap: wrap; justify-content: center; }
-    .tab-btn { padding: 10px 22px; border: none; border-radius: 40px; background: transparent; color: var(--text-main); font-weight: 800; cursor: pointer; transition: all 0.3s ease; font-size: 13px; text-transform: uppercase; }
-    .tab-btn.active { background: var(--accent-gold); color: white; box-shadow: 0 4px 15px rgba(243, 156, 18, 0.5); }
-    
-    /* 卡片与内容样式 */
-    .slide-card { display: none; background: rgba(var(--glass-base), var(--glass-alpha)); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(var(--glass-base), 0.4); border-radius: 24px; padding: 50px; box-shadow: 0 30px 70px rgba(0,0,0,0.4); width: 100%; max-width: 1200px; color: var(--text-main); box-sizing: border-box; }
+    .control-panel { position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.85); padding: 10px 18px; border-radius: 12px; color: white; font-size: 12px; z-index: 1000; display: flex; align-items: center; gap: 12px; }
+    .tabs-container { margin-top: 20px; margin-bottom: 30px; display: flex; gap: 12px; padding: 8px 15px; background: rgba(var(--glass-base), 0.2); backdrop-filter: blur(15px); border-radius: 50px; z-index: 900; }
+    .tab-btn { padding: 10px 22px; border: none; border-radius: 40px; background: transparent; color: var(--text-main); font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 13px; }
+    .tab-btn.active { background: var(--accent-gold); color: white; }
+
+    .slide-card { display: none; background: rgba(var(--glass-base), var(--glass-alpha)); backdrop-filter: blur(25px); border-radius: 24px; padding: 50px; box-shadow: 0 30px 70px rgba(0,0,0,0.4); width: 100%; max-width: 1200px; color: var(--text-main); box-sizing: border-box; }
     .slide-card.active { display: inline-block; animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     
-    .header-group { margin-bottom: 20px; text-align: center; }
-    .title-box h1 { margin: 0; font-size: 38px; font-weight: 900; color: inherit; text-transform: uppercase; letter-spacing: 2px;}
-    
-    .section-subtitle { margin: 40px 0 15px 0; font-size: 20px; font-weight: 800; color: inherit; text-align: left; border-left: 5px solid var(--accent-gold); padding-left: 15px; text-transform: uppercase; letter-spacing: 1px; }
-    .sheet-img { width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-alpha); box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: block; background: #fff; }
-    
-    /* 下载按钮 */
-    .btn-download { position: fixed; bottom: 40px; right: 40px; padding: 18px 35px; background: var(--accent-gold); color: white; border: none; border-radius: 60px; cursor: pointer; font-weight: 800; font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; gap: 10px; transition: transform 0.2s ease; }
-    .btn-download:hover { transform: translateY(-3px); }
+    .title-box h1 { margin: 0; font-size: 38px; font-weight: 900; text-transform: uppercase; text-align: center; margin-bottom: 20px;}
+    .section-subtitle { margin: 40px 0 15px 0; font-size: 20px; font-weight: 800; border-left: 5px solid var(--accent-gold); padding-left: 15px; }
+
+    /* 原生高清表格样式 */
+    .table-container { overflow-x: auto; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 30px; background: #fff;}
+    table { border-collapse: collapse; font-size: 14px; text-align: center; width: 100%; background: rgba(var(--glass-base), 0.05); color: inherit; }
+    th, td { border: 1px solid var(--border-alpha); padding: 12px 18px; white-space: nowrap; font-weight: 600; }
+    tr:first-child td { background: var(--header-cyan) !important; color: #000 !important; font-weight: 800; padding: 18px 10px; }
+    tr:nth-child(even) td { background: rgba(var(--glass-base), 0.1); }
+
+    .btn-download { position: fixed; bottom: 40px; right: 40px; padding: 18px 35px; background: var(--accent-gold); color: white; border: none; border-radius: 60px; cursor: pointer; font-weight: 800; font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; }
   </style>
 </head>
 <body>
-
-  <!-- 登录层 -->
   <div id="login-screen">
     <div class="login-box">
       <h2>SECURE LOGON</h2>
@@ -84,32 +69,19 @@
     </div>
   </div>
 
-  <!-- 主界面 -->
   <div id="main-wrapper">
-    <!-- 日间/夜间透明度调节 -->
     <div class="control-panel">
-      <span>View Style</span>
-      <input type="range" id="opacityRange" min="0.1" max="0.95" step="0.01" value="0.5">
+      <span>View Style</span><input type="range" id="opacityRange" min="0.1" max="0.95" step="0.01" value="0.5">
     </div>
-
-    <!-- 标签页导航栏 -->
     <div class="tabs-container" id="tabs-nav"></div>
-
-    <!-- 内容展示区 -->
     <div id="app-content"></div>
-
-    <!-- 截图下载按钮 -->
-    <button class="btn-download" onclick="exportToPNG()">
-      <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-      DOWNLOAD PNG SNAPSHOT
-    </button>
+    <button class="btn-download" onclick="exportToPNG()">DOWNLOAD PNG SNAPSHOT</button>
   </div>
 
-    <script>
-    // ！！！请把下面引号里的链接，替换成你刚刚在第一步复制的 Google Apps Script 网址 ！！！
+  <script>
+    // 【在此处填入你新部署的 API URL】
     const API_URL = 'https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec';
 
-    // 登录校验与数据拉取
     async function attemptLogin() {
       const u = document.getElementById('user-input').value;
       const p = document.getElementById('pass-input').value;
@@ -117,129 +89,86 @@
       const btn = document.querySelector('.login-box button');
 
       if (!u || !p) return;
-      errorEl.style.display = 'none';
-      btn.innerText = "LOADING DATA..."; // 提示用户正在截图中
+      errorEl.style.display = 'none'; btn.innerText = "LOADING DATA...";
 
       try {
-        // 使用 fetch 替代原先的 google.script.run
         const response = await fetch(`${API_URL}?u=${encodeURIComponent(u)}&p=${encodeURIComponent(p)}`);
         const result = await response.json();
 
         if (result.status === "success") {
-          // 登录成功，设置背景图
           document.body.style.background = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('${result.bgImage}')`;
-          document.body.style.backgroundSize = "cover";
-          document.body.style.backgroundAttachment = "fixed";
+          document.body.style.backgroundSize = "cover"; document.body.style.backgroundAttachment = "fixed";
           
-          // 隐藏登录界面，显示主界面
           document.getElementById('login-screen').style.opacity = '0';
           setTimeout(() => {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-wrapper').style.display = 'flex';
-            render(result.data); // 开始渲染数据
+            render(result.data);
           }, 500);
         } else {
-          errorEl.innerText = result.message;
-          errorEl.style.display = 'block';
-          btn.innerText = "CONNECT";
+          errorEl.innerText = result.message; errorEl.style.display = 'block'; btn.innerText = "CONNECT";
         }
-      } catch (error) {
-        errorEl.innerText = "CONNECTION FAILED (Check Network or API URL)";
-        errorEl.style.display = 'block';
-        btn.innerText = "CONNECT";
+      } catch (err) {
+        errorEl.innerText = "CONNECTION FAILED"; errorEl.style.display = 'block'; btn.innerText = "CONNECT";
       }
     }
-
-    // 回车快捷登录
     document.addEventListener('keypress', (e) => { if(e.key === 'Enter') attemptLogin(); });
 
-    // -------- 以下代码保持不变，照抄你之前的渲染逻辑 (opacityRange, render, switchTab, exportToPNG) --------
-
-
-    // 回车快捷登录
-    document.addEventListener('keypress', (e) => { if(e.key === 'Enter') attemptLogin(); });
-
-    // 毛玻璃透明度控制
     document.getElementById('opacityRange').addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value);
-      const root = document.documentElement;
+      const val = parseFloat(e.target.value); const root = document.documentElement;
       root.style.setProperty('--glass-alpha', val);
-      if (val < 0.45) {
-        root.style.setProperty('--glass-base', '25, 25, 25'); 
-        root.style.setProperty('--text-main', '#ffffff');
-        root.style.setProperty('--border-alpha', 'rgba(255, 255, 255, 0.2)');
-      } else {
-        root.style.setProperty('--glass-base', '255, 255, 255');
-        root.style.setProperty('--text-main', '#000000');
-        root.style.setProperty('--border-alpha', 'rgba(0, 0, 0, 0.15)');
-      }
+      if (val < 0.45) { root.style.setProperty('--glass-base', '25, 25, 25'); root.style.setProperty('--text-main', '#ffffff'); } 
+      else { root.style.setProperty('--glass-base', '255, 255, 255'); root.style.setProperty('--text-main', '#000000'); }
     });
 
-    // 核心渲染逻辑
     function render(slidesData) {
-      const container = document.getElementById('app-content');
-      const tabsNav = document.getElementById('tabs-nav');
+      const container = document.getElementById('app-content'); const tabsNav = document.getElementById('tabs-nav');
       container.innerHTML = ''; tabsNav.innerHTML = '';
 
       slidesData.forEach((slide, index) => {
-        // 创建标签按钮
         const btn = document.createElement('button');
         btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
-        btn.innerText = slide.sheetName; 
-        btn.onclick = () => switchTab(index);
+        btn.innerText = slide.sheetName; btn.onclick = () => switchTab(index);
         tabsNav.appendChild(btn);
 
-        // 创建数据卡片
         const card = document.createElement('div');
-        card.className = `slide-card ${index === 0 ? 'active' : ''}`;
-        card.id = `card-${index}`;
+        card.className = `slide-card ${index === 0 ? 'active' : ''}`; card.id = `card-${index}`;
 
-        // 主标题 HTML
-        let contentHtml = `
-          <div class="header-group">
-            <div class="title-box">
-              <h1>${slide.title}</h1>
-            </div>
-          </div>
-        `;
+        let contentHtml = `<div class="title-box"><h1>${slide.title}</h1></div>`;
 
-        // 循环插入该页面的：副标题 + 图片
         slide.sections.forEach(sec => {
-          if (sec.subtitle) {
-            contentHtml += `<div class="section-subtitle">${sec.subtitle}</div>`;
+          if (sec.subtitle) contentHtml += `<div class="section-subtitle">${sec.subtitle}</div>`;
+          
+          // 动态生成高清 HTML 表格
+          if (sec.type === "table" && sec.tableData) {
+            let tableHtml = `<div class="table-container"><table>`;
+            sec.tableData.forEach(row => {
+              tableHtml += `<tr>`;
+              row.forEach(cell => { tableHtml += `<td>${cell}</td>`; });
+              tableHtml += `</tr>`;
+            });
+            tableHtml += `</table></div>`;
+            contentHtml += tableHtml;
           }
-          contentHtml += `<img src="${sec.base64}" class="sheet-img" alt="Data Snapshot">`;
         });
-
-        card.innerHTML = contentHtml;
-        container.appendChild(card);
+        card.innerHTML = contentHtml; container.appendChild(card);
       });
     }
 
-    // 切换标签页逻辑
     function switchTab(index) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-btn')[index].classList.add('active');
-      document.querySelectorAll('.slide-card').forEach(card => card.classList.remove('active'));
+      document.querySelectorAll('.slide-card').forEach(c => c.classList.remove('active'));
       document.getElementById(`card-${index}`).classList.add('active');
     }
 
-    // 一键下载网页截图逻辑
     function exportToPNG() {
       const activeCard = document.querySelector('.slide-card.active');
       if(!activeCard) return;
-      
-      const btn = document.querySelector('.btn-download');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = "PROCESSING...";
-      
       html2canvas(activeCard, { useCORS: true, backgroundColor: null, scale: 2 }).then(canvas => {
         const link = document.createElement('a');
-        const activeBtn = document.querySelector('.tab-btn.active');
-        link.download = `${activeBtn.innerText}_Snapshot.png`;
-        link.href = canvas.toDataURL('image/png', 1.0);
-        link.click();
-        btn.innerHTML = originalText;
+        link.download = `${document.querySelector('.tab-btn.active').innerText}.png`;
+        link.href = canvas.toDataURL('image/png', 1.0); link.click();
       });
     }
   </script>
