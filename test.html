@@ -1,171 +1,266 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>System Dashboard</title>
+  <title>多标签页高级数据看板</title>
+  <!-- 引入 html2canvas 用于一键下载截图 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  
   <style>
     :root {
-      --accent-gold: #f39c12;
-      --border-alpha: rgba(0, 0, 0, 0.15);
+      --primary-gold: #f39c12;
+      --bg-dark: #1a1a1a;
+      --table-header: #4ecdc4; /* 青色表头 */
+      --glass-bg: rgba(255, 255, 255, 0.85); /* 稍微偏白，让表格字更清晰 */
     }
-
     body {
-      font-family: 'Segoe UI', sans-serif; margin: 0;
-      /* 网页外部大背景改为纯深色 */
-      background: #1a1a1a; 
-      display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: white;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-dark);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      color: #fff;
     }
-
+    /* 登录界面 */
     #login-screen {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #1a1a1a; 
-      display: flex; justify-content: center; align-items: center; z-index: 9999; transition: 0.5s ease;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100vh;
     }
-    .login-box { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); width: 300px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-    .login-box h2 { margin-bottom: 25px; letter-spacing: 2px; font-weight: 900; }
-    .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; box-sizing: border-box; outline: none;}
-    .login-box button { width: 100%; padding: 12px; background: var(--accent-gold); border: none; border-radius: 10px; color: white; font-weight: 800; cursor: pointer; transition: 0.3s; }
-    .login-box button:hover { background: #e67e22; transform: scale(1.03); }
-    #login-error { color: #ff6b6b; font-size: 13px; margin-top: 15px; display: none; font-weight: 700; }
-
-    #main-wrapper { display: none; width: 100%; flex-direction: column; align-items: center; padding: 20px 40px 120px 40px; box-sizing: border-box; }
+    .login-box {
+      background: #2a2a2a; padding: 40px; border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center;
+    }
+    .login-box input {
+      display: block; width: 100%; padding: 10px; margin: 10px 0;
+      border: none; border-radius: 4px; box-sizing: border-box; background: #333; color: white;
+    }
+    .login-box button {
+      background: var(--primary-gold); color: #fff; border: none; padding: 10px 20px;
+      border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px;
+    }
+    /* 主应用区域 */
+    #app-content { display: none; padding: 20px; }
+    /* 顶部导航标签页 */
+    .tabs-container {
+      display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px;
+    }
+    .tab-btn {
+      background: rgba(255,255,255,0.1); border: none; color: #aaa; padding: 10px 20px;
+      border-radius: 30px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;
+    }
+    .tab-btn.active {
+      background: var(--primary-gold); color: #fff; box-shadow: 0 0 10px rgba(243,156,18,0.5);
+    }
+    /* 内容区及毛玻璃卡片 */
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
     
-    .tabs-container { margin-top: 20px; margin-bottom: 30px; display: flex; gap: 12px; padding: 8px 15px; background: rgba(255,255,255, 0.1); border-radius: 50px; z-index: 900; }
-    .tab-btn { padding: 10px 22px; border: none; border-radius: 40px; background: transparent; color: #fff; font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 13px; }
-    .tab-btn.active { background: var(--accent-gold); color: white; }
-
-    /* 数据卡片：这里将会被赋予你上传的背景图 */
-    .slide-card { 
-      display: none; 
-      border-radius: 24px; padding: 50px; 
-      box-shadow: 0 30px 70px rgba(0,0,0,0.6); 
-      width: 100%; max-width: 1200px; 
-      color: #000; /* 卡片内文字改为黑色以适应可能有明亮部分的背景图 */
-      box-sizing: border-box; 
+    .slide-card {
+      max-width: 1200px; margin: 0 auto 30px auto;
+      border-radius: 16px; padding: 40px;
+      /* 背景图片在 JS 中动态设置 */
+      background-size: cover !important;
+      background-position: center !important;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       position: relative;
-      overflow: hidden;
     }
-    .slide-card.active { display: inline-block; animation: fadeIn 0.4s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+    .card-content-wrapper {
+      /* 给内容加一层半透明底色，确保文字和表格可读 */
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 30px; border-radius: 12px;
+      color: #333; /* 文字变暗以适配亮色卡片 */
+    }
+    .main-title { font-size: 32px; font-weight: 900; margin-bottom: 30px; text-align: center; }
+    .subtitle {
+      font-size: 16px; font-weight: bold; border-left: 4px solid var(--primary-gold);
+      padding-left: 10px; margin: 25px 0 15px 0; color: #d35400;
+    }
+    /* HTML 表格样式 */
+    .data-table {
+      width: 100%; border-collapse: collapse; margin-bottom: 20px;
+      background: #fff; color: #333; font-size: 14px; text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .data-table th, .data-table td {
+      border: 1px solid #ddd; padding: 10px 8px;
+    }
+    .data-table th {
+      background-color: var(--table-header); color: #fff; font-weight: bold;
+    }
+    .data-table tr:nth-child(even) { background-color: #fcfcfc; }
+    .error-msg { color: red; font-weight: bold; }
     
-    .title-box h1 { margin: 0; font-size: 38px; font-weight: 900; text-transform: uppercase; text-align: center; margin-bottom: 20px;}
-    .section-subtitle { margin: 40px 0 15px 0; font-size: 20px; font-weight: 800; border-left: 5px solid var(--accent-gold); padding-left: 15px; }
-    
-    /* 恢复高清图片展示样式 */
-    .sheet-img { width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(0,0,0,0.2); box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: block; margin-bottom: 20px;}
-
-    .btn-download { position: fixed; bottom: 40px; right: 40px; padding: 18px 35px; background: var(--accent-gold); color: white; border: none; border-radius: 60px; cursor: pointer; font-weight: 800; font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; }
+    /* 底部按钮 */
+    .download-wrapper { text-align: center; margin-top: 30px; }
+    .btn-download {
+      background: var(--primary-gold); color: #fff; border: none; padding: 15px 30px;
+      border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer;
+    }
   </style>
 </head>
 <body>
+
+  <!-- 登录界面 -->
   <div id="login-screen">
     <div class="login-box">
-      <h2>SECURE LOGON</h2>
-      <input type="text" id="user-input" placeholder="USERNAME">
-      <input type="password" id="pass-input" placeholder="PASSWORD">
-      <button onclick="attemptLogin()">CONNECT</button>
-      <div id="login-error">INVALID CREDENTIALS</div>
+      <h2 style="margin-top:0;">系统登录</h2>
+      <input type="text" id="api-url" placeholder="Apps Script 部署 URL (https://script.google.com/...)" />
+      <input type="text" id="username" placeholder="账户" />
+      <input type="password" id="password" placeholder="密码" />
+      <button onclick="login()">安全登录</button>
+      <p id="login-msg" style="color: #ff6b6b; font-size: 14px; margin-bottom:0;"></p>
     </div>
   </div>
 
-  <div id="main-wrapper">
-    <div class="tabs-container" id="tabs-nav"></div>
-    <div id="app-content"></div>
-    <button class="btn-download" onclick="exportToPNG()">DOWNLOAD PNG SNAPSHOT</button>
+  <!-- 主应用 -->
+  <div id="app-content">
+    <div class="tabs-container" id="tabs-container"></div>
+    <div id="panes-container"></div>
+    <div class="download-wrapper">
+      <button class="btn-download" onclick="exportToPNG()">DOWNLOAD PNG SNAPSHOT</button>
+    </div>
   </div>
 
   <script>
-    // ！！！务必确认这里是你最新发布的 API_URL ！！！
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec';
+    let globalBgImage = "";
 
-    async function attemptLogin() {
-      const u = document.getElementById('user-input').value;
-      const p = document.getElementById('pass-input').value;
-      const errorEl = document.getElementById('login-error');
-      const btn = document.querySelector('.login-box button');
+    async function login() {
+      const apiUrl = document.getElementById('api-url').value.trim();
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value.trim();
+      const msg = document.getElementById('login-msg');
 
-      if (!u || !p) return;
-      errorEl.style.display = 'none'; btn.innerText = "LOADING DATA...";
+      if (!apiUrl || !user || !pass) {
+        msg.innerText = "请填写所有字段"; return;
+      }
 
+      msg.innerText = "连接中，正在获取数据...";
       try {
-        const response = await fetch(`${API_URL}?u=${encodeURIComponent(u)}&p=${encodeURIComponent(p)}`);
-        const result = await response.json();
+        const res = await fetch(`${apiUrl}?u=${encodeURIComponent(user)}&p=${encodeURIComponent(pass)}`);
+        const json = await res.json();
 
-        if (result.status === "success") {
-          document.getElementById('login-screen').style.opacity = '0';
-          setTimeout(() => {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-wrapper').style.display = 'flex';
-            // 将背景图 URL 传给渲染函数
-            render(result.data, result.bgImage);
-          }, 500);
+        if (json.status === "error") {
+          msg.innerText = json.message;
         } else {
-          errorEl.innerText = result.message; errorEl.style.display = 'block'; btn.innerText = "CONNECT";
+          globalBgImage = json.bgImage; // 拿到 Drive 背景图 Base64
+          buildDashboard(json.data);
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('app-content').style.display = 'block';
         }
       } catch (err) {
-        errorEl.innerText = "CONNECTION FAILED"; errorEl.style.display = 'block'; btn.innerText = "CONNECT";
+        msg.innerText = "连接失败，请检查网络或 API URL";
       }
     }
-    document.addEventListener('keypress', (e) => { if(e.key === 'Enter') attemptLogin(); });
 
-    // 渲染函数：将背景图绑定到卡片上
-    function render(slidesData, bgImageUrl) {
-      const container = document.getElementById('app-content'); 
-      const tabsNav = document.getElementById('tabs-nav');
-      container.innerHTML = ''; tabsNav.innerHTML = '';
+    function buildDashboard(dataList) {
+      const tabsBox = document.getElementById('tabs-container');
+      const panesBox = document.getElementById('panes-container');
+      tabsBox.innerHTML = ''; panesBox.innerHTML = '';
 
-      slidesData.forEach((slide, index) => {
+      dataList.forEach((sheetObj, index) => {
+        // 创建标签页按钮
         const btn = document.createElement('button');
-        btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
-        btn.innerText = slide.sheetName; btn.onclick = () => switchTab(index);
-        tabsNav.appendChild(btn);
+        btn.className = 'tab-btn' + (index === 0 ? ' active' : '');
+        btn.innerText = sheetObj.sheetName;
+        btn.onclick = () => switchTab(index);
+        tabsBox.appendChild(btn);
 
-        const card = document.createElement('div');
-        card.className = `slide-card ${index === 0 ? 'active' : ''}`; 
-        card.id = `card-${index}`;
-        
-        // 【核心修改】：把背景图赋予当前卡片，并加一个极淡的白色遮罩保证文字可读
-        card.style.background = `linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.35)), url('${bgImageUrl}')`;
-        card.style.backgroundSize = "cover";
-        card.style.backgroundPosition = "center";
+        // 创建内容面板
+        const pane = document.createElement('div');
+        pane.className = 'tab-pane' + (index === 0 ? ' active' : '');
+        pane.id = 'pane-' + index;
 
-        let contentHtml = `<div class="title-box"><h1>${slide.title}</h1></div>`;
+        // 生成 HTML
+        let htmlStr = `
+          <div class="slide-card" id="card-${index}" style="background: url('${globalBgImage}')">
+            <div class="card-content-wrapper">
+              <div class="main-title">${sheetObj.title || sheetObj.sheetName}</div>
+        `;
 
-        slide.sections.forEach(sec => {
-          if (sec.subtitle) contentHtml += `<div class="section-subtitle">${sec.subtitle}</div>`;
-          
-          if (sec.type === "image" && sec.base64) {
-            // 完美还原你在表格里排版的高清图片！
-            contentHtml += `<img src="${sec.base64}" class="sheet-img" alt="Data Snapshot">`;
-          } else if (sec.type === "error") {
-            contentHtml += `<div style="color:red; font-weight:bold; margin-bottom:20px;">${sec.subtitle}</div>`;
+        sheetObj.sections.forEach(sec => {
+          if (sec.subtitle) {
+            htmlStr += `<div class="subtitle">${sec.subtitle}</div>`;
+          }
+          if (sec.type === "error") {
+            htmlStr += `<div class="error-msg">${sec.message}</div>`;
+          } else if (sec.type === "table") {
+            htmlStr += buildHtmlTable(sec.tableData, sec.merges);
           }
         });
-        card.innerHTML = contentHtml; container.appendChild(card);
+
+        htmlStr += `</div></div>`; // 关闭 wrapper 和 slide-card
+        pane.innerHTML = htmlStr;
+        panesBox.appendChild(pane);
       });
     }
 
-    function switchTab(index) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-btn')[index].classList.add('active');
-      document.querySelectorAll('.slide-card').forEach(c => c.classList.remove('active'));
-      document.getElementById(`card-${index}`).classList.add('active');
+    // 核心功能：将纯数据渲染成带有合并单元格的 HTML 表格
+    function buildHtmlTable(tableData, merges) {
+      if (!tableData || tableData.length === 0) return '';
+      
+      // 记录哪些单元格是被合并覆盖掉的，渲染时要跳过它们
+      let skipMap = {};
+      if (merges) {
+        merges.forEach(m => {
+          for (let r = 0; r < m.rowSpan; r++) {
+            for (let c = 0; c < m.colSpan; c++) {
+              if (r === 0 && c === 0) continue; // 根节点保留
+              skipMap[`${m.row + r},${m.col + c}`] = true;
+            }
+          }
+        });
+      }
+
+      let html = '<table class="data-table"><tbody>';
+      
+      tableData.forEach((row, rIndex) => {
+        html += '<tr>';
+        row.forEach((cellData, cIndex) => {
+          if (skipMap[`${rIndex},${cIndex}`]) return; // 被合并的格子不画
+          
+          let cellTag = (rIndex === 0) ? 'th' : 'td';
+          let mergeAttr = '';
+          
+          if (merges) {
+            let mergeInfo = merges.find(m => m.row === rIndex && m.col === cIndex);
+            if (mergeInfo) {
+              if (mergeInfo.rowSpan > 1) mergeAttr += ` rowspan="${mergeInfo.rowSpan}"`;
+              if (mergeInfo.colSpan > 1) mergeAttr += ` colspan="${mergeInfo.colSpan}"`;
+            }
+          }
+          html += `<${cellTag}${mergeAttr}>${cellData}</${cellTag}>`;
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      return html;
+    }
+
+    function switchTab(activeIndex) {
+      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i === activeIndex);
+      });
+      document.querySelectorAll('.tab-pane').forEach((pane, i) => {
+        pane.classList.toggle('active', i === activeIndex);
+      });
     }
 
     function exportToPNG() {
-      const activeCard = document.querySelector('.slide-card.active');
-      if(!activeCard) return;
-      const originalRadius = activeCard.style.borderRadius;
-      activeCard.style.borderRadius = '0'; // 下载时临时去掉圆角，让图片边缘完整
+      const activePane = document.querySelector('.tab-pane.active');
+      if (!activePane) return;
+      const card = activePane.querySelector('.slide-card');
       
-      html2canvas(activeCard, { useCORS: true, backgroundColor: null, scale: 2 }).then(canvas => {
+      // 截图时临时干掉圆角，防止黑边
+      const originalRadius = card.style.borderRadius;
+      card.style.borderRadius = "0px";
+      
+      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+        card.style.borderRadius = originalRadius; // 恢复圆角
         const link = document.createElement('a');
-        link.download = `${document.querySelector('.tab-btn.active').innerText}.png`;
-        link.href = canvas.toDataURL('image/png', 1.0); link.click();
-        activeCard.style.borderRadius = originalRadius; // 恢复圆角
+        link.download = 'Dashboard_Snapshot.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
       });
     }
   </script>
