@@ -12,13 +12,12 @@
       --glass-base: 255, 255, 255;
       --text-main: #000000;
       --accent-gold: #f39c12;
-      --header-cyan: #4ecdc4;
       --border-alpha: rgba(0, 0, 0, 0.15);
     }
 
     body {
       font-family: 'Segoe UI', sans-serif; margin: 0;
-      background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), #333;
+      background: #333; /* 初始背景 */
       background-size: cover; background-attachment: fixed; background-position: center;
       display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: white;
     }
@@ -47,13 +46,9 @@
     
     .title-box h1 { margin: 0; font-size: 38px; font-weight: 900; text-transform: uppercase; text-align: center; margin-bottom: 20px;}
     .section-subtitle { margin: 40px 0 15px 0; font-size: 20px; font-weight: 800; border-left: 5px solid var(--accent-gold); padding-left: 15px; }
-
-    /* 原生高清表格样式 */
-    .table-container { overflow-x: auto; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 30px; background: #fff;}
-    table { border-collapse: collapse; font-size: 14px; text-align: center; width: 100%; background: rgba(var(--glass-base), 0.05); color: inherit; }
-    th, td { border: 1px solid var(--border-alpha); padding: 12px 18px; white-space: nowrap; font-weight: 600; }
-    tr:first-child td { background: var(--header-cyan) !important; color: #000 !important; font-weight: 800; padding: 18px 10px; }
-    tr:nth-child(even) td { background: rgba(var(--glass-base), 0.1); }
+    
+    /* 恢复高清图片展示样式 */
+    .sheet-img { width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-alpha); box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: block; background: #fff; margin-bottom: 20px;}
 
     .btn-download { position: fixed; bottom: 40px; right: 40px; padding: 18px 35px; background: var(--accent-gold); color: white; border: none; border-radius: 60px; cursor: pointer; font-weight: 800; font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; }
   </style>
@@ -79,7 +74,7 @@
   </div>
 
   <script>
-    // 【在此处填入你新部署的 API URL】
+    // ！！！务必确认这里是你最新发布的 API_URL ！！！
     const API_URL = 'https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec';
 
     async function attemptLogin() {
@@ -96,6 +91,7 @@
         const result = await response.json();
 
         if (result.status === "success") {
+          // 直接使用后端传过来的 Base64 图片作为背景，不再受跨域限制
           document.body.style.background = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('${result.bgImage}')`;
           document.body.style.backgroundSize = "cover"; document.body.style.backgroundAttachment = "fixed";
           
@@ -139,16 +135,11 @@
         slide.sections.forEach(sec => {
           if (sec.subtitle) contentHtml += `<div class="section-subtitle">${sec.subtitle}</div>`;
           
-          // 动态生成高清 HTML 表格
-          if (sec.type === "table" && sec.tableData) {
-            let tableHtml = `<div class="table-container"><table>`;
-            sec.tableData.forEach(row => {
-              tableHtml += `<tr>`;
-              row.forEach(cell => { tableHtml += `<td>${cell}</td>`; });
-              tableHtml += `</tr>`;
-            });
-            tableHtml += `</table></div>`;
-            contentHtml += tableHtml;
+          if (sec.type === "image" && sec.base64) {
+            // 完美还原你在表格里排版的高清图片！
+            contentHtml += `<img src="${sec.base64}" class="sheet-img" alt="Data Snapshot">`;
+          } else if (sec.type === "error") {
+            contentHtml += `<div style="color:red; font-weight:bold; margin-bottom:20px;">${sec.subtitle}</div>`;
           }
         });
         card.innerHTML = contentHtml; container.appendChild(card);
