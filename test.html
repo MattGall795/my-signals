@@ -8,26 +8,23 @@
   
   <style>
     :root {
-      --glass-alpha: 0.5;
-      --glass-base: 255, 255, 255;
-      --text-main: #000000;
       --accent-gold: #f39c12;
       --border-alpha: rgba(0, 0, 0, 0.15);
     }
 
     body {
       font-family: 'Segoe UI', sans-serif; margin: 0;
-      background: #333; /* 初始背景 */
-      background-size: cover; background-attachment: fixed; background-position: center;
+      /* 网页外部大背景改为纯深色 */
+      background: #1a1a1a; 
       display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: white;
     }
 
     #login-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(15px);
+      background: #1a1a1a; 
       display: flex; justify-content: center; align-items: center; z-index: 9999; transition: 0.5s ease;
     }
-    .login-box { background: rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.2); width: 300px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    .login-box { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); width: 300px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     .login-box h2 { margin-bottom: 25px; letter-spacing: 2px; font-weight: 900; }
     .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; box-sizing: border-box; outline: none;}
     .login-box button { width: 100%; padding: 12px; background: var(--accent-gold); border: none; border-radius: 10px; color: white; font-weight: 800; cursor: pointer; transition: 0.3s; }
@@ -35,12 +32,22 @@
     #login-error { color: #ff6b6b; font-size: 13px; margin-top: 15px; display: none; font-weight: 700; }
 
     #main-wrapper { display: none; width: 100%; flex-direction: column; align-items: center; padding: 20px 40px 120px 40px; box-sizing: border-box; }
-    .control-panel { position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.85); padding: 10px 18px; border-radius: 12px; color: white; font-size: 12px; z-index: 1000; display: flex; align-items: center; gap: 12px; }
-    .tabs-container { margin-top: 20px; margin-bottom: 30px; display: flex; gap: 12px; padding: 8px 15px; background: rgba(var(--glass-base), 0.2); backdrop-filter: blur(15px); border-radius: 50px; z-index: 900; }
-    .tab-btn { padding: 10px 22px; border: none; border-radius: 40px; background: transparent; color: var(--text-main); font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 13px; }
+    
+    .tabs-container { margin-top: 20px; margin-bottom: 30px; display: flex; gap: 12px; padding: 8px 15px; background: rgba(255,255,255, 0.1); border-radius: 50px; z-index: 900; }
+    .tab-btn { padding: 10px 22px; border: none; border-radius: 40px; background: transparent; color: #fff; font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 13px; }
     .tab-btn.active { background: var(--accent-gold); color: white; }
 
-    .slide-card { display: none; background: rgba(var(--glass-base), var(--glass-alpha)); backdrop-filter: blur(25px); border-radius: 24px; padding: 50px; box-shadow: 0 30px 70px rgba(0,0,0,0.4); width: 100%; max-width: 1200px; color: var(--text-main); box-sizing: border-box; }
+    /* 数据卡片：这里将会被赋予你上传的背景图 */
+    .slide-card { 
+      display: none; 
+      border-radius: 24px; padding: 50px; 
+      box-shadow: 0 30px 70px rgba(0,0,0,0.6); 
+      width: 100%; max-width: 1200px; 
+      color: #000; /* 卡片内文字改为黑色以适应可能有明亮部分的背景图 */
+      box-sizing: border-box; 
+      position: relative;
+      overflow: hidden;
+    }
     .slide-card.active { display: inline-block; animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     
@@ -48,7 +55,7 @@
     .section-subtitle { margin: 40px 0 15px 0; font-size: 20px; font-weight: 800; border-left: 5px solid var(--accent-gold); padding-left: 15px; }
     
     /* 恢复高清图片展示样式 */
-    .sheet-img { width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-alpha); box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: block; background: #fff; margin-bottom: 20px;}
+    .sheet-img { width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(0,0,0,0.2); box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: block; margin-bottom: 20px;}
 
     .btn-download { position: fixed; bottom: 40px; right: 40px; padding: 18px 35px; background: var(--accent-gold); color: white; border: none; border-radius: 60px; cursor: pointer; font-weight: 800; font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; }
   </style>
@@ -65,9 +72,6 @@
   </div>
 
   <div id="main-wrapper">
-    <div class="control-panel">
-      <span>View Style</span><input type="range" id="opacityRange" min="0.1" max="0.95" step="0.01" value="0.5">
-    </div>
     <div class="tabs-container" id="tabs-nav"></div>
     <div id="app-content"></div>
     <button class="btn-download" onclick="exportToPNG()">DOWNLOAD PNG SNAPSHOT</button>
@@ -91,15 +95,12 @@
         const result = await response.json();
 
         if (result.status === "success") {
-          // 直接使用后端传过来的 Base64 图片作为背景，不再受跨域限制
-          document.body.style.background = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('${result.bgImage}')`;
-          document.body.style.backgroundSize = "cover"; document.body.style.backgroundAttachment = "fixed";
-          
           document.getElementById('login-screen').style.opacity = '0';
           setTimeout(() => {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-wrapper').style.display = 'flex';
-            render(result.data);
+            // 将背景图 URL 传给渲染函数
+            render(result.data, result.bgImage);
           }, 500);
         } else {
           errorEl.innerText = result.message; errorEl.style.display = 'block'; btn.innerText = "CONNECT";
@@ -110,15 +111,10 @@
     }
     document.addEventListener('keypress', (e) => { if(e.key === 'Enter') attemptLogin(); });
 
-    document.getElementById('opacityRange').addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value); const root = document.documentElement;
-      root.style.setProperty('--glass-alpha', val);
-      if (val < 0.45) { root.style.setProperty('--glass-base', '25, 25, 25'); root.style.setProperty('--text-main', '#ffffff'); } 
-      else { root.style.setProperty('--glass-base', '255, 255, 255'); root.style.setProperty('--text-main', '#000000'); }
-    });
-
-    function render(slidesData) {
-      const container = document.getElementById('app-content'); const tabsNav = document.getElementById('tabs-nav');
+    // 渲染函数：将背景图绑定到卡片上
+    function render(slidesData, bgImageUrl) {
+      const container = document.getElementById('app-content'); 
+      const tabsNav = document.getElementById('tabs-nav');
       container.innerHTML = ''; tabsNav.innerHTML = '';
 
       slidesData.forEach((slide, index) => {
@@ -128,7 +124,13 @@
         tabsNav.appendChild(btn);
 
         const card = document.createElement('div');
-        card.className = `slide-card ${index === 0 ? 'active' : ''}`; card.id = `card-${index}`;
+        card.className = `slide-card ${index === 0 ? 'active' : ''}`; 
+        card.id = `card-${index}`;
+        
+        // 【核心修改】：把背景图赋予当前卡片，并加一个极淡的白色遮罩保证文字可读
+        card.style.background = `linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.35)), url('${bgImageUrl}')`;
+        card.style.backgroundSize = "cover";
+        card.style.backgroundPosition = "center";
 
         let contentHtml = `<div class="title-box"><h1>${slide.title}</h1></div>`;
 
@@ -156,10 +158,14 @@
     function exportToPNG() {
       const activeCard = document.querySelector('.slide-card.active');
       if(!activeCard) return;
+      const originalRadius = activeCard.style.borderRadius;
+      activeCard.style.borderRadius = '0'; // 下载时临时去掉圆角，让图片边缘完整
+      
       html2canvas(activeCard, { useCORS: true, backgroundColor: null, scale: 2 }).then(canvas => {
         const link = document.createElement('a');
         link.download = `${document.querySelector('.tab-btn.active').innerText}.png`;
         link.href = canvas.toDataURL('image/png', 1.0); link.click();
+        activeCard.style.borderRadius = originalRadius; // 恢复圆角
       });
     }
   </script>
