@@ -1,55 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-    <title>幸运大转盘</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幸运大转盘 - 抽奖系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        #wheel-container { width: 300px; height: 300px; border: 5px solid #333; border-radius: 50%; position: relative; transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); overflow: hidden; }
-        .pointer { width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 40px solid red; position: absolute; top: -20px; left: 130px; z-index: 10; }
-        .input-group { margin-top: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 90%; }
+        h2 { color: #333; margin-bottom: 20px; }
+        #wheel-canvas { width: 300px; height: 300px; margin-bottom: 20px; transition: transform 4s cubic-bezier(0.1, 0, 0.2, 1); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 12px; background: #ff4757; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #e84118; }
+        .pointer { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 30px solid #2f3542; position: relative; top: 10px; z-index: 10; }
     </style>
 </head>
 <body>
+
+<div class="container">
+    <h2>幸运抽奖中心</h2>
     <div class="pointer"></div>
-    <div id="wheel-container">
-        <!-- 这里可以用JS画扇形，或者简单放一张背景图 -->
-        <img src="https://path-to-your-wheel-image.com/wheel.png" id="wheel" style="width:100%">
-    </div>
+    <canvas id="wheel-canvas" width="300" height="300"></canvas>
+    
+    <input type="text" id="drawCode" placeholder="请输入8位抽奖码">
+    <input type="number" id="userId" placeholder="请输入您的用户ID (纯数字)">
+    <button onclick="handleStart()">立即抽奖</button>
+</div>
 
-    <div class="input-group">
-        <input type="text" id="drawCode" placeholder="输入8位抽奖码">
-        <input type="number" id="userId" placeholder="输入您的数字ID">
-        <button onclick="startDraw()">开始抽奖</button>
-    </div>
+<script>
+    const API_URL = "你的_APPS_SCRIPT_WEBAPP_URL"; // 替换成你的部署URL
+    const canvas = document.getElementById('wheel-canvas');
+    const ctx = canvas.getContext('2d');
+    const prizes = ["特等奖", "一等奖", "二等奖", "三等奖", "参与奖", "谢谢参与"];
+    const colors = ["#ff9f43", "#ee5253", "#10ac84", "#54a0ff", "#5f27cd", "#c8d6e5"];
 
-    <script>
-        const WEB_APP_URL = "你的_APPS_SCRIPT_URL"; // 填入上面生成的URL
+    // 绘制转盘
+    function drawWheel() {
+        const arc = Math.PI * 2 / prizes.length;
+        for (let i = 0; i < prizes.length; i++) {
+            ctx.fillStyle = colors[i];
+            ctx.beginPath();
+            ctx.arc(150, 150, 150, i * arc, (i + 1) * arc);
+            ctx.lineTo(150, 150);
+            ctx.fill();
+            ctx.save();
+            ctx.fillStyle = "white";
+            ctx.translate(150 + Math.cos(i * arc + arc/2) * 100, 150 + Math.sin(i * arc + arc/2) * 100);
+            ctx.rotate(i * arc + arc/2 + Math.PI/2);
+            ctx.fillText(prizes[i], -ctx.measureText(prizes[i]).width/2, 0);
+            ctx.restore();
+        }
+    }
+    drawWheel();
 
-        async function startDraw() {
-            const code = document.getElementById('drawCode').value;
-            const userId = document.getElementById('userId').value;
+    async function handleStart() {
+        const code = document.getElementById('drawCode').value;
+        const userId = document.getElementById('userId').value;
 
-            if(!code || !userId) return alert("请完整填写信息");
+        if (!code || !userId) {
+            Swal.fire("错误", "请填写抽奖码和用户ID", "error");
+            return;
+        }
 
-            const response = await fetch(WEB_APP_URL, {
+        // 预请求验证
+        try {
+            const resp = await fetch(API_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'draw', code: code, userId: userId })
+                body: JSON.stringify({ action: 'draw', code, userId })
             });
+            const res = await resp.json();
 
-            const result = await response.json();
-
-            if (result.status === "success") {
-                // 模拟旋转动画
-                const wheel = document.getElementById('wheel-container');
-                const randomDeg = Math.floor(Math.random() * 360) + 3600; // 旋转10圈加随机角度
-                wheel.style.transform = `rotate(${randomDeg}deg)`;
-
+            if (res.status === "success") {
+                const deg = Math.floor(Math.random() * 360) + 3600; // 旋转圈数
+                canvas.style.transform = `rotate(${deg}deg)`;
+                
                 setTimeout(() => {
-                    alert(`恭喜！您抽中了：${result.prize}\n奖品详情：${result.desc}`);
+                    Swal.fire({
+                        title: '恭喜中奖!',
+                        text: `您抽中了: ${res.prize} (${res.desc})`,
+                        icon: 'success',
+                        confirmButtonText: '太棒了'
+                    });
                 }, 4500);
             } else {
-                alert(result.msg);
+                Swal.fire("抱歉", res.msg, "warning");
             }
+        } catch (e) {
+            Swal.fire("系统繁忙", "请检查网络或配置", "error");
         }
-    </script>
+    }
+</script>
 </body>
 </html>
