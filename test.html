@@ -2,176 +2,292 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Global Control PPT Engine</title>
+  <title>Global Control Dashboard</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
-    :root { --gold: #f39c12; --dark: #0f0f0f; }
-    body { margin: 0; background: var(--dark); font-family: 'Segoe UI', Arial, sans-serif; color: white; }
+    :root {
+      --bg-image: url('');
+    }
+    body {
+      margin: 0; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #2b2b2b; color: white; display: flex; flex-direction: column; align-items: center;
+    }
+    #login-container {
+      background: #333; padding: 30px; border-radius: 8px; margin-top: 100px; text-align: center;
+    }
+    input {
+      display: block; width: 100%; margin: 10px 0; padding: 10px; border-radius: 4px; border: none; box-sizing: border-box;
+    }
+    button {
+      background: #f39c12; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px;
+    }
+    #dashboard {
+      display: none; width: 100%; max-width: 1400px;
+    }
+    .tabs { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .tab {
+      padding: 10px 20px; background: #444; border-radius: 4px; cursor: pointer; font-weight: bold;
+    }
+    .tab.active { background: #f39c12; }
     
-    /* Login */
-    #login-screen { display: flex; align-items: center; justify-content: center; height: 100vh; }
-    .login-box { background: #1a1a1a; padding: 40px; border-radius: 8px; width: 340px; text-align: center; border: 1px solid #333; }
-    .login-box input { width: 100%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; }
-    .login-box button { width: 100%; padding: 14px; background: var(--gold); border: none; font-weight: bold; cursor: pointer; color: white; }
-
-    /* Layout Control */
-    #app-content { display: none; padding: 20px; text-align: center; }
-    .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-    .tab { background: #222; color: #888; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; }
-    .tab.active { background: var(--gold); color: white; }
-
-    /* THE PPT CANVAS (FIXED 1280x720) */
-    .slide-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 50px; }
+    /* 核心 PPT 画布 */
     .ppt-slide {
-      width: 1280px; height: 720px; /* STRICT PPT RATIO */
-      background-size: 100% 100% !important;
-      background-position: center !important;
-      position: relative; /* All elements inside are absolute */
-      box-shadow: 0 30px 80px rgba(0,0,0,0.8);
-      overflow: hidden; /* Keep inside slide */
+      width: 1280px; 
+      height: 720px;
+      position: relative;
+      background-image: var(--bg-image);
+      background-size: cover;
+      background-position: center;
+      margin: 0 auto;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-
-    /* Absolute Title */
-    .title-group {
-      position: absolute; width: 100%; text-align: center;
-      text-shadow: 0 5px 15px rgba(0,0,0,0.8); z-index: 10;
+    
+    /* 标题控制 */
+    .slide-title {
+      position: absolute;
+      color: #fff;
+      font-size: 38px;
+      font-weight: 900;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+      white-space: nowrap;
     }
-    .ppt-title { font-size: 50px; font-weight: 900; color: white; margin: 0; text-transform: uppercase; }
-    .ppt-subtitle { font-size: 20px; color: #eee; margin-top: 5px; }
-
-    /* Absolute & Scalable Table Box */
+    
+    .slide-subtitle {
+      position: absolute;
+      color: #f39c12;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+      white-space: nowrap;
+    }
+    
+    /* 表格容器控制 */
     .table-box {
       position: absolute;
+      transform-origin: top left; /* 缩放原点在左上角 */
+    }
+    
+    table {
+      /* 修复边框锯齿和内联渲染问题 */
+      border-spacing: 0;
+      border-collapse: separate; 
       background: rgba(255, 255, 255, 0.95);
-      border-radius: 6px; padding: 15px; box-sizing: border-box;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-      transform-origin: top left; /* Scale from top-left for easy positioning */
+      border-radius: 4px;
+      overflow: hidden;
+      font-size: 14px;
+      color: #333;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
-
-    .ppt-table {
-      width: 100%; table-layout: fixed; border-collapse: collapse;
-      background: white; font-size: 13px; color: #333;
+    
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 10px;
+      box-sizing: border-box;
+      /* 修复合并单元格文字截断 */
+      word-wrap: break-word;
+      word-break: break-all;
+      white-space: pre-wrap; 
     }
-    .ppt-table th { background: #2980b9; color: white; padding: 10px; border: 1px solid #21618c; }
-    .ppt-table td { padding: 6px; border: 1px solid #d5d8dc; white-space: normal; line-height: 1.2; }
-    .ppt-table tr:nth-child(even) { background-color: #f7fbff; }
-
-    .download-btn { position: fixed; bottom: 30px; right: 30px; padding: 16px 40px; background: var(--gold); border-radius: 50px; border: none; color: white; font-weight: bold; cursor: pointer; z-index: 100; }
+    
+    th {
+      background-color: #2980b9;
+      color: white;
+      font-weight: bold;
+      border-color: #1a5276;
+    }
+    
+    tr:nth-child(even) td {
+      background-color: #f9f9f9;
+    }
+    
+    .download-btn {
+      display: block;
+      width: 200px;
+      margin: 20px auto;
+      text-align: center;
+      background: #27ae60;
+    }
   </style>
 </head>
 <body>
 
-<div id="login-screen">
-  <div class="login-box">
-    <h2>PPT DASHBOARD</h2>
-    <input type="text" id="user" placeholder="Username" />
-    <input type="password" id="pass" placeholder="Password" />
-    <button onclick="doLogin()">SIGN IN</button>
+  <div id="login-container">
+    <h2>System Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div id="login-error" style="color:#e74c3c; margin-top:10px;"></div>
   </div>
-</div>
 
-<div id="app-content">
-  <div class="tabs" id="tabs"></div>
-  <div class="slide-outer">
-    <div id="capture-zone" class="ppt-slide">
-      <div id="title-layer" class="title-group">
-        <h1 id="main-t" class="ppt-title"></h1>
-        <div id="sub-t" class="ppt-subtitle"></div>
-      </div>
-      <div id="table-layer"></div>
-    </div>
+  <div id="dashboard">
+    <div class="tabs" id="tabs-container"></div>
+    <div id="slides-container"></div>
   </div>
-  <button class="download-btn" onclick="savePNG()">DOWNLOAD SLIDE</button>
-</div>
 
-<script>
-const API = "https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec";
-let masterData = [];
-let bgImg = "";
+  <script>
+    // ！！！！将这里替换为你的最新 API URL！！！！
+    const API_URL = "https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec";
+    
+    let pagesData = [];
 
-async function doLogin() {
-  const u = document.getElementById('user').value;
-  const p = document.getElementById('pass').value;
-  try {
-    const r = await fetch(`${API}?u=${u}&p=${p}`);
-    const j = await r.json();
-    if (j.status === "success") {
-      masterData = j.data; bgImg = j.bgImage;
-      buildApp();
-      document.getElementById('login-screen').style.display='none';
-      document.getElementById('app-content').style.display='block';
-    } else { alert(j.message); }
-  } catch(e) { alert("Connect Error"); }
-}
+    async function login() {
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      const btn = document.querySelector('#login-container button');
+      btn.innerText = "Loading...";
+      btn.disabled = true;
 
-function buildApp() {
-  const tabs = document.getElementById('tabs'); tabs.innerHTML = '';
-  masterData.forEach((page, i) => {
-    const b = document.createElement('button');
-    b.className = 'tab' + (i === 0 ? ' active' : '');
-    b.innerText = `PAGE ${i+1}`;
-    b.onclick = () => renderPage(i);
-    tabs.appendChild(b);
-  });
-  renderPage(0);
-}
-
-function renderPage(idx) {
-  document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('active', i === idx));
-  const page = masterData[idx];
-  
-  document.getElementById('capture-zone').style.background = `url('${bgImg}')`;
-  
-  // 1. 位置控制 - 标题
-  const titleLayer = document.getElementById('title-layer');
-  titleLayer.style.left = page.titleX + "px";
-  titleLayer.style.top = page.titleY + "px";
-  document.getElementById('main-t').innerText = page.title;
-  document.getElementById('sub-t').innerText = page.subtitle;
-
-  // 2. 位置控制 - 表格
-  let html = "";
-  page.sections.forEach(sec => {
-    const style = `left: ${sec.x}px; top: ${sec.y}px; transform: scale(${sec.scale});`;
-    html += `<div class="table-box" style="${style}">${generateTable(sec)}</div>`;
-  });
-  document.getElementById('table-layer').innerHTML = html;
-}
-
-function generateTable(sec) {
-  const { tableData, merges, colWidths, hAligns, vAligns } = sec;
-  let skip = {};
-  merges.forEach(m => {
-    for(let r=0; r<m.rowSpan; r++) {
-      for(let c=0; c<m.colSpan; c++) {
-        if(r===0 && c===0) continue;
-        skip[`${m.row+r},${m.col+c}`] = true;
+      try {
+        const res = await fetch(`${API_URL}?u=${encodeURIComponent(u)}&p=${encodeURIComponent(p)}`);
+        const data = await res.json();
+        if (data.status === "error") {
+          document.getElementById('login-error').innerText = data.message;
+          btn.innerText = "Login";
+          btn.disabled = false;
+        } else {
+          document.getElementById('login-container').style.display = 'none';
+          document.getElementById('dashboard').style.display = 'block';
+          if (data.bgImage) {
+            document.documentElement.style.setProperty('--bg-image', `url(${data.bgImage})`);
+          }
+          pagesData = data.data;
+          renderTabs();
+        }
+      } catch (err) {
+        document.getElementById('login-error').innerText = "Network error.";
+        btn.innerText = "Login";
+        btn.disabled = false;
       }
     }
-  });
-  let colG = '<colgroup>'; colWidths.forEach(w => colG += `<col style="width:${w}px">`); colG += '</colgroup>';
-  let h = `<table class="ppt-table">${colG}<thead>`;
-  tableData.forEach((row, rIdx) => {
-    h += '<tr>';
-    row.forEach((txt, cIdx) => {
-      if(skip[`${rIdx},${cIdx}`]) return;
-      let m = merges.find(x => x.row === rIdx && x.col === cIdx);
-      let sp = m ? `${m.rowSpan>1?' rowspan="'+m.rowSpan+'"':''}${m.colSpan>1?' colspan="'+m.colSpan+'"':''}` : '';
-      let al = `text-align:${hAligns[rIdx][cIdx]}; vertical-align:${vAligns[rIdx][cIdx]};`;
-      let val = txt.toString().replace(/\n/g, '<br>');
-      h += rIdx === 0 ? `<th ${sp} style="${al}">${val}</th>` : `<td ${sp} style="${al}">${val}</td>`;
-    });
-    h += '</tr>';
-    if(rIdx === 0) h += '</thead><tbody>';
-  });
-  return h + '</tbody></table>';
-}
 
-function savePNG() {
-  html2canvas(document.getElementById('capture-zone'), { scale: 2, useCORS: true }).then(canvas => {
-    const a = document.createElement('a'); a.download = 'Slide.png'; a.href = canvas.toDataURL(); a.click();
-  });
-}
-</script>
+    function renderTabs() {
+      const tabsDiv = document.getElementById('tabs-container');
+      const slidesDiv = document.getElementById('slides-container');
+      tabsDiv.innerHTML = '';
+      slidesDiv.innerHTML = '';
+
+      pagesData.forEach((page, index) => {
+        const tab = document.createElement('div');
+        tab.className = `tab ${index === 0 ? 'active' : ''}`;
+        tab.innerText = `PAGE ${index + 1}`;
+        tab.onclick = () => switchTab(index);
+        tabsDiv.appendChild(tab);
+
+        const slideWrapper = document.createElement('div');
+        slideWrapper.className = 'slide-wrapper';
+        slideWrapper.style.display = index === 0 ? 'block' : 'none';
+        slideWrapper.id = `slide-wrapper-${index}`;
+        
+        // 构建 16:9 画布
+        const slide = document.createElement('div');
+        slide.className = 'ppt-slide';
+        slide.id = `slide-${index}`;
+        
+        // 主标题
+        if (page.title) {
+          const titleDiv = document.createElement('div');
+          titleDiv.className = 'slide-title';
+          titleDiv.innerText = page.title;
+          titleDiv.style.left = page.titleX + 'px';
+          titleDiv.style.top = page.titleY + 'px';
+          slide.appendChild(titleDiv);
+        }
+        
+        // 副标题 (支持副标题X和Y)
+        if (page.subtitle) {
+          const subDiv = document.createElement('div');
+          subDiv.className = 'slide-subtitle';
+          subDiv.innerText = page.subtitle;
+          subDiv.style.left = page.subtitleX + 'px';
+          subDiv.style.top = page.subtitleY + 'px';
+          slide.appendChild(subDiv);
+        }
+
+        // 渲染表格区块
+        page.sections.forEach(sec => {
+          if (sec.type === 'table') {
+            const tableBox = document.createElement('div');
+            tableBox.className = 'table-box';
+            // 应用后台的 X/Y 和缩放
+            tableBox.style.left = sec.x + 'px';
+            tableBox.style.top = sec.y + 'px';
+            tableBox.style.transform = `scale(${sec.scale})`;
+            
+            const table = document.createElement('table');
+            const skipCells = new Set();
+
+            // 处理合并单元格字典
+            sec.merges.forEach(m => {
+              for (let r = m.row; r < m.row + m.rowSpan; r++) {
+                for (let c = m.col; c < m.col + m.colSpan; c++) {
+                  if (r === m.row && c === m.col) continue;
+                  skipCells.add(`${r},${c}`);
+                }
+              }
+            });
+
+            sec.tableData.forEach((rowData, rIndex) => {
+              const tr = document.createElement('tr');
+              rowData.forEach((cellData, cIndex) => {
+                if (skipCells.has(`${rIndex},${cIndex}`)) return;
+
+                const cell = document.createElement(rIndex === 0 ? 'th' : 'td');
+                cell.innerText = cellData;
+                
+                // 列宽对齐
+                if (sec.colWidths && sec.colWidths[cIndex]) {
+                  cell.style.width = sec.colWidths[cIndex] + 'px';
+                  cell.style.minWidth = sec.colWidths[cIndex] + 'px';
+                  cell.style.maxWidth = sec.colWidths[cIndex] + 'px';
+                }
+                if (sec.hAligns && sec.hAligns[rIndex][cIndex]) cell.style.textAlign = sec.hAligns[rIndex][cIndex];
+                if (sec.vAligns && sec.vAligns[rIndex][cIndex]) cell.style.verticalAlign = sec.vAligns[rIndex][cIndex];
+
+                // 应用合并属性
+                const mergeObj = sec.merges.find(m => m.row === rIndex && m.col === cIndex);
+                if (mergeObj) {
+                  if (mergeObj.rowSpan > 1) cell.rowSpan = mergeObj.rowSpan;
+                  if (mergeObj.colSpan > 1) cell.colSpan = mergeObj.colSpan;
+                }
+                tr.appendChild(cell);
+              });
+              table.appendChild(tr);
+            });
+            tableBox.appendChild(table);
+            slide.appendChild(tableBox);
+          }
+        });
+
+        const btn = document.createElement('button');
+        btn.className = 'download-btn';
+        btn.innerText = "Download Image";
+        btn.onclick = () => downloadImage(`slide-${index}`, `Page_${index+1}.png`);
+
+        slideWrapper.appendChild(slide);
+        slideWrapper.appendChild(btn);
+        slidesDiv.appendChild(slideWrapper);
+      });
+    }
+
+    function switchTab(index) {
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        t.className = i === index ? 'tab active' : 'tab';
+      });
+      document.querySelectorAll('.slide-wrapper').forEach((sw, i) => {
+        sw.style.display = i === index ? 'block' : 'none';
+      });
+    }
+
+    function downloadImage(elementId, filename) {
+      const element = document.getElementById(elementId);
+      html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+  </script>
 </body>
 </html>
