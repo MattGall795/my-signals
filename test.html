@@ -1,292 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>Global Control Dashboard</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <title>VIP 专属抽奖</title>
   <style>
-    :root {
-      --bg-image: url('');
-    }
     body {
-      margin: 0; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #2b2b2b; color: white; display: flex; flex-direction: column; align-items: center;
+      margin: 0; padding: 0; background: #111; color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;
+      overflow: hidden;
     }
-    #login-container {
-      background: #333; padding: 30px; border-radius: 8px; margin-top: 100px; text-align: center;
+    .container {
+      background: rgba(40, 40, 40, 0.9); padding: 40px; border-radius: 12px;
+      box-shadow: 0 0 20px rgba(243, 156, 18, 0.5); text-align: center;
+      width: 90%; max-width: 400px; z-index: 10;
     }
+    h1 { color: #f39c12; margin-top: 0; }
     input {
-      display: block; width: 100%; margin: 10px 0; padding: 10px; border-radius: 4px; border: none; box-sizing: border-box;
+      width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 6px;
+      background: #222; color: #fff; font-size: 16px; box-sizing: border-box;
     }
     button {
-      background: #f39c12; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px;
+      width: 100%; padding: 14px; margin-top: 20px; border: none; border-radius: 6px;
+      background: linear-gradient(90deg, #f39c12, #d35400); color: white;
+      font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;
     }
-    #dashboard {
-      display: none; width: 100%; max-width: 1400px;
-    }
-    .tabs { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-    .tab {
-      padding: 10px 20px; background: #444; border-radius: 4px; cursor: pointer; font-weight: bold;
-    }
-    .tab.active { background: #f39c12; }
+    button:disabled { background: #555; cursor: not-allowed; }
     
-    /* 核心 PPT 画布 */
-    .ppt-slide {
-      width: 1280px; 
-      height: 720px;
-      position: relative;
-      background-image: var(--bg-image);
-      background-size: cover;
-      background-position: center;
-      margin: 0 auto;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    #animation-box { display: none; margin-top: 20px; font-size: 80px; }
+    .shake { animation: shake-anim 0.5s infinite; }
+    @keyframes shake-anim {
+      0% { transform: translate(1px, 1px) rotate(0deg); }
+      25% { transform: translate(-3px, 0px) rotate(-10deg); }
+      50% { transform: translate(1px, -1px) rotate(10deg); }
+      75% { transform: translate(-1px, 2px) rotate(-10deg); }
+      100% { transform: translate(1px, 1px) rotate(0deg); }
     }
-    
-    /* 标题控制 */
-    .slide-title {
-      position: absolute;
-      color: #fff;
-      font-size: 38px;
-      font-weight: 900;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-      white-space: nowrap;
-    }
-    
-    .slide-subtitle {
-      position: absolute;
-      color: #f39c12;
-      font-size: 24px;
-      font-weight: bold;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-      white-space: nowrap;
-    }
-    
-    /* 表格容器控制 */
-    .table-box {
-      position: absolute;
-      transform-origin: top left; /* 缩放原点在左上角 */
-    }
-    
-    table {
-      /* 修复边框锯齿和内联渲染问题 */
-      border-spacing: 0;
-      border-collapse: separate; 
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 4px;
-      overflow: hidden;
-      font-size: 14px;
-      color: #333;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-    
-    th, td {
-      border: 1px solid #ddd;
-      padding: 6px 10px;
-      box-sizing: border-box;
-      /* 修复合并单元格文字截断 */
-      word-wrap: break-word;
-      word-break: break-all;
-      white-space: pre-wrap; 
-    }
-    
-    th {
-      background-color: #2980b9;
-      color: white;
-      font-weight: bold;
-      border-color: #1a5276;
-    }
-    
-    tr:nth-child(even) td {
-      background-color: #f9f9f9;
-    }
-    
-    .download-btn {
-      display: block;
-      width: 200px;
-      margin: 20px auto;
-      text-align: center;
-      background: #27ae60;
-    }
+    #result-msg { margin-top: 20px; font-size: 20px; font-weight: bold; color: #e74c3c; display: none; }
+    .win-text { color: #2ecc71 !important; }
   </style>
 </head>
 <body>
-
-  <div id="login-container">
-    <h2>System Login</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <div id="login-error" style="color:#e74c3c; margin-top:10px;"></div>
-  </div>
-
-  <div id="dashboard">
-    <div class="tabs" id="tabs-container"></div>
-    <div id="slides-container"></div>
+  <div class="container">
+    <h1>🎁 惊喜抽奖盲盒</h1>
+    <input type="text" id="userId" placeholder="请输入用户 ID (如: UID888)">
+    <input type="text" id="code" placeholder="请输入专属抽奖码">
+    <button id="drawBtn" onclick="startDraw()">开启盲盒</button>
+    <div id="animation-box">🎁</div>
+    <div id="result-msg"></div>
   </div>
 
   <script>
-    // ！！！！将这里替换为你的最新 API URL！！！！
+    // ⚠️！！！将这里替换为你的 Google Apps Script 部署 URL！！！
     const API_URL = "https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec";
-    
-    let pagesData = [];
 
-    async function login() {
-      const u = document.getElementById('username').value;
-      const p = document.getElementById('password').value;
-      const btn = document.querySelector('#login-container button');
-      btn.innerText = "Loading...";
-      btn.disabled = true;
+    async function startDraw() {
+      const uid = document.getElementById('userId').value.trim();
+      const code = document.getElementById('code').value.trim();
+      const btn = document.getElementById('drawBtn');
+      const animBox = document.getElementById('animation-box');
+      const resultMsg = document.getElementById('result-msg');
+
+      if (!uid || !code) return alert("用户ID和抽奖码不能为空！");
+
+      btn.disabled = true; btn.innerText = "正在开启...";
+      animBox.style.display = "block"; animBox.classList.add("shake");
+      resultMsg.style.display = "none"; resultMsg.className = "";
 
       try {
-        const res = await fetch(`${API_URL}?u=${encodeURIComponent(u)}&p=${encodeURIComponent(p)}`);
-        const data = await res.json();
-        if (data.status === "error") {
-          document.getElementById('login-error').innerText = data.message;
-          btn.innerText = "Login";
-          btn.disabled = false;
-        } else {
-          document.getElementById('login-container').style.display = 'none';
-          document.getElementById('dashboard').style.display = 'block';
-          if (data.bgImage) {
-            document.documentElement.style.setProperty('--bg-image', `url(${data.bgImage})`);
-          }
-          pagesData = data.data;
-          renderTabs();
-        }
-      } catch (err) {
-        document.getElementById('login-error').innerText = "Network error.";
-        btn.innerText = "Login";
-        btn.disabled = false;
-      }
-    }
-
-    function renderTabs() {
-      const tabsDiv = document.getElementById('tabs-container');
-      const slidesDiv = document.getElementById('slides-container');
-      tabsDiv.innerHTML = '';
-      slidesDiv.innerHTML = '';
-
-      pagesData.forEach((page, index) => {
-        const tab = document.createElement('div');
-        tab.className = `tab ${index === 0 ? 'active' : ''}`;
-        tab.innerText = `PAGE ${index + 1}`;
-        tab.onclick = () => switchTab(index);
-        tabsDiv.appendChild(tab);
-
-        const slideWrapper = document.createElement('div');
-        slideWrapper.className = 'slide-wrapper';
-        slideWrapper.style.display = index === 0 ? 'block' : 'none';
-        slideWrapper.id = `slide-wrapper-${index}`;
-        
-        // 构建 16:9 画布
-        const slide = document.createElement('div');
-        slide.className = 'ppt-slide';
-        slide.id = `slide-${index}`;
-        
-        // 主标题
-        if (page.title) {
-          const titleDiv = document.createElement('div');
-          titleDiv.className = 'slide-title';
-          titleDiv.innerText = page.title;
-          titleDiv.style.left = page.titleX + 'px';
-          titleDiv.style.top = page.titleY + 'px';
-          slide.appendChild(titleDiv);
-        }
-        
-        // 副标题 (支持副标题X和Y)
-        if (page.subtitle) {
-          const subDiv = document.createElement('div');
-          subDiv.className = 'slide-subtitle';
-          subDiv.innerText = page.subtitle;
-          subDiv.style.left = page.subtitleX + 'px';
-          subDiv.style.top = page.subtitleY + 'px';
-          slide.appendChild(subDiv);
-        }
-
-        // 渲染表格区块
-        page.sections.forEach(sec => {
-          if (sec.type === 'table') {
-            const tableBox = document.createElement('div');
-            tableBox.className = 'table-box';
-            // 应用后台的 X/Y 和缩放
-            tableBox.style.left = sec.x + 'px';
-            tableBox.style.top = sec.y + 'px';
-            tableBox.style.transform = `scale(${sec.scale})`;
-            
-            const table = document.createElement('table');
-            const skipCells = new Set();
-
-            // 处理合并单元格字典
-            sec.merges.forEach(m => {
-              for (let r = m.row; r < m.row + m.rowSpan; r++) {
-                for (let c = m.col; c < m.col + m.colSpan; c++) {
-                  if (r === m.row && c === m.col) continue;
-                  skipCells.add(`${r},${c}`);
-                }
-              }
-            });
-
-            sec.tableData.forEach((rowData, rIndex) => {
-              const tr = document.createElement('tr');
-              rowData.forEach((cellData, cIndex) => {
-                if (skipCells.has(`${rIndex},${cIndex}`)) return;
-
-                const cell = document.createElement(rIndex === 0 ? 'th' : 'td');
-                cell.innerText = cellData;
-                
-                // 列宽对齐
-                if (sec.colWidths && sec.colWidths[cIndex]) {
-                  cell.style.width = sec.colWidths[cIndex] + 'px';
-                  cell.style.minWidth = sec.colWidths[cIndex] + 'px';
-                  cell.style.maxWidth = sec.colWidths[cIndex] + 'px';
-                }
-                if (sec.hAligns && sec.hAligns[rIndex][cIndex]) cell.style.textAlign = sec.hAligns[rIndex][cIndex];
-                if (sec.vAligns && sec.vAligns[rIndex][cIndex]) cell.style.verticalAlign = sec.vAligns[rIndex][cIndex];
-
-                // 应用合并属性
-                const mergeObj = sec.merges.find(m => m.row === rIndex && m.col === cIndex);
-                if (mergeObj) {
-                  if (mergeObj.rowSpan > 1) cell.rowSpan = mergeObj.rowSpan;
-                  if (mergeObj.colSpan > 1) cell.colSpan = mergeObj.colSpan;
-                }
-                tr.appendChild(cell);
-              });
-              table.appendChild(tr);
-            });
-            tableBox.appendChild(table);
-            slide.appendChild(tableBox);
-          }
+        // 使用 text/plain 绕过 GitHub Pages 请求 GAS 的跨域预检问题
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: 'draw', userId: uid, code: code })
         });
+        const resData = await response.json();
 
-        const btn = document.createElement('button');
-        btn.className = 'download-btn';
-        btn.innerText = "Download Image";
-        btn.onclick = () => downloadImage(`slide-${index}`, `Page_${index+1}.png`);
-
-        slideWrapper.appendChild(slide);
-        slideWrapper.appendChild(btn);
-        slidesDiv.appendChild(slideWrapper);
-      });
-    }
-
-    function switchTab(index) {
-      document.querySelectorAll('.tab').forEach((t, i) => {
-        t.className = i === index ? 'tab active' : 'tab';
-      });
-      document.querySelectorAll('.slide-wrapper').forEach((sw, i) => {
-        sw.style.display = i === index ? 'block' : 'none';
-      });
-    }
-
-    function downloadImage(elementId, filename) {
-      const element = document.getElementById(elementId);
-      html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = filename;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-      });
+        setTimeout(() => {
+          animBox.classList.remove("shake");
+          if (resData.status === 'error') {
+            animBox.innerText = "❌"; resultMsg.innerText = resData.message;
+          } else {
+            if (resData.type === 'win') {
+              animBox.innerText = "🎉"; resultMsg.innerText = "恭喜您获得：\n" + resData.prize;
+              resultMsg.classList.add("win-text");
+            } else {
+              animBox.innerText = "😭"; resultMsg.innerText = resData.prize;
+            }
+          }
+          resultMsg.style.display = "block"; btn.innerText = "抽奖结束";
+        }, 2000);
+      } catch (err) {
+        animBox.classList.remove("shake"); animBox.innerText = "⚠️";
+        resultMsg.innerText = "网络请求失败，请稍后再试。";
+        resultMsg.style.display = "block"; btn.disabled = false; btn.innerText = "重新开启";
+      }
     }
   </script>
 </body>
