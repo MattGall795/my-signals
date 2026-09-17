@@ -1,102 +1,55 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>VIP 专属抽奖</title>
-  <style>
-    body {
-      margin: 0; padding: 0; background: #111; color: white;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;
-      overflow: hidden;
-    }
-    .container {
-      background: rgba(40, 40, 40, 0.9); padding: 40px; border-radius: 12px;
-      box-shadow: 0 0 20px rgba(243, 156, 18, 0.5); text-align: center;
-      width: 90%; max-width: 400px; z-index: 10;
-    }
-    h1 { color: #f39c12; margin-top: 0; }
-    input {
-      width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 6px;
-      background: #222; color: #fff; font-size: 16px; box-sizing: border-box;
-    }
-    button {
-      width: 100%; padding: 14px; margin-top: 20px; border: none; border-radius: 6px;
-      background: linear-gradient(90deg, #f39c12, #d35400); color: white;
-      font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;
-    }
-    button:disabled { background: #555; cursor: not-allowed; }
-    
-    #animation-box { display: none; margin-top: 20px; font-size: 80px; }
-    .shake { animation: shake-anim 0.5s infinite; }
-    @keyframes shake-anim {
-      0% { transform: translate(1px, 1px) rotate(0deg); }
-      25% { transform: translate(-3px, 0px) rotate(-10deg); }
-      50% { transform: translate(1px, -1px) rotate(10deg); }
-      75% { transform: translate(-1px, 2px) rotate(-10deg); }
-      100% { transform: translate(1px, 1px) rotate(0deg); }
-    }
-    #result-msg { margin-top: 20px; font-size: 20px; font-weight: bold; color: #e74c3c; display: none; }
-    .win-text { color: #2ecc71 !important; }
-  </style>
+    <title>幸运大转盘</title>
+    <style>
+        #wheel-container { width: 300px; height: 300px; border: 5px solid #333; border-radius: 50%; position: relative; transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); overflow: hidden; }
+        .pointer { width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 40px solid red; position: absolute; top: -20px; left: 130px; z-index: 10; }
+        .input-group { margin-top: 20px; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎁 惊喜抽奖盲盒</h1>
-    <input type="text" id="userId" placeholder="请输入用户 ID (如: UID888)">
-    <input type="text" id="code" placeholder="请输入专属抽奖码">
-    <button id="drawBtn" onclick="startDraw()">开启盲盒</button>
-    <div id="animation-box">🎁</div>
-    <div id="result-msg"></div>
-  </div>
+    <div class="pointer"></div>
+    <div id="wheel-container">
+        <!-- 这里可以用JS画扇形，或者简单放一张背景图 -->
+        <img src="https://path-to-your-wheel-image.com/wheel.png" id="wheel" style="width:100%">
+    </div>
 
-  <script>
-    // ⚠️！！！将这里替换为你的 Google Apps Script 部署 URL！！！
-    const API_URL = "https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec";
+    <div class="input-group">
+        <input type="text" id="drawCode" placeholder="输入8位抽奖码">
+        <input type="number" id="userId" placeholder="输入您的数字ID">
+        <button onclick="startDraw()">开始抽奖</button>
+    </div>
 
-    async function startDraw() {
-      const uid = document.getElementById('userId').value.trim();
-      const code = document.getElementById('code').value.trim();
-      const btn = document.getElementById('drawBtn');
-      const animBox = document.getElementById('animation-box');
-      const resultMsg = document.getElementById('result-msg');
+    <script>
+        const WEB_APP_URL = "你的_APPS_SCRIPT_URL"; // 填入上面生成的URL
 
-      if (!uid || !code) return alert("用户ID和抽奖码不能为空！");
+        async function startDraw() {
+            const code = document.getElementById('drawCode').value;
+            const userId = document.getElementById('userId').value;
 
-      btn.disabled = true; btn.innerText = "正在开启...";
-      animBox.style.display = "block"; animBox.classList.add("shake");
-      resultMsg.style.display = "none"; resultMsg.className = "";
+            if(!code || !userId) return alert("请完整填写信息");
 
-      try {
-        // 使用 text/plain 绕过 GitHub Pages 请求 GAS 的跨域预检问题
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          redirect: "follow",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: 'draw', userId: uid, code: code })
-        });
-        const resData = await response.json();
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'draw', code: code, userId: userId })
+            });
 
-        setTimeout(() => {
-          animBox.classList.remove("shake");
-          if (resData.status === 'error') {
-            animBox.innerText = "❌"; resultMsg.innerText = resData.message;
-          } else {
-            if (resData.type === 'win') {
-              animBox.innerText = "🎉"; resultMsg.innerText = "恭喜您获得：\n" + resData.prize;
-              resultMsg.classList.add("win-text");
+            const result = await response.json();
+
+            if (result.status === "success") {
+                // 模拟旋转动画
+                const wheel = document.getElementById('wheel-container');
+                const randomDeg = Math.floor(Math.random() * 360) + 3600; // 旋转10圈加随机角度
+                wheel.style.transform = `rotate(${randomDeg}deg)`;
+
+                setTimeout(() => {
+                    alert(`恭喜！您抽中了：${result.prize}\n奖品详情：${result.desc}`);
+                }, 4500);
             } else {
-              animBox.innerText = "😭"; resultMsg.innerText = resData.prize;
+                alert(result.msg);
             }
-          }
-          resultMsg.style.display = "block"; btn.innerText = "抽奖结束";
-        }, 2000);
-      } catch (err) {
-        animBox.classList.remove("shake"); animBox.innerText = "⚠️";
-        resultMsg.innerText = "网络请求失败，请稍后再试。";
-        resultMsg.style.display = "block"; btn.disabled = false; btn.innerText = "重新开启";
-      }
-    }
-  </script>
+        }
+    </script>
 </body>
 </html>
