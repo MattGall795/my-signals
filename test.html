@@ -2,58 +2,97 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大转盘抽奖</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { background: #f0f2f5; font-family: sans-serif; text-align: center; padding: 20px; }
-        .box { background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        canvas { width: 100%; max-width: 400px; height: auto; transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); }
-        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
-        button { width: 90%; padding: 15px; background: #e74c3c; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; }
+        body { background: #f4f7f6; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
+        .wheel-wrap { position: relative; margin: 20px auto; width: 320px; height: 320px; }
+        canvas { width: 100%; height: 100%; transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); border-radius: 50%; border: 5px solid #333; }
+        .pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid red; z-index: 10; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2>幸运大转盘</h2>
-        <canvas id="canvas" width="500" height="500"></canvas>
-        <input type="text" id="code" placeholder="输入8位抽奖码">
-        <input type="number" id="uid" placeholder="输入数字ID">
-        <button onclick="start()">点击抽奖</button>
+    <div class="card">
+        <h2>幸运抽奖大转盘</h2>
+        <div class="wheel-wrap">
+            <div class="pointer"></div>
+            <canvas id="wheel" width="500" height="500"></canvas>
+        </div>
+        <input type="text" id="code" placeholder="请输入抽奖码">
+        <input type="number" id="uid" placeholder="请输入数字ID">
+        <button id="btn" onclick="startDraw()">开始抽奖</button>
     </div>
 
     <script>
-        const API = "https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec"; // 这里一定要换！
-        const canvas = document.getElementById('canvas');
+        const API = "你的_APPS_SCRIPT_URL"; // 替换为最新的URL
+        const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
-        const p = ["奖品1","奖品2","奖品3","奖品4","奖品5","谢谢参与"];
-        const colors = ["#e74c3c","#f1c40f","#2ecc71","#3498db","#9b59b6","#95a5a6"];
+        let prizeNames = ["特等奖","一等奖","二等奖","三等奖","四等奖","谢谢参与"];
+        const colors = ["#f1c40f","#e67e22","#e74c3c","#9b59b6","#3498db","#95a5a6"];
+
+        // 初始化：从服务器获取真实奖品名
+        async function init() {
+            try {
+                const r = await fetch(API, {method:"POST", body: JSON.stringify({action:"getPrizes"})});
+                const data = await r.json();
+                if(data.length > 0) prizeNames = data;
+                draw();
+            } catch(e) { draw(); }
+        }
 
         function draw() {
-            let deg = Math.PI * 2 / p.length;
-            for(let i=0; i<p.length; i++){
-                ctx.fillStyle = colors[i];
+            const arc = Math.PI * 2 / prizeNames.length;
+            ctx.clearRect(0,0,500,500);
+            for(let i=0; i<prizeNames.length; i++) {
+                ctx.fillStyle = colors[i % colors.length];
                 ctx.beginPath(); ctx.moveTo(250,250);
-                ctx.arc(250,250,250, i*deg, (i+1)*deg); ctx.fill();
+                ctx.arc(250,250,250, i*arc, (i+1)*arc); ctx.fill();
+                // 绘制文字
+                ctx.save();
+                ctx.fillStyle = "#fff"; ctx.font = "bold 22px Arial";
+                ctx.translate(250 + Math.cos(i*arc + arc/2)*160, 250 + Math.sin(i*arc + arc/2)*160);
+                ctx.rotate(i*arc + arc/2 + Math.PI/2);
+                ctx.fillText(prizeNames[i], -ctx.measureText(prizeNames[i]).width/2, 0);
+                ctx.restore();
             }
         }
-        draw();
 
-        async function start() {
-            const code = document.getElementById('code').value;
-            const uid = document.getElementById('uid').value;
-            if(!code || !uid) return alert("请填写完整");
+        async function startDraw() {
+            const code = document.getElementById('code').value.trim();
+            const uid = document.getElementById('uid').value.trim();
+            if(!code || !uid) return Swal.fire("提示", "请输入完整信息", "warning");
+
+            const btn = document.getElementById('btn');
+            btn.disabled = true;
 
             try {
-                const res = await fetch(API, { method:"POST", body: JSON.stringify({action:"draw", code:code, userId:uid}) });
-                const json = await res.json();
-                if(json.status === "success") {
-                    canvas.style.transform = `rotate(${Math.floor(Math.random()*360) + 3600}deg)`;
-                    setTimeout(() => { Swal.fire("中奖了!", json.prize, "success"); }, 5200);
+                const res = await fetch(API, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "draw", code, userId: uid })
+                });
+                const data = await res.json();
+
+                if (data.status === "success") {
+                    const angle = Math.floor(Math.random() * 360) + 3600;
+                    canvas.style.transform = `rotate(${angle}deg)`;
+                    setTimeout(() => {
+                        Swal.fire("恭喜!", `您抽中了：${data.prize}`, "success");
+                        btn.disabled = false;
+                    }, 5200);
                 } else {
-                    alert(json.msg);
+                    Swal.fire("抱歉", data.msg, "error");
+                    btn.disabled = false;
                 }
-            } catch(e) { alert("系统错误"); }
+            } catch (e) {
+                Swal.fire("错误", "连接超时，请重试", "error");
+                btn.disabled = false;
+            }
         }
+        init();
     </script>
 </body>
 </html>
