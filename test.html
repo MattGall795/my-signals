@@ -6,12 +6,13 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { background: #1e1e2e; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: #fff; color: #333; padding: 40px; border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); width: 450px; text-align: center; }
-        .wheel-box { position: relative; width: 350px; height: 350px; margin: 0 auto 30px; }
-        canvas { width: 100%; height: 100%; border-radius: 50%; border: 6px solid #333; transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); }
+        .container { background: #fff; color: #333; padding: 30px; border-radius: 20px; width: 450px; text-align: center; }
+        .wheel-box { position: relative; width: 320px; height: 320px; margin: 0 auto 20px; }
+        canvas { width: 100%; height: 100%; border-radius: 50%; border: 5px solid #333; transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); }
         .arrow { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #e74c3c; z-index: 10; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 18px; background: #e74c3c; color: #fff; border: none; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #e74c3c; color: #fff; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        button:disabled { background: #ccc; }
     </style>
 </head>
 <body>
@@ -21,33 +22,46 @@
             <div class="arrow"></div>
             <canvas id="wheel" width="500" height="500"></canvas>
         </div>
-        <input type="text" id="code" placeholder="输入8位抽奖码">
-        <input type="number" id="uid" placeholder="输入纯数字用户ID">
-        <button id="drawBtn" onclick="runDraw()">立刻抽奖</button>
+        <div id="status-text" style="color:#666; font-size:12px; margin-bottom:10px;">正在连接服务器...</div>
+        <input type="text" id="code" placeholder="输入抽奖码">
+        <input type="number" id="uid" placeholder="输入您的数字ID">
+        <button id="drawBtn" disabled onclick="runDraw()">立刻抽奖</button>
     </div>
 
     <script>
-        const API = "https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec"; // 替换为最新部署URL
+        const API = "你的_APPS_SCRIPT_URL"; 
         const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
-        let prizes = [];
+        const statusText = document.getElementById('status-text');
+        const drawBtn = document.getElementById('drawBtn');
+
+        // 默认奖品列表（防止服务器加载失败变空白）
+        let prizes = [{name:"奖项加载中", value:""}];
 
         async function init() {
             try {
                 const res = await fetch(API, {method:"POST", body: JSON.stringify({action:"getPrizes"})});
-                prizes = await res.json();
-                draw();
-            } catch(e) { console.error("加载奖品失败"); }
+                const data = await res.json();
+                if(data && data.length > 0) {
+                    prizes = data;
+                    statusText.innerText = "数据已同步";
+                    drawBtn.disabled = false;
+                }
+            } catch(e) {
+                statusText.innerText = "连接失败，请检查 URL";
+                prizes = [{name:"错误", value:"重新加载"}];
+            }
+            draw();
         }
 
         function draw() {
-            if(!prizes.length) return;
             const arc = Math.PI * 2 / prizes.length;
             const colors = ["#ff9f43", "#ee5253", "#10ac84", "#54a0ff", "#5f27cd", "#c8d6e5"];
             ctx.clearRect(0,0,500,500);
             for(let i=0; i<prizes.length; i++) {
                 ctx.fillStyle = colors[i % colors.length];
                 ctx.beginPath(); ctx.moveTo(250,250);
+                ctx.arc(250,250,250, i*arc, (i+ arcs[i]*0 + (i+1)*arc)); 
                 ctx.arc(250,250,250, i*arc, (i+1)*arc); ctx.fill();
                 
                 ctx.save();
@@ -55,11 +69,9 @@
                 ctx.font = "bold 20px Arial";
                 ctx.translate(250 + Math.cos(i*arc + arc/2)*160, 250 + Math.sin(i*arc + arc/2)*160);
                 ctx.rotate(i*arc + arc/2 + Math.PI/2);
-                // 显示名称
                 ctx.fillText(prizes[i].name, -ctx.measureText(prizes[i].name).width/2, 0);
-                // 显示价值 (字体小一点)
                 ctx.font = "14px Arial";
-                ctx.fillText(prizes[i].value || "", -ctx.measureText(prizes[i].value).width/2, 25);
+                ctx.fillText(prizes[i].value, -ctx.measureText(prizes[i].value).width/2, 25);
                 ctx.restore();
             }
         }
@@ -67,10 +79,7 @@
         async function runDraw() {
             const code = document.getElementById('code').value.trim();
             const uid = document.getElementById('uid').value.trim();
-            if(!code || !uid) return Swal.fire("错误", "请填写完整", "error");
-
-            const btn = document.getElementById('drawBtn');
-            btn.disabled = true;
+            drawBtn.disabled = true;
 
             try {
                 const res = await fetch(API, {method:"POST", body: JSON.stringify({action:"draw", code, userId:uid})});
@@ -80,20 +89,16 @@
                     const angle = Math.floor(Math.random() * 360) + 3600;
                     canvas.style.transform = `rotate(${angle}deg)`;
                     setTimeout(() => {
-                        Swal.fire({
-                            title: `恭喜中奖：${data.prize}`,
-                            html: `<b style="color:#e74c3c; font-size:20px">${data.value}</b>`,
-                            icon: "success"
-                        });
-                        btn.disabled = false;
+                        Swal.fire({ title: `恭喜：${data.prize}`, text: data.value, icon: "success" });
+                        drawBtn.disabled = false;
                     }, 5200);
                 } else {
                     Swal.fire("提示", data.msg, "warning");
-                    btn.disabled = false;
+                    drawBtn.disabled = false;
                 }
             } catch(e) {
-                Swal.fire("错误", "服务器响应超时", "error");
-                btn.disabled = false;
+                Swal.fire("错误", "连接超时", "error");
+                drawBtn.disabled = false;
             }
         }
         init();
