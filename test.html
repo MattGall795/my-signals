@@ -1,41 +1,52 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>大转盘抽奖</title>
+  <title>Lucky Spin Wheel</title>
+  
+  <!-- 添加网站标签标识 (Favicon) -->
+  <link rel="icon" type="image/png" href="./favicon.png">
+  
   <style>
-    body { text-align: center; font-family: Arial, sans-serif; background: #f4f6f9; padding: 20px; }
-    .container { max-width: 420px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    canvas { margin: 20px 0; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.15); }
-    .input-group { margin: 12px 0; text-align: left; }
-    .input-group label { display: block; font-size: 14px; margin-bottom: 5px; color: #333; font-weight: bold; }
-    .input-group input { width: 93%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-    button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px; }
-    button:disabled { background: #b0bec5; cursor: not-allowed; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .container { width: 100%; max-width: 450px; background: #ffffff; padding: 30px 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; }
+    h2 { margin-top: 0; color: #1a1a1a; font-size: 24px; font-weight: 700; margin-bottom: 20px; }
+    .wheel-wrapper { position: relative; width: 340px; height: 340px; margin: 0 auto 25px auto; }
+    canvas { border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .input-group { margin-bottom: 15px; text-align: left; }
+    .input-group label { display: block; font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
+    .input-group input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .input-group input:focus { border-color: #3182ce; }
+    button { width: 100%; padding: 14px; background: #3182ce; color: #ffffff; border: none; font-size: 16px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
+    button:hover { background: #2b6cb0; }
+    button:disabled { background: #cbd5e0; cursor: not-allowed; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>幸运大转盘</h2>
-  <canvas id="wheel" width="320" height="320"></canvas>
-  
-  <div class="input-group">
-    <label>抽奖码：</label>
-    <input type="text" id="code" placeholder="请输入8位抽奖码">
-  </div>
-  <div class="input-group">
-    <label>用户 ID (纯数字)：</label>
-    <input type="text" id="userId" placeholder="自定义输入纯数字ID">
+  <h2>Lucky Spin Wheel</h2>
+  <div class="wheel-wrapper">
+    <canvas id="wheel" width="340" height="340"></canvas>
   </div>
   
-  <button id="drawBtn" onclick="startDraw()">按确定进行抽奖</button>
+  <div class="input-group">
+    <label for="code">Redemption Code:</label>
+    <input type="text" id="code" placeholder="Enter 8-digit code">
+  </div>
+  <div class="input-group">
+    <label for="userId">User ID (Digits only):</label>
+    <input type="text" id="userId" placeholder="Enter your numeric User ID">
+  </div>
+  
+  <button id="drawBtn" onclick="startDraw()">SPIN NOW</button>
 </div>
 
 <script>
-  // 替换为你部署得到的 Web App URL
-  const API_URL = "https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec";
+  // 请替换为你部署获得的 Web App URL
+  const API_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL";
   let prizes = [];
   let currentAngle = 0;
   let isSpinning = false;
@@ -49,7 +60,7 @@
         drawWheel();
       }
     } catch (e) {
-      alert("加载奖品数据失败，请检查 API URL。");
+      alert("Failed to load prize configuration. Please check your API URL.");
     }
   };
 
@@ -57,34 +68,46 @@
     const canvas = document.getElementById("wheel");
     const ctx = canvas.getContext("2d");
     const numPrizes = prizes.length;
+    if (numPrizes === 0) return;
+    
     const arc = (2 * Math.PI) / numPrizes;
+    const centerX = 170;
+    const centerY = 170;
+    const radius = 160;
 
-    ctx.clearRect(0, 0, 320, 320);
+    ctx.clearRect(0, 0, 340, 340);
     
     for (let i = 0; i < numPrizes; i++) {
       let angle = currentAngle + i * arc;
-      ctx.fillStyle = prizes[i].color || "#FFD700";
+      ctx.fillStyle = prizes[i].color || "#CBD5E0";
       ctx.beginPath();
-      ctx.arc(160, 160, 150, angle, angle + arc);
-      ctx.lineTo(160, 160);
+      ctx.arc(centerX, centerY, radius, angle, angle + arc);
+      ctx.lineTo(centerX, centerY);
       ctx.fill();
 
-      // 绘制文字
+      // 绘制扇区文字与 Icon
       ctx.save();
-      ctx.fillStyle = "#000";
-      ctx.translate(160 + Math.cos(angle + arc / 2) * 100, 160 + Math.sin(angle + arc / 2) * 100);
+      ctx.fillStyle = "#1A202C";
+      ctx.translate(centerX + Math.cos(angle + arc / 2) * 110, centerY + Math.sin(angle + arc / 2) * 110);
       ctx.rotate(angle + arc / 2 + Math.PI / 2);
+      
+      if (prizes[i].icon) {
+        ctx.font = "20px Arial";
+        ctx.fillText(prizes[i].icon, -ctx.measureText(prizes[i].icon).width / 2, -10);
+      }
+      
       ctx.font = "bold 12px Arial";
-      ctx.fillText(prizes[i].name, -ctx.measureText(prizes[i].name).width / 2, 0);
+      let text = prizes[i].name;
+      ctx.fillText(text, -ctx.measureText(text).width / 2, prizes[i].icon ? 12 : 0);
       ctx.restore();
     }
 
-    // 绘制顶部指针
-    ctx.fillStyle = "#e74c3c";
+    // 绘制顶部红色指针
+    ctx.fillStyle = "#E53E3E";
     ctx.beginPath();
-    ctx.moveTo(150, 5);
-    ctx.lineTo(170, 5);
-    ctx.lineTo(160, 25);
+    ctx.moveTo(centerX - 12, 5);
+    ctx.lineTo(centerX + 12, 5);
+    ctx.lineTo(centerX, 25);
     ctx.fill();
   }
 
@@ -93,7 +116,7 @@
     let userId = document.getElementById("userId").value.trim();
 
     if (!code || !/^\d+$/.test(userId)) {
-      alert("请输入有效的抽奖码，且用户ID必须为纯数字！");
+      alert("Please enter a valid Redemption Code and numeric User ID!");
       return;
     }
 
@@ -102,7 +125,6 @@
     document.getElementById("drawBtn").disabled = true;
 
     try {
-      // 使用 GET 解决跨域与重定向问题
       let res = await fetch(`${API_URL}?action=draw&code=${encodeURIComponent(code)}&userId=${encodeURIComponent(userId)}`);
       let result = await res.json();
 
@@ -113,7 +135,6 @@
         return;
       }
 
-      // 计算指针动画停止的位置
       let prizeIndex = result.prizeIndex;
       let numPrizes = prizes.length;
       let sectorAngle = (2 * Math.PI) / numPrizes;
@@ -136,7 +157,7 @@
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
-          alert(`🎉 恭喜中奖：${result.prize.name}\n奖品详情：${result.prize.category}`);
+          alert(`🎉 Congratulations!\nYou won: ${result.prize.name}\nValue/Details: ${result.prize.category}`);
           isSpinning = false;
           document.getElementById("drawBtn").disabled = false;
         }
@@ -144,7 +165,7 @@
       requestAnimationFrame(animate);
 
     } catch (e) {
-      alert("网络请求失败，请稍后重试！");
+      alert("Network request failed. Please try again.");
       isSpinning = false;
       document.getElementById("drawBtn").disabled = false;
     }
