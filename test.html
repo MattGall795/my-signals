@@ -3,48 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>幸运大转盘抽奖</title>
+  <title>大转盘抽奖</title>
   <style>
-    body { text-align: center; font-family: Arial, sans-serif; background: #f7f7f7; padding: 20px; }
-    .container { max-width: 450px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    canvas { margin-top: 20px; border-radius: 50%; }
-    .input-group { margin: 15px 0; text-align: left; }
-    .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-    .input-group input { width: 95%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
-    button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; font-size: 16px; border-radius: 6px; cursor: pointer; }
-    button:disabled { background: #ccc; }
+    body { text-align: center; font-family: Arial, sans-serif; background: #f4f6f9; padding: 20px; }
+    .container { max-width: 420px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    canvas { margin: 20px 0; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.15); }
+    .input-group { margin: 12px 0; text-align: left; }
+    .input-group label { display: block; font-size: 14px; margin-bottom: 5px; color: #333; font-weight: bold; }
+    .input-group input { width: 93%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+    button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+    button:disabled { background: #b0bec5; cursor: not-allowed; }
   </style>
 </head>
 <body>
 
 <div class="container">
   <h2>幸运大转盘</h2>
-  <canvas id="wheel" width="350" height="350"></canvas>
+  <canvas id="wheel" width="320" height="320"></canvas>
   
   <div class="input-group">
     <label>抽奖码：</label>
-    <input type="text" id="code" placeholder="输入8位抽奖码">
+    <input type="text" id="code" placeholder="请输入8位抽奖码">
   </div>
   <div class="input-group">
     <label>用户 ID (纯数字)：</label>
-    <input type="number" id="userId" placeholder="请输入纯数字用户ID">
+    <input type="text" id="userId" placeholder="自定义输入纯数字ID">
   </div>
   
   <button id="drawBtn" onclick="startDraw()">按确定进行抽奖</button>
 </div>
 
 <script>
-  // 替换为你的 Apps Script 部署 URL
-  const API_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL";
+  // 替换为你部署得到的 Web App URL
+  const API_URL = "https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec";
   let prizes = [];
   let currentAngle = 0;
   let isSpinning = false;
 
   window.onload = async () => {
-    let res = await fetch(`${API_URL}?action=getPrizes`);
-    let data = await res.json();
-    prizes = data.prizes;
-    drawWheel();
+    try {
+      let res = await fetch(`${API_URL}?action=getPrizes`);
+      let data = await res.json();
+      if (data.status === "success") {
+        prizes = data.prizes;
+        drawWheel();
+      }
+    } catch (e) {
+      alert("加载奖品数据失败，请检查 API URL。");
+    }
   };
 
   function drawWheel() {
@@ -53,32 +59,32 @@
     const numPrizes = prizes.length;
     const arc = (2 * Math.PI) / numPrizes;
 
-    ctx.clearRect(0, 0, 350, 350);
+    ctx.clearRect(0, 0, 320, 320);
     
     for (let i = 0; i < numPrizes; i++) {
       let angle = currentAngle + i * arc;
       ctx.fillStyle = prizes[i].color || "#FFD700";
       ctx.beginPath();
-      ctx.arc(175, 175, 160, angle, angle + arc);
-      ctx.lineTo(175, 175);
+      ctx.arc(160, 160, 150, angle, angle + arc);
+      ctx.lineTo(160, 160);
       ctx.fill();
 
       // 绘制文字
       ctx.save();
       ctx.fillStyle = "#000";
-      ctx.translate(175 + Math.cos(angle + arc / 2) * 110, 175 + Math.sin(angle + arc / 2) * 110);
+      ctx.translate(160 + Math.cos(angle + arc / 2) * 100, 160 + Math.sin(angle + arc / 2) * 100);
       ctx.rotate(angle + arc / 2 + Math.PI / 2);
       ctx.font = "bold 12px Arial";
       ctx.fillText(prizes[i].name, -ctx.measureText(prizes[i].name).width / 2, 0);
       ctx.restore();
     }
 
-    // 指针
-    ctx.fillStyle = "red";
+    // 绘制顶部指针
+    ctx.fillStyle = "#e74c3c";
     ctx.beginPath();
-    ctx.moveTo(165, 10);
-    ctx.lineTo(185, 10);
-    ctx.lineTo(175, 30);
+    ctx.moveTo(150, 5);
+    ctx.lineTo(170, 5);
+    ctx.lineTo(160, 25);
     ctx.fill();
   }
 
@@ -87,7 +93,7 @@
     let userId = document.getElementById("userId").value.trim();
 
     if (!code || !/^\d+$/.test(userId)) {
-      alert("请输入有效的抽奖码和纯数字用户ID！");
+      alert("请输入有效的抽奖码，且用户ID必须为纯数字！");
       return;
     }
 
@@ -96,10 +102,8 @@
     document.getElementById("drawBtn").disabled = true;
 
     try {
-      let res = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "draw", code: code, userId: userId })
-      });
+      // 使用 GET 解决跨域与重定向问题
+      let res = await fetch(`${API_URL}?action=draw&code=${encodeURIComponent(code)}&userId=${encodeURIComponent(userId)}`);
       let result = await res.json();
 
       if (result.status === "error") {
@@ -109,12 +113,11 @@
         return;
       }
 
-      // 旋转动画控制
+      // 计算指针动画停止的位置
       let prizeIndex = result.prizeIndex;
       let numPrizes = prizes.length;
       let sectorAngle = (2 * Math.PI) / numPrizes;
       
-      // 计算目标停止角度
       let targetSector = (3 * Math.PI / 2) - (prizeIndex * sectorAngle) - (sectorAngle / 2);
       let totalRotation = currentAngle + (Math.PI * 8) + (targetSector - (currentAngle % (2 * Math.PI)));
 
@@ -126,7 +129,6 @@
         let progress = (timestamp - startTime) / duration;
         if (progress > 1) progress = 1;
 
-        // 减速缓动（Ease-out）
         let easeOut = 1 - Math.pow(1 - progress, 3);
         currentAngle = currentAngle + (totalRotation - currentAngle) * easeOut;
         drawWheel();
@@ -134,7 +136,7 @@
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
-          alert(`🎉 恭喜获得：${result.prize.name}\n类别/价值：${result.prize.category}`);
+          alert(`🎉 恭喜中奖：${result.prize.name}\n奖品详情：${result.prize.category}`);
           isSpinning = false;
           document.getElementById("drawBtn").disabled = false;
         }
@@ -142,7 +144,7 @@
       requestAnimationFrame(animate);
 
     } catch (e) {
-      alert("系统网络异常，请重试");
+      alert("网络请求失败，请稍后重试！");
       isSpinning = false;
       document.getElementById("drawBtn").disabled = false;
     }
