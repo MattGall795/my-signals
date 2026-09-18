@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>STAR Group&Lucky Spin Wheel</title>
+  <title>STAR Lucky Wheel</title>
   
-   <link rel="icon" type="image/png" href="./favicon.png">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="./favicon.png">
   
   <style>
     * { box-sizing: border-box; }
@@ -13,7 +14,15 @@
     .container { width: 100%; max-width: 450px; background: #ffffff; padding: 30px 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; }
     h2 { margin-top: 0; color: #1a1a1a; font-size: 24px; font-weight: 700; margin-bottom: 20px; }
     .wheel-wrapper { position: relative; width: 340px; height: 340px; margin: 0 auto 25px auto; }
-    canvas { border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    
+    
+    canvas { 
+      border-radius: 50%; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+      will-change: transform;
+      transform: translateZ(0);
+    }
+    
     .input-group { margin-bottom: 15px; text-align: left; }
     .input-group label { display: block; font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
     .input-group input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s; }
@@ -28,7 +37,7 @@
 <div class="container">
   <h2>Lucky Spin Wheel</h2>
   <div class="wheel-wrapper">
-    <canvas id="wheel" width="340" height="340"></canvas>
+    <canvas id="wheel" width="680" height="680" style="width:340px; height:340px;"></canvas>
   </div>
   
   <div class="input-group">
@@ -44,10 +53,13 @@
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec";
   let prizes = [];
   let currentAngle = 0;
   let isSpinning = false;
+  
+  
+  let offscreenCanvas = null;
 
   window.onload = async () => {
     try {
@@ -55,6 +67,7 @@
       let data = await res.json();
       if (data.status === "success") {
         prizes = data.prizes;
+        initOffscreenWheel();
         drawWheel();
       }
     } catch (e) {
@@ -62,51 +75,74 @@
     }
   };
 
-  function drawWheel() {
-    const canvas = document.getElementById("wheel");
-    const ctx = canvas.getContext("2d");
+  
+  function initOffscreenWheel() {
     const numPrizes = prizes.length;
     if (numPrizes === 0) return;
-    
-    const arc = (2 * Math.PI) / numPrizes;
-    const centerX = 170;
-    const centerY = 170;
-    const radius = 160;
 
-    ctx.clearRect(0, 0, 340, 340);
-    
+    offscreenCanvas = document.createElement("canvas");
+    offscreenCanvas.width = 680;
+    offscreenCanvas.height = 680;
+    const ctx = offscreenCanvas.getContext("2d");
+
+    const arc = (2 * Math.PI) / numPrizes;
+    const centerX = 340;
+    const centerY = 340;
+    const radius = 320;
+
     for (let i = 0; i < numPrizes; i++) {
-      let angle = currentAngle + i * arc;
+      let angle = i * arc;
       ctx.fillStyle = prizes[i].color || "#CBD5E0";
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, angle, angle + arc);
       ctx.lineTo(centerX, centerY);
       ctx.fill();
 
-      // 绘制扇区文字与 Icon
+      
       ctx.save();
       ctx.fillStyle = "#1A202C";
-      ctx.translate(centerX + Math.cos(angle + arc / 2) * 110, centerY + Math.sin(angle + arc / 2) * 110);
+      ctx.translate(centerX + Math.cos(angle + arc / 2) * 220, centerY + Math.sin(angle + arc / 2) * 220);
       ctx.rotate(angle + arc / 2 + Math.PI / 2);
       
       if (prizes[i].icon) {
-        ctx.font = "20px Arial";
-        ctx.fillText(prizes[i].icon, -ctx.measureText(prizes[i].icon).width / 2, -10);
+        ctx.font = "40px Arial";
+        ctx.fillText(prizes[i].icon, -ctx.measureText(prizes[i].icon).width / 2, -20);
       }
       
-      ctx.font = "bold 12px Arial";
+      ctx.font = "bold 24px Arial";
       let text = prizes[i].name;
-      ctx.fillText(text, -ctx.measureText(text).width / 2, prizes[i].icon ? 12 : 0);
+      ctx.fillText(text, -ctx.measureText(text).width / 2, prizes[i].icon ? 24 : 0);
+      ctx.restore();
+    }
+  }
+
+  
+  function drawWheel() {
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    
+    ctx.clearRect(0, 0, 680, 680);
+
+    if (offscreenCanvas) {
+      ctx.save();
+      ctx.translate(340, 340);
+      ctx.rotate(currentAngle);
+      ctx.drawImage(offscreenCanvas, -340, -340);
       ctx.restore();
     }
 
-    // 绘制顶部红色指针
+    
     ctx.fillStyle = "#E53E3E";
     ctx.beginPath();
-    ctx.moveTo(centerX - 12, 5);
-    ctx.lineTo(centerX + 12, 5);
-    ctx.lineTo(centerX, 25);
+    ctx.moveTo(340 - 24, 10);
+    ctx.lineTo(340 + 24, 10);
+    ctx.lineTo(340, 50);
     ctx.fill();
+  }
+
+  
+  function easeOutCubic(x) {
+    return 1 - Math.pow(1 - x, 3);
   }
 
   async function startDraw() {
@@ -138,18 +174,19 @@
       let sectorAngle = (2 * Math.PI) / numPrizes;
       
       let targetSector = (3 * Math.PI / 2) - (prizeIndex * sectorAngle) - (sectorAngle / 2);
-      let totalRotation = currentAngle + (Math.PI * 8) + (targetSector - (currentAngle % (2 * Math.PI)));
+      
+      let startAngle = currentAngle;
+      let totalRotation = startAngle + (Math.PI * 10) + (targetSector - (startAngle % (2 * Math.PI)));
 
       let startTime = null;
-      let duration = 4000;
+      let duration = 4500; 
 
       function animate(timestamp) {
         if (!startTime) startTime = timestamp;
-        let progress = (timestamp - startTime) / duration;
-        if (progress > 1) progress = 1;
+        let elapsed = timestamp - startTime;
+        let progress = Math.min(elapsed / duration, 1);
 
-        let easeOut = 1 - Math.pow(1 - progress, 3);
-        currentAngle = currentAngle + (totalRotation - currentAngle) * easeOut;
+        currentAngle = startAngle + (totalRotation - startAngle) * easeOutCubic(progress);
         drawWheel();
 
         if (progress < 1) {
