@@ -1,107 +1,153 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <title>幸运大转盘</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        body { background: #1e1e2e; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: #fff; color: #333; padding: 30px; border-radius: 20px; width: 450px; text-align: center; }
-        .wheel-box { position: relative; width: 320px; height: 320px; margin: 0 auto 20px; }
-        canvas { width: 100%; height: 100%; border-radius: 50%; border: 5px solid #333; transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); }
-        .arrow { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #e74c3c; z-index: 10; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: #e74c3c; color: #fff; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        button:disabled { background: #ccc; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>幸运大转盘抽奖</title>
+  <style>
+    body { text-align: center; font-family: Arial, sans-serif; background: #f7f7f7; padding: 20px; }
+    .container { max-width: 450px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    canvas { margin-top: 20px; border-radius: 50%; }
+    .input-group { margin: 15px 0; text-align: left; }
+    .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+    .input-group input { width: 95%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+    button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; font-size: 16px; border-radius: 6px; cursor: pointer; }
+    button:disabled { background: #ccc; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2 style="color:#e74c3c">幸运大转盘</h2>
-        <div class="wheel-box">
-            <div class="arrow"></div>
-            <canvas id="wheel" width="500" height="500"></canvas>
-        </div>
-        <div id="status-text" style="color:#666; font-size:12px; margin-bottom:10px;">正在连接服务器...</div>
-        <input type="text" id="code" placeholder="输入抽奖码">
-        <input type="number" id="uid" placeholder="输入您的数字ID">
-        <button id="drawBtn" disabled onclick="runDraw()">立刻抽奖</button>
-    </div>
 
-    <script>
-        const API = "https://script.google.com/macros/s/AKfycbwhn_gGLONbPhB_i0EPFZLmfzG45WDKVmr2cMQe7neCXJgqv87wD1Fu93n6f9eqytouUQ/exec"; 
-        const canvas = document.getElementById('wheel');
-        const ctx = canvas.getContext('2d');
-        const statusText = document.getElementById('status-text');
-        const drawBtn = document.getElementById('drawBtn');
+<div class="container">
+  <h2>幸运大转盘</h2>
+  <canvas id="wheel" width="350" height="350"></canvas>
+  
+  <div class="input-group">
+    <label>抽奖码：</label>
+    <input type="text" id="code" placeholder="输入8位抽奖码">
+  </div>
+  <div class="input-group">
+    <label>用户 ID (纯数字)：</label>
+    <input type="number" id="userId" placeholder="请输入纯数字用户ID">
+  </div>
+  
+  <button id="drawBtn" onclick="startDraw()">按确定进行抽奖</button>
+</div>
 
-        // 默认奖品列表（防止服务器加载失败变空白）
-        let prizes = [{name:"奖项加载中", value:""}];
+<script>
+  // 替换为你的 Apps Script 部署 URL
+  const API_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL";
+  let prizes = [];
+  let currentAngle = 0;
+  let isSpinning = false;
 
-        async function init() {
-            try {
-                const res = await fetch(API, {method:"POST", body: JSON.stringify({action:"getPrizes"})});
-                const data = await res.json();
-                if(data && data.length > 0) {
-                    prizes = data;
-                    statusText.innerText = "数据已同步";
-                    drawBtn.disabled = false;
-                }
-            } catch(e) {
-                statusText.innerText = "连接失败，请检查 URL";
-                prizes = [{name:"错误", value:"重新加载"}];
-            }
-            draw();
+  window.onload = async () => {
+    let res = await fetch(`${API_URL}?action=getPrizes`);
+    let data = await res.json();
+    prizes = data.prizes;
+    drawWheel();
+  };
+
+  function drawWheel() {
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const numPrizes = prizes.length;
+    const arc = (2 * Math.PI) / numPrizes;
+
+    ctx.clearRect(0, 0, 350, 350);
+    
+    for (let i = 0; i < numPrizes; i++) {
+      let angle = currentAngle + i * arc;
+      ctx.fillStyle = prizes[i].color || "#FFD700";
+      ctx.beginPath();
+      ctx.arc(175, 175, 160, angle, angle + arc);
+      ctx.lineTo(175, 175);
+      ctx.fill();
+
+      // 绘制文字
+      ctx.save();
+      ctx.fillStyle = "#000";
+      ctx.translate(175 + Math.cos(angle + arc / 2) * 110, 175 + Math.sin(angle + arc / 2) * 110);
+      ctx.rotate(angle + arc / 2 + Math.PI / 2);
+      ctx.font = "bold 12px Arial";
+      ctx.fillText(prizes[i].name, -ctx.measureText(prizes[i].name).width / 2, 0);
+      ctx.restore();
+    }
+
+    // 指针
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.moveTo(165, 10);
+    ctx.lineTo(185, 10);
+    ctx.lineTo(175, 30);
+    ctx.fill();
+  }
+
+  async function startDraw() {
+    let code = document.getElementById("code").value.trim();
+    let userId = document.getElementById("userId").value.trim();
+
+    if (!code || !/^\d+$/.test(userId)) {
+      alert("请输入有效的抽奖码和纯数字用户ID！");
+      return;
+    }
+
+    if (isSpinning) return;
+    isSpinning = true;
+    document.getElementById("drawBtn").disabled = true;
+
+    try {
+      let res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "draw", code: code, userId: userId })
+      });
+      let result = await res.json();
+
+      if (result.status === "error") {
+        alert(result.message);
+        isSpinning = false;
+        document.getElementById("drawBtn").disabled = false;
+        return;
+      }
+
+      // 旋转动画控制
+      let prizeIndex = result.prizeIndex;
+      let numPrizes = prizes.length;
+      let sectorAngle = (2 * Math.PI) / numPrizes;
+      
+      // 计算目标停止角度
+      let targetSector = (3 * Math.PI / 2) - (prizeIndex * sectorAngle) - (sectorAngle / 2);
+      let totalRotation = currentAngle + (Math.PI * 8) + (targetSector - (currentAngle % (2 * Math.PI)));
+
+      let startTime = null;
+      let duration = 4000;
+
+      function animate(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let progress = (timestamp - startTime) / duration;
+        if (progress > 1) progress = 1;
+
+        // 减速缓动（Ease-out）
+        let easeOut = 1 - Math.pow(1 - progress, 3);
+        currentAngle = currentAngle + (totalRotation - currentAngle) * easeOut;
+        drawWheel();
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          alert(`🎉 恭喜获得：${result.prize.name}\n类别/价值：${result.prize.category}`);
+          isSpinning = false;
+          document.getElementById("drawBtn").disabled = false;
         }
+      }
+      requestAnimationFrame(animate);
 
-        function draw() {
-            const arc = Math.PI * 2 / prizes.length;
-            const colors = ["#ff9f43", "#ee5253", "#10ac84", "#54a0ff", "#5f27cd", "#c8d6e5"];
-            ctx.clearRect(0,0,500,500);
-            for(let i=0; i<prizes.length; i++) {
-                ctx.fillStyle = colors[i % colors.length];
-                ctx.beginPath(); ctx.moveTo(250,250);
-                ctx.arc(250,250,250, i*arc, (i+ arcs[i]*0 + (i+1)*arc)); 
-                ctx.arc(250,250,250, i*arc, (i+1)*arc); ctx.fill();
-                
-                ctx.save();
-                ctx.fillStyle = "#fff";
-                ctx.font = "bold 20px Arial";
-                ctx.translate(250 + Math.cos(i*arc + arc/2)*160, 250 + Math.sin(i*arc + arc/2)*160);
-                ctx.rotate(i*arc + arc/2 + Math.PI/2);
-                ctx.fillText(prizes[i].name, -ctx.measureText(prizes[i].name).width/2, 0);
-                ctx.font = "14px Arial";
-                ctx.fillText(prizes[i].value, -ctx.measureText(prizes[i].value).width/2, 25);
-                ctx.restore();
-            }
-        }
+    } catch (e) {
+      alert("系统网络异常，请重试");
+      isSpinning = false;
+      document.getElementById("drawBtn").disabled = false;
+    }
+  }
+</script>
 
-        async function runDraw() {
-            const code = document.getElementById('code').value.trim();
-            const uid = document.getElementById('uid').value.trim();
-            drawBtn.disabled = true;
-
-            try {
-                const res = await fetch(API, {method:"POST", body: JSON.stringify({action:"draw", code, userId:uid})});
-                const data = await res.json();
-
-                if(data.status === "success") {
-                    const angle = Math.floor(Math.random() * 360) + 3600;
-                    canvas.style.transform = `rotate(${angle}deg)`;
-                    setTimeout(() => {
-                        Swal.fire({ title: `恭喜：${data.prize}`, text: data.value, icon: "success" });
-                        drawBtn.disabled = false;
-                    }, 5200);
-                } else {
-                    Swal.fire("提示", data.msg, "warning");
-                    drawBtn.disabled = false;
-                }
-            } catch(e) {
-                Swal.fire("错误", "连接超时", "error");
-                drawBtn.disabled = false;
-            }
-        }
-        init();
-    </script>
 </body>
 </html>
